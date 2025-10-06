@@ -11,10 +11,11 @@ app.use(express.json());
 
 // MySQL Database connection
 const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '1234567890', // Update if your MySQL has a password
-  database: 'contact_us', // Ensure this database exists
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  port: process.env.DB_PORT || 3306
 });
 
 // Test database connection
