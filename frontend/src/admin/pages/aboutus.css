@@ -1,0 +1,276 @@
+/* ---------- Layout & Typography ---------- */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f2f5; /* Soft light background like Booking page */
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+.aboutus-container.full-page {
+    max-width: 98vw;
+    margin: 1rem auto;
+    padding: 2rem;
+}
+
+/* ---------- Section Cards ---------- */
+.admin-section {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    padding: 2rem;
+    flex: 1;
+    min-width: 320px;
+    margin-bottom: 2rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-section:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+}
+
+/* ---------- Headings ---------- */
+h1 {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 2.5rem;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    color: #34495e;
+    border-bottom: 2px solid #ecf0f1;
+    padding-bottom: 0.5rem;
+}
+
+h3 {
+    font-size: 1.4rem;
+    color: #2c3e50;
+    margin-top: 2rem;
+}
+
+h4 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+/* ---------- Messages ---------- */
+.info-message, .success-message, .error-message {
+    padding: 0.8rem 1rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+    text-align: center;
+}
+
+.info-message {
+    background-color: #dbeaf5;
+    color: #2c3e50;
+}
+
+.success-message {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* ---------- Forms ---------- */
+.form-group {
+    margin-bottom: 1.2rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-weight: 600;
+    color: #34495e;
+    font-size: 0.95rem;
+}
+
+input[type="text"],
+textarea,
+select {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+input[type="text"]:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: #2980b9;
+    box-shadow: 0 0 0 3px rgba(41,128,185,0.2);
+}
+
+textarea { resize: vertical; }
+
+/* ---------- Buttons ---------- */
+.admin-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+.admin-actions button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* Primary Buttons */
+.admin-actions button:not(.delete-btn):not(.cancel-btn):not(.edit-btn) {
+    background: linear-gradient(90deg, #2980b9, #3498db);
+    color: #fff;
+}
+
+.admin-actions button:not(.delete-btn):not(.cancel-btn):not(.edit-btn):hover {
+    background: linear-gradient(90deg, #3498db, #2980b9);
+    transform: translateY(-2px);
+}
+
+/* Delete Buttons */
+.delete-btn {
+    background: linear-gradient(90deg, #e74c3c, #c0392b);
+    color: #fff;
+}
+
+.delete-btn:hover {
+    background: linear-gradient(90deg, #c0392b, #e74c3c);
+    transform: translateY(-2px);
+}
+
+/* Cancel Buttons */
+.cancel-btn {
+    background: linear-gradient(90deg, #7f8c8d, #95a5a6);
+    color: #fff;
+}
+
+.cancel-btn:hover {
+    background: linear-gradient(90deg, #95a5a6, #7f8c8d);
+    transform: translateY(-2px);
+}
+
+/* Edit Buttons */
+.edit-btn {
+    background: linear-gradient(90deg, #1abc9c, #16a085);
+    color: #fff;
+}
+
+.edit-btn:hover {
+    background: linear-gradient(90deg, #16a085, #1abc9c);
+    transform: translateY(-2px);
+}
+
+/* ---------- Item Cards ---------- */
+.item-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.item-card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.item-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
+.item-card .item-details strong {
+    font-size: 1.1rem;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.item-card .item-details p {
+    font-size: 0.95rem;
+    color: #34495e;
+    line-height: 1.4;
+    margin: 0;
+}
+
+.item-card .item-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    margin-top: 1rem;
+}
+
+/* ---------- Policy Category Groups ---------- */
+.policy-category-group {
+    background: #fafafa;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.policy-category-group h4 {
+    border-bottom: 1px solid #ecf0f1;
+    padding-bottom: 0.5rem;
+    margin-top: 0;
+}
+
+/* ---------- Pagination ---------- */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.pagination button {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #fff;
+}
+
+.pagination button.active {
+    background: linear-gradient(90deg, #2980b9, #3498db);
+    color: #fff;
+    border-color: #2980b9;
+}
+
+.pagination button:hover {
+    background: linear-gradient(90deg, #3498db, #2980b9);
+    color: #fff;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+    .main-content-wrapper { flex-direction: column; gap: 2rem; }
+    .item-list { grid-template-columns: 1fr; }
+    .admin-actions { flex-direction: column; gap: 0.8rem; }
+    .admin-actions button { width: 100%; }
+}

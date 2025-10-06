@@ -1,0 +1,30 @@
+/* App.css */
+
+/* Universal Reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Base HTML and Body styles for full coverage */
+body, html {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9f4; /* Light background color */
+  color: #2f3e2e; /* Default text color */
+  width: 100%; /* Ensure full width */
+  height: 100%; /* Ensure full height */
+  overflow-x: hidden; /* Prevent horizontal scrollbars */
+  -webkit-font-smoothing: antialiased; /* Smoother fonts on WebKit browsers */
+  -moz-osx-font-smoothing: grayscale; /* Smoother fonts on Firefox */
+}
+
+/* App Container - ensures the app fills the viewport */
+.app-container {
+  display: flex;
+  flex-direction: column; /* Stacks header, main, footer vertically */
+  min-height: 100vh; /* Minimum height is full viewport height */
+  width: 100%; /* Ensures it takes full width */
+}
+
+/* Removed styles for .app-header, .app-logo, .app-nav, .nav-link, .app-image-section, .resort-image, .hero-text-overlay, .app-main, .resort-offerings, .offering, .offering-image, .offering-name, .learn-button, .app-footer as they will now be in layout.css or userinterface.css */

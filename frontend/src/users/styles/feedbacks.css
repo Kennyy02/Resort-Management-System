@@ -1,0 +1,356 @@
+/* styles/feedbacks.css */
+
+/* --- GENERAL PAGE LAYOUT --- */
+.feedbacks-container {
+  width: 100%;
+  min-height: 100vh;
+  background: #fff;
+  color: #000;
+  padding: 3rem 2rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Title */
+.feedbacks-container h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #8a9a5b; /* sage green */
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+/* --- WRITE FEEDBACK BUTTON & STATUS MESSAGES --- */
+.write-feedback-btn {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.write-feedback-btn button {
+  padding: 0.6rem 1.5rem;
+  border: 2px solid #8a9a5b;
+  border-radius: 50px;
+  background: transparent;
+  color: #8a9a5b;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.write-feedback-btn button:hover {
+  background: #8a9a5b;
+  color: #fff;
+}
+
+.status-message {
+  padding: 1rem;
+  margin: 1rem auto;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 1.1rem;
+  max-width: 600px;
+}
+
+.loading {
+  background-color: #f1f8f4;
+  color: #8a9a5b;
+}
+
+.error {
+  background-color: #ffebee;
+  color: #d32f2f;
+}
+
+/* --- FILTERS SECTION (ONE LINE, SHORT) --- */
+.filters {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: nowrap; /* ✅ keep in one row */
+}
+
+.filters select,
+.filters input[type="date"] {
+  padding: 0.5rem 1rem;
+  border: 2px solid #8a9a5b;
+  border-radius: 50px;
+  font-size: 0.95rem;
+  background: transparent;
+  color: #333;
+  transition: 0.3s;
+  width: auto;       /* ✅ no stretching */
+  min-width: 140px;  /* ✅ small but readable */
+  max-width: 160px;
+  text-align: center;
+}
+
+.filters select:focus,
+.filters input[type="date"]:focus {
+  outline: none;
+  border-color: #6b7b3d;
+}
+
+/* --- FEEDBACK CARDS --- */
+.feedback-card {
+  background-color: #fff;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  border-left: 4px solid #8a9a5b;
+}
+
+.feedback-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  border-bottom: 1px dashed #eee;
+  padding-bottom: 1rem;
+}
+
+.feedback-header img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-right: 15px;
+  object-fit: cover;
+  border: 2px solid #ddd;
+}
+
+.feedback-header strong {
+  font-size: 1.2rem;
+  color: #333;
+  display: block;
+}
+
+.feedback-header small {
+  color: #888;
+  font-size: 0.9rem;
+  display: block;
+}
+
+.stars {
+  color: #e2b714; /* gold */
+  letter-spacing: 2px;
+}
+
+/* 3-dot menu */
+.menu-container {
+  margin-left: auto;
+  position: relative;
+}
+
+.menu-button {
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #8a9a5b;
+}
+
+.menu-dropdown {
+  position: absolute;
+  right: 0;
+  top: 120%;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-dropdown button {
+  padding: 0.6rem 1rem;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.menu-dropdown button:hover {
+  background: #f5f5f5;
+}
+
+/* Feedback message */
+.feedback-message {
+  font-size: 1.05rem;
+  color: #444;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+/* --- PHOTOS --- */
+.feedback-photos {
+  display: flex;
+  gap: 0.8rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.feedback-photos img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  cursor: zoom-in;
+  flex-shrink: 0;
+}
+
+/* --- ACTIONS & REPLIES --- */
+.feedback-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+  flex-wrap: wrap;
+}
+
+.feedback-actions button {
+  padding: 0.5rem 1.2rem;
+  border: 2px solid #8a9a5b;
+  border-radius: 50px;
+  background: transparent;
+  color: #8a9a5b;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.feedback-actions button:hover:not(:disabled) {
+  background: #8a9a5b;
+  color: #fff;
+}
+
+.feedback-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Reply Box */
+.reply-box {
+  width: 100%;
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  padding: 1rem;
+  background-color: #f7f7f7;
+  border-radius: 8px;
+}
+
+.reply-box input[type="text"] {
+  padding: 0.6rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.reply-box label {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.reply-box button {
+  align-self: flex-end;
+  background-color: #8a9a5b;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 0.6rem 1.2rem;
+  font-weight: 600;
+}
+
+.reply-box button:hover {
+  background-color: #6b7b3d;
+}
+
+/* Replies List */
+.replies-list {
+  margin-top: 1rem;
+  padding-left: 0.8rem;
+  border-left: 3px solid #eaeaea;
+}
+
+.reply-card {
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 0.6rem;
+  background-color: #fff;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.reply-card strong {
+  color: #8a9a5b;
+  font-weight: 600;
+}
+
+/* --- PAGINATION --- */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  padding: 2rem 0;
+}
+
+.pagination button {
+  padding: 0.6rem 1.2rem;
+  border: 2px solid #8a9a5b;
+  background-color: transparent;
+  color: #8a9a5b;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: 0.3s;
+  font-weight: 600;
+}
+
+.pagination button:hover:not(:disabled) {
+  background-color: #8a9a5b;
+  color: #fff;
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #eee;
+  color: #888;
+}
+
+.pagination span {
+  font-weight: 600;
+  color: #555;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+  .feedbacks-container {
+    padding: 1.5rem;
+  }
+
+  .filters {
+    flex-direction: column;
+    flex-wrap: wrap;
+  }
+
+  .filters select,
+  .filters input[type="date"] {
+    width: 100%;
+    max-width: none;
+  }
+
+  .feedback-actions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

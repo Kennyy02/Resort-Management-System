@@ -1,0 +1,89 @@
+/* Full page */
+.aboutus-fullpage {
+  width: 100%;
+  min-height: 100vh;
+  background: #fff;
+  color: #000;
+  padding: 3rem 2rem;
+}
+
+/* Title */
+.aboutus-fullpage h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #8a9a5b; /* sage green */
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.tab {
+  padding: 0.6rem 1.5rem;
+  border: 2px solid #8a9a5b;
+  border-radius: 50px;
+  background: transparent;
+  color: #8a9a5b;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.tab:hover {
+  background: #8a9a5b;
+  color: #fff;
+}
+
+.tab.active {
+  background: #8a9a5b;
+  color: #fff;
+}
+
+/* Content */
+.tab-content {
+  font-size: 1rem;
+  line-height: 1.6;
+  max-width: 100%;
+}
+
+.tab-content h2 {
+  color: #8a9a5b;
+  margin-bottom: 1rem;
+}
+
+.tab-content h3 {
+  margin: 1.5rem 0 0.5rem;
+  color: #8a9a5b;
+}
+
+/* Clean lists */
+.info-list,
+.facility-list,
+.policy-list {
+  list-style-type: disc;
+  padding-left: 2rem;
+  margin-bottom: 2rem;
+}
+
+.info-list li,
+.facility-list li,
+.policy-list li {
+  margin-bottom: 0.6rem;
+  line-height: 1.6;
+  color: #333;
+  font-size: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .aboutus-fullpage h1 {
+    font-size: 2rem;
+  }
+}

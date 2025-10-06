@@ -1,0 +1,228 @@
+/* src/users/PaymentConfirmation.css - Modern Design */
+
+/* Overall container for the page */
+.confirmation-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: #f8faff; /* Light, clean background */
+    padding: 2rem;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Modern sans-serif font stack */
+    color: #333;
+}
+
+/* Specific wrapper for when no booking details are found */
+.confirmation-wrapper.no-details-wrapper {
+    align-items: center;
+}
+
+/* Main confirmation card */
+.confirmation-card {
+    background-color: #ffffff;
+    border-radius: 12px; /* More rounded corners */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04); /* Soft, layered shadow */
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 560px; /* Slightly wider for better detail display */
+    box-sizing: border-box;
+    text-align: center; /* Center content within the card */
+    animation: fadeInScale 0.5s ease-out forwards; /* Fade in and slightly scale up */
+}
+
+@keyframes fadeInScale {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* Styling for the card when no details are found (error state) */
+.confirmation-card.no-details-card {
+    border: 1px solid #ffccb2; /* Light red border */
+    box-shadow: 0 6px 20px rgba(255, 99, 71, 0.1), 0 2px 8px rgba(255, 99, 71, 0.05);
+}
+
+
+/* Title styles */
+.confirmation-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.confirmation-title.success-title {
+    color: #28a745; /* Green for success */
+}
+
+.confirmation-title.error-title {
+    color: #dc3545; /* Red for error */
+}
+
+/* Main message below the title */
+.confirmation-message {
+    font-size: 1.1rem;
+    color: #555;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.confirmation-message.error-message {
+    color: #888;
+}
+
+/* Link styling within messages */
+.link-text {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.link-text:hover {
+    text-decoration: underline;
+    color: #0056b3;
+}
+
+
+/* Booking details list container */
+.booking-details-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem; /* Space between detail items */
+    margin-bottom: 2rem;
+    text-align: left; /* Align details to the left */
+}
+
+/* Individual detail item */
+.detail-item {
+    display: flex;
+    justify-content: space-between; /* Pushes label to left, value to right */
+    padding-bottom: 0.8rem;
+    border-bottom: 1px dashed #eee; /* Subtle dashed separator */
+    font-size: 1rem;
+    color: #495057;
+}
+
+.detail-item:last-of-type {
+    border-bottom: none; /* No border for the last item */
+    padding-bottom: 0;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: #343a40; /* Slightly darker for labels */
+}
+
+/* Specific styling for total price */
+.detail-item.total-price-item {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #007bff; /* Primary blue for total price */
+    margin-top: 1rem; /* Extra space above total price */
+    border-top: 2px solid #e9ecef; /* A stronger top border for separation */
+    padding-top: 1rem;
+}
+
+/* Specific styling for amount paid online */
+.detail-item.amount-paid-item {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #28a745; /* Green for paid amount */
+}
+
+/* Specific styling for remaining balance */
+.detail-item.remaining-balance-item {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #ffc107; /* Orange/yellow for remaining balance */
+}
+
+
+/* Final message before the button */
+.final-message {
+    font-size: 1.05rem;
+    color: #6c757d;
+    margin-bottom: 2.5rem;
+}
+
+/* Button container */
+.button-container {
+    text-align: center;
+}
+
+/* Home button */
+.home-button {
+    background-color: #007bff; /* Primary blue button */
+    color: #ffffff;
+    padding: 0.9rem 2rem;
+    border: none;
+    border-radius: 8px; /* Rounded button */
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none; /* In case it's rendered as an <a> */
+    display: inline-block; /* For padding and alignment */
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.home-button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+    transform: translateY(-2px); /* Slight lift effect */
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2); /* Soft shadow on hover */
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .confirmation-card {
+        padding: 1.5rem;
+        border-radius: 8px;
+    }
+
+    .confirmation-title {
+        font-size: 1.8rem;
+        margin-bottom: 1rem;
+    }
+
+    .confirmation-message {
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .booking-details-list {
+        gap: 0.8rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .detail-item,
+    .detail-item.total-price-item,
+    .detail-item.amount-paid-item,
+    .detail-item.remaining-balance-item {
+        font-size: 0.95rem;
+        padding-bottom: 0.6rem;
+    }
+
+    .detail-item.total-price-item {
+        margin-top: 0.8rem;
+        padding-top: 0.8rem;
+    }
+
+    .final-message {
+        font-size: 0.95rem;
+        margin-bottom: 2rem;
+    }
+
+    .home-button {
+        padding: 0.8rem 1.5rem;
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 400px) {
+    .confirmation-wrapper {
+        padding: 1rem;
+    }
+    .confirmation-card {
+        padding: 1rem;
+    }
+}
