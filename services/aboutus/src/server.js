@@ -5,7 +5,9 @@ const cors = require('cors');
 const app = express();
 const PORT = 5006; // Port for the About Us microservice
 
-app.use(cors());
+app.use(cors({
+  origin: "https://front-end-production-9ee2.up.railway.app"
+}));
 app.use(express.json()); // For parsing application/json bodies
 
 // MySQL connection setup for the 'Informations' database
@@ -243,5 +245,5 @@ app.delete('/pre/api/policies/:id', async (req, res) => {
 
 // Start the Express server
 app.listen(PORT, () => {
-    console.log(`About Us microservice running at http://localhost:${PORT}`);
+    console.log(`📘 About Us microservice running on port ${PORT}`);
 });
