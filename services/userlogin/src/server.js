@@ -13,7 +13,12 @@ const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 app.use(express.json());
 app.use(
   cors({
-    origin: ["http://localhost:3000", "http://localhost:3001", "http://localhost:3003"],
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "http://localhost:3003",
+      "https://front-end-production-9ee2.up.railway.app"
+    ],
     credentials: true,
   })
 );
