@@ -2,9 +2,11 @@ import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import './aboutus.css';
 
-const GENERAL_API_URL = 'http://localhost:5006/pre/api/aboutus';
-const FACILITIES_API_URL = 'http://localhost:5006/pre/api/facilities';
-const POLICIES_API_URL = 'http://localhost:5006/pre/api/policies';
+const BASE_URL = process.env.REACT_APP_ABOUTUS_API;
+
+const GENERAL_API_URL = `${BASE_URL}/pre/api/aboutus`;
+const FACILITIES_API_URL = `${BASE_URL}/pre/api/facilities`;
+const POLICIES_API_URL = `${BASE_URL}/pre/api/policies`;
 
 const AdminAboutUs = () => {
     const [generalContent, setGeneralContent] = useState('');
