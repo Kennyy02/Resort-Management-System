@@ -3,9 +3,11 @@ import axios from 'axios';
 import './styles/aboutus.css';
 
 // API URLs
-const GENERAL_API_URL = 'http://localhost:5006/pre/api/aboutus';
-const FACILITIES_API_URL = 'http://localhost:5006/pre/api/facilities';
-const POLICIES_API_URL = 'http://localhost:5006/pre/api/policies';
+const BASE_URL = process.env.REACT_APP_ABOUTUS_API;
+
+const GENERAL_API_URL = `${BASE_URL}/pre/api/aboutus`;
+const FACILITIES_API_URL = `${BASE_URL}/pre/api/facilities`;
+const POLICIES_API_URL = `${BASE_URL}/pre/api/policies`;
 
 const AboutUs = () => {
   const [activeTab, setActiveTab] = useState('general');
