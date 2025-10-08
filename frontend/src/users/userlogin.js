@@ -23,10 +23,10 @@ const UserLogin = () => {
     if (!consent) return setMessage("You must agree to the Terms and Privacy Policy.");
 
     try {
-      const res = await fetch("http://localhost:4000/login", {
+      const res = await fetch(`${process.env.REACT_APP_USER_API}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ identifier: phone, password }), // <-- FIXED HERE
+        body: JSON.stringify({ identifier: phone, password }), 
       });
 
       const data = await res.json();
@@ -94,7 +94,7 @@ const UserLogin = () => {
           <GoogleLogin
             onSuccess={async (credentialResponse) => {
               try {
-                const res = await fetch("http://localhost:4000/google-login", {
+                const res = await fetch(`${process.env.REACT_APP_USER_API}/google-login`, {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({ token: credentialResponse.credential }),
