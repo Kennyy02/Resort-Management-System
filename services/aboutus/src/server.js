@@ -5,12 +5,7 @@ const cors = require('cors');
 const app = express();
 const PORT = 5006; // Port for the About Us microservice
 
-app.use(cors({
-  origin: "https://emzbayviewmountainresort.up.railway.app",
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type"],
-  credentials: true
-}));
+app.use(cors());
 app.use(express.json()); // For parsing application/json bodies
 
 // MySQL connection setup for the 'Informations' database
