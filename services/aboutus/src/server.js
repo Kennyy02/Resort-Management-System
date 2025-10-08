@@ -5,7 +5,6 @@ const cors = require('cors');
 const app = express();
 const PORT = 5006; // Port for the About Us microservice
 
-const cors = require('cors');
 app.use(cors());
 app.use(express.json()); // For parsing application/json bodies
 
