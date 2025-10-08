@@ -14,7 +14,7 @@ const AdminLogin = () => {
     e.preventDefault();
 
     try {
-      const res = await fetch('http://localhost:4000/admin-login', {
+      const res = await fetch(`${process.env.REACT_APP_ADMIN_API}/admin-login`,, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ staffId, email, password }), // <-- FIXED HERE
@@ -26,9 +26,9 @@ const AdminLogin = () => {
         localStorage.setItem('isLoggedIn', 'true');
         localStorage.setItem('admin', JSON.stringify(data.admin)); // store admin info
         console.log('Login successful, navigating...');
-        navigate('/admin/analytics'); // redirect after login
+        navigate('/admin/analytics'); 
       } else {
-        setMessage(data.error || 'Login failed'); // <-- backend sends 'error', not 'message'
+        setMessage(data.error || 'Login failed'); 
       }
     } catch (error) {
       console.error('Error during login:', error);
