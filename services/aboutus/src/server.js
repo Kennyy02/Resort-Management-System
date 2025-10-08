@@ -6,7 +6,7 @@ const app = express();
 const PORT = 5006; // Port for the About Us microservice
 
 app.use(cors({
-  origin: "https://front-end-production-9ee2.up.railway.app"
+  origin: "https://emzbayviewmountainresort.up.railway.app"
 }));
 app.use(express.json()); // For parsing application/json bodies
 
