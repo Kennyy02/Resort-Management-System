@@ -302,7 +302,7 @@ function AdminServices() {
               </div>
               {s.image_url && (
                 <img
-                  <img src={`${process.env.REACT_APP_ADMIN_API}${s.image_url}`}
+                  src={`${process.env.REACT_APP_ADMIN_API}${s.image_url}`}
                   alt={s.name}
                   style={{ width: '100px', height: 'auto', marginTop: '5px', borderRadius: '5px' }}
                 />
