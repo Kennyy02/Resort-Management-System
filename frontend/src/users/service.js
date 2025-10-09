@@ -24,7 +24,7 @@ function UserServices() {
             const data = await res.json();
             setServices(data);
         } catch (err) {
-            console.error("Fetch error (UserServices):", err);
+            console.log("Fetching from:", `${process.env.REACT_APP_USER_API}/services`);
             setError(`Failed to load services: ${err.message}`);
         } finally {
             setLoading(false);
