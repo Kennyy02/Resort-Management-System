@@ -14,7 +14,7 @@ function UserServices() {
         setLoading(true);
         setError(null);
         try {
-            const url = `${process.env.REACT_APP_USER_API}/services`;
+            const url = `${process.env.REACT_APP_USER_API}/api/services`;
             console.log("Fetching from:", url);
 
             const res = await fetch(url);
