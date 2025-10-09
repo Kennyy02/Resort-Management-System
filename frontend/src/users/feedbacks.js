@@ -18,7 +18,7 @@ export default function Feedbacks({ user }) {
   const fetchFeedbacks = async () => {
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:5001/feedbacks");
+      const res = await fetch(`${process.env.REACT_APP_RATINGS_API}/feedbacks`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to fetch feedbacks");
       setFeedbacks(data);
@@ -37,7 +37,7 @@ export default function Feedbacks({ user }) {
   const handleLike = async (feedbackId) => {
     if (!user) return alert("Login to like feedback");
     try {
-      const res = await fetch(`http://localhost:5001/feedbacks/${feedbackId}/like`, {
+      const res = await fetch(`${process.env.REACT_APP_RATINGS_API}/feedbacks/${feedbackId}/like`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId: user.email }),
@@ -58,7 +58,7 @@ export default function Feedbacks({ user }) {
     const anonymous = anonymousReplies[feedbackId] || false;
 
     try {
-      const res = await fetch(`http://localhost:5001/feedbacks/${feedbackId}/reply`, {
+      const res = await fetch(`${process.env.REACT_APP_RATINGS_API}/feedbacks/${feedbackId}/reply`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -83,7 +83,7 @@ export default function Feedbacks({ user }) {
     if (!newMessage) return;
 
     try {
-      const res = await fetch(`http://localhost:5001/feedbacks/${feedback.id}`, {
+      const res = await fetch(`${process.env.REACT_APP_RATINGS_API}/feedbacks/${feedback.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: newMessage }),
@@ -98,7 +98,7 @@ export default function Feedbacks({ user }) {
   const deleteFeedback = async (feedbackId) => {
     if (!window.confirm("Are you sure you want to delete this feedback?")) return;
     try {
-      const res = await fetch(`http://localhost:5001/feedbacks/${feedbackId}`, {
+      const res = await fetch(`${process.env.REACT_APP_RATINGS_API}/feedbacks/${feedbackId}`, {
         method: "DELETE",
       });
       if (!res.ok) throw new Error("Failed to delete feedback");
@@ -183,7 +183,7 @@ export default function Feedbacks({ user }) {
           {fb.photos && String(fb.photos).length > 0 && (
             <div className="feedback-photos">
               {String(fb.photos).split(",").map((photo, idx) => (
-                <img key={idx} src={`http://localhost:5001/uploads/feedbacks/${photo.trim()}`} alt="Feedback" />
+                <img key={idx} src={`${process.env.REACT_APP_RATINGS_API}/uploads/feedbacks/${photo.trim()}`} alt="Feedback" />
               ))}
             </div>
           )}
