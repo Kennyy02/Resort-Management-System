@@ -10,28 +10,28 @@ function UserServices() {
     const [sortOrder, setSortOrder] = useState('none');
     const navigate = useNavigate();
 
-    const fetchServices = async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            const url = `${process.env.REACT_APP_USER_API}/api/services`;
-            console.log("Fetching from:", url);
+const fetchServices = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+        const url = `${process.env.REACT_APP_USER_API}/api/services`;
+        console.log("Fetching from:", url);
 
-            const res = await fetch(url);
-            const contentType = res.headers.get("content-type");
+        const res = await fetch(url);
+        const contentType = res.headers.get("content-type");
 
-            if (!res.ok || !contentType.includes("application/json")) {
-                throw new Error(`Invalid response format: ${contentType}`);
-            }
-
-            const data = await res.json();
-            setServices(data);
-        } catch (err) {
-            setError(`Failed to load services: ${err.message}`);
-        } finally {
-            setLoading(false);
+        if (!res.ok || !contentType.includes("application/json")) {
+            throw new Error(`Invalid response format: ${contentType}`);
         }
-    };
+
+        const data = await res.json();
+        setServices(data);
+    } catch (err) {
+        setError(`Failed to load services: ${err.message}`);
+    } finally {
+        setLoading(false);
+    }
+};
 
     useEffect(() => {
         fetchServices();
