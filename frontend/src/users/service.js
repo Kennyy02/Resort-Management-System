@@ -14,7 +14,7 @@ function UserServices() {
         setLoading(true);
         setError(null);
         try {
-            const res = await fetch('http://localhost:5002/api/services');
+            const res = await fetch(`${process.env.REACT_APP_USER_API}/api/services`);
 
             if (!res.ok) {
                 const errorData = await res.json();
@@ -77,7 +77,7 @@ function UserServices() {
                     <div className="service-image-wrapper">
                         {service.image_url ? (
                             <img
-                                src={`http://localhost:5002${service.image_url}`}
+                                <img src={`${process.env.REACT_APP_USER_API}${service.image_url}`}
                                 alt={service.name}
                                 className="service-image"
                             />
