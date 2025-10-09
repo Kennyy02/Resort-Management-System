@@ -14,7 +14,7 @@ function UserServices() {
         setLoading(true);
         setError(null);
         try {
-            const res = await fetch(`${process.env.REACT_APP_USER_API}/api/services`);
+            const res = await fetch(`${process.env.REACT_APP_USER_API}/services`);
 
             if (!res.ok) {
                 const errorData = await res.json();
