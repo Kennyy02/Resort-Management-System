@@ -17,7 +17,8 @@ app.use(
       "http://localhost:3000",
       "http://localhost:3001",
       "http://localhost:3003",
-      "https://front-end-production-9ee2.up.railway.app"
+      "https://front-end-production-9ee2.up.railway.app",
+      "https://user-login-production.up.railway.app"
     ],
     credentials: true,
   })
