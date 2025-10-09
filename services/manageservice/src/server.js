@@ -193,5 +193,5 @@ app.use((err, req, res, next) => {
 // Change to a new port (e.g., 5002) to avoid potential conflicts
 const PORT = 5002;
 app.listen(PORT, () => {
-    console.log(`🚀 Services Server running at http://localhost:${PORT}`);
+    console.log(`🚀 Services Server running at https://your-backend.up.railway.app`);
 });
