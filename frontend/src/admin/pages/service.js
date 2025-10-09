@@ -1,4 +1,4 @@
- import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './service.css'; 
 
 function AdminServices() {
@@ -11,16 +11,16 @@ function AdminServices() {
     status: 'available',
     image: null, // this will store the File object
   });
-  const [previewImage, setPreviewImage] = useState(null); // for showing preview
+  const [previewImage, setPreviewImage] = useState(null); 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [editingServiceId, setEditingServiceId] = useState(null); // State to hold the ID of the service being edited
+  const [editingServiceId, setEditingServiceId] = useState(null); 
 
   const fetchServices = async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('http://localhost:5002/api/services');
+      const res = await fetch(`${process.env.REACT_APP_ADMIN_API}/api/services`);
       console.log("Raw response (AdminServices):", res);
 
       if (!res.ok) {
@@ -102,7 +102,7 @@ function AdminServices() {
         formPayload.append('image', image);
       }
 
-      const res = await fetch('http://localhost:5002/api/services', {
+      const res = await fetch(`${process.env.REACT_APP_ADMIN_API}/api/services`, {
         method: 'POST',
         body: formPayload,
       });
@@ -126,7 +126,7 @@ function AdminServices() {
     if (!window.confirm('Are you sure you want to delete this service?')) return;
 
     try {
-      const res = await fetch(`http://localhost:5002/api/services/${id}`, {
+      const res = await fetch(`${process.env.REACT_APP_ADMIN_API}/api/services/${id}`, {
         method: 'DELETE',
       });
       if (!res.ok) {
@@ -156,7 +156,7 @@ function AdminServices() {
     });
     // If there's an existing image_url, set it as preview
     if (service.image_url) {
-      setPreviewImage(`http://localhost:5002${service.image_url}`);
+      setPreviewImage(`${process.env.REACT_APP_ADMIN_API}${service.image_url}`);
     } else {
       setPreviewImage(null);
     }
@@ -194,7 +194,7 @@ function AdminServices() {
         // If you want to explicitly remove image, you'd need a separate checkbox/button
       }
 
-      const res = await fetch(`http://localhost:5002/api/services/${editingServiceId}`, {
+      const res = await fetch(`${process.env.REACT_APP_ADMIN_API}/api/services/${editingServiceId}`, {
         method: 'PUT', // Use PUT for updates
         body: formPayload,
       });
@@ -302,7 +302,7 @@ function AdminServices() {
               </div>
               {s.image_url && (
                 <img
-                  src={`http://localhost:5002${s.image_url}`}
+                  <img src={`${process.env.REACT_APP_ADMIN_API}${s.image_url}`}
                   alt={s.name}
                   style={{ width: '100px', height: 'auto', marginTop: '5px', borderRadius: '5px' }}
                 />
