@@ -45,7 +45,7 @@ export default function FeedbackForm({ onSubmitted }) {
         formData.append("photos", file);
       });
 
-      const res = await fetch("http://localhost:5001/feedbacks", {
+      const res = await fetch(`${process.env.REACT_APP_RATINGS_API}/feedbacks`, {
         method: "POST",
         body: formData,
       });
