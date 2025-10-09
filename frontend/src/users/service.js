@@ -77,7 +77,7 @@ function UserServices() {
                     <div className="service-image-wrapper">
                         {service.image_url ? (
                             <img
-                                <img src={`${process.env.REACT_APP_USER_API}${service.image_url}`}
+                                src={`${process.env.REACT_APP_USER_API}${service.image_url}`}
                                 alt={service.name}
                                 className="service-image"
                             />
