@@ -58,11 +58,12 @@ function Signup() {
     console.log("Submitting signup data:", { name, phone, password });
 
     try {
-      await fetch(`${process.env.REACT_APP_USER_API}/signup`, { ... });
+      const res = await fetch(`${process.env.REACT_APP_USER_API}/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, phone, password }),
       });
+
 
       const data = await res.json();
       setMessage(data.message || data.error);
