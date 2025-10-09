@@ -7,24 +7,26 @@ function UserServices() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [activeTab, setActiveTab] = useState('rooms');
-    const [sortOrder, setSortOrder] = useState('none'); // New state for sorting
+    const [sortOrder, setSortOrder] = useState('none');
     const navigate = useNavigate();
 
     const fetchServices = async () => {
         setLoading(true);
         setError(null);
         try {
-            const res = await fetch(`${process.env.REACT_APP_USER_API}/api/services`);
+            const url = `${process.env.REACT_APP_USER_API}/services`;
+            console.log("Fetching from:", url);
 
-            if (!res.ok) {
-                const errorData = await res.json();
-                throw new Error(errorData.error || `HTTP error! status: ${res.status}`);
+            const res = await fetch(url);
+            const contentType = res.headers.get("content-type");
+
+            if (!res.ok || !contentType.includes("application/json")) {
+                throw new Error(`Invalid response format: ${contentType}`);
             }
 
             const data = await res.json();
             setServices(data);
         } catch (err) {
-            console.log("Fetching from:", `${process.env.REACT_APP_USER_API}/api/services`);
             setError(`Failed to load services: ${err.message}`);
         } finally {
             setLoading(false);
@@ -35,22 +37,14 @@ function UserServices() {
         fetchServices();
     }, []);
 
-    // Memoized sorted services to prevent unnecessary re-sorting
     const sortedServices = useMemo(() => {
-        if (sortOrder === 'none') {
-            return services;
-        }
+        if (sortOrder === 'none') return services;
 
-        const sorted = [...services].sort((a, b) => {
+        return [...services].sort((a, b) => {
             const priceA = parseFloat(a.price);
             const priceB = parseFloat(b.price);
-            if (sortOrder === 'price_asc') {
-                return priceA - priceB;
-            } else { // price_desc
-                return priceB - priceA;
-            }
+            return sortOrder === 'price_asc' ? priceA - priceB : priceB - priceA;
         });
-        return sorted;
     }, [services, sortOrder]);
 
     const handleBookNowClick = (serviceId, serviceName, servicePrice) => {
@@ -66,7 +60,6 @@ function UserServices() {
         return <div className="user-services-container error-message">{error}</div>;
     }
 
-    // Filter services based on the sorted list
     const rooms = sortedServices.filter(service => service.type === 'room');
     const cottages = sortedServices.filter(service => service.type === 'cottage');
 
@@ -91,9 +84,7 @@ function UserServices() {
                         <p><strong>Price:</strong> ₱{parseFloat(service.price).toFixed(2)}</p>
                         <p>
                             <strong>Status:</strong>{' '}
-                            <span
-                                className={service.status === 'available' ? 'status-available' : 'status-unavailable'}
-                            >
+                            <span className={service.status === 'available' ? 'status-available' : 'status-unavailable'}>
                                 {service.status}
                             </span>
                         </p>
