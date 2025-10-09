@@ -8,7 +8,7 @@ import './analytics.css';
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend, Title, BarElement, Filler);
 
-const API_BASE_URL = 'http://localhost:3002/api/analytics';
+const API_BASE_URL = `${process.env.REACT_APP_ANALYTICS_API}/api/analytics`;
 
 const formatCurrencyPHP = (value) => {
   const numericValue = parseFloat(value);
