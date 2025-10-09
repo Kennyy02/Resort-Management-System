@@ -14,7 +14,7 @@ const fetchServices = async () => {
     setLoading(true);
     setError(null);
     try {
-        const url = `${process.env.REACT_APP_USER_API}/api/services`;
+        const url = `${process.env.REACT_APP_SERVICES_API}/api/services`;
         console.log("Fetching from:", url);
 
         const res = await fetch(url);
@@ -70,7 +70,7 @@ const fetchServices = async () => {
                     <div className="service-image-wrapper">
                         {service.image_url ? (
                             <img
-                                src={`${process.env.REACT_APP_USER_API}${service.image_url}`}
+                                src={`${process.env.REACT_APP_SERVICES_API}${service.image_url}`}
                                 alt={service.name}
                                 className="service-image"
                             />
