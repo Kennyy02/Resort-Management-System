@@ -3,7 +3,7 @@ const mysql = require('mysql2');  // <-- changed here
 const cors = require('cors');
 
 const app = express();
-const PORT = 8081;
+const PORT = process.env.PORT || 8081;
 
 // Middleware
 app.use(cors());
@@ -92,5 +92,5 @@ app.delete('/api/messages/:id', (req, res) => {
 
 // Start the server
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
