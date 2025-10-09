@@ -13,7 +13,7 @@ export default function ManageFeedback() {
 
   const fetchFeedbacks = () => {
     setLoading(true);
-    const url = `http://localhost:5001/feedbacks?showDeleted=${showHidden}`;
+    const url = `${process.env.REACT_APP_RATINGS_API}/feedbacks?showDeleted=${showHidden}`;
     fetch(url)
       .then((res) => {
         if (!res.ok) throw new Error("Network response was not ok");
@@ -42,7 +42,7 @@ export default function ManageFeedback() {
     if (!window.confirm(`Are you sure you want to hide feedback ID ${id}?`))
       return;
 
-    fetch(`http://localhost:5001/feedbacks/${id}/delete`, { method: "PUT" })
+    fetch(`${process.env.REACT_APP_RATINGS_API}/feedbacks/${id}/delete`, { method: "PUT" })
       .then((res) => {
         if (!res.ok) throw new Error("Hide request failed");
         return res.json();
@@ -58,7 +58,7 @@ export default function ManageFeedback() {
     if (!window.confirm(`Are you sure you want to restore feedback ID ${id}?`))
       return;
 
-    fetch(`http://localhost:5001/feedbacks/${id}/restore`, { method: "PUT" })
+    fetch(`${process.env.REACT_APP_RATINGS_API}/feedbacks/${id}/restore`, { method: "PUT" })
       .then((res) => {
         if (!res.ok) throw new Error("Restore request failed");
         return res.json();
@@ -130,7 +130,7 @@ export default function ManageFeedback() {
                             {photos.slice(0, 3).map((photo, index) => (
                               <img
                                 key={index}
-                                src={`http://localhost:5001/uploads/feedbacks/${photo}`}
+                                src={`${process.env.REACT_APP_RATINGS_API}/uploads/feedbacks/${photo}`}
                                 alt="feedback"
                                 className="admin-feedback-image"
                               />
