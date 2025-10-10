@@ -13,7 +13,7 @@ function AdminBookNow() {
         setLoading(true);
         setError(null);
         try {
-            const res = await fetch('http://localhost:5003/api/bookings');
+            const res = await fetch('https://booking-production-5576.up.railway.app/api/bookings');
             if (!res.ok) {
                 const errorText = await res.text();
                 throw new Error(`Failed to fetch bookings: ${res.status} ${res.statusText} - ${errorText}`);
@@ -44,7 +44,7 @@ function AdminBookNow() {
         }
 
         try {
-            const res = await fetch(`http://localhost:5003/api/bookings/${id}/status`, {
+            const res = await fetch(`https://booking-production-5576.up.railway.app/api/bookings/${id}/status`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: newStatus }),
