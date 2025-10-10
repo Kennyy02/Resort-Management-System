@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "./styles/booknow.css";
+import "./booknow.css";
 
 const AdminBookNow = () => {
   const [bookings, setBookings] = useState([]);
