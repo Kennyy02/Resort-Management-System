@@ -4,9 +4,9 @@ const cors = require('cors');
 const nodemailer = require('nodemailer');
 
 const app = express();
-const PORT = process.env.PORT || 5003; // ✅ Use Railway-assigned port
+const PORT = process.env.PORT || 5003;
 
-// ✅ CORS configuration (must be before routes and middleware)
+// ✅ CORS setup with preflight support
 const corsOptions = {
   origin: 'https://emzbayviewmountainresort.up.railway.app',
   methods: ['GET', 'POST', 'PUT', 'OPTIONS'],
@@ -15,7 +15,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // ✅ Handle preflight requests
+app.options('*', cors(corsOptions)); // ✅ Respond to preflight requests
 app.use(express.json());
 
 // ✅ MySQL setup
