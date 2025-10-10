@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
-import "./styles/booknow.css";
+import { useLocation, useNavigate } from "react-router-dom";
+import './styles/booknow.css';
 
 const BookNow = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { serviceId, serviceName } = location.state || {};
 
   const [formData, setFormData] = useState({
@@ -12,106 +13,161 @@ const BookNow = () => {
     phoneNumber: "",
     checkInDate: "",
     checkOutDate: "",
-    modeOfPayment: "",
-    referenceNumber: "",
+    modeOfPayment: "online",
   });
 
   const [bookedDates, setBookedDates] = useState([]);
   const [message, setMessage] = useState("");
 
-  // --- Fetch booked dates for selected service ---
+  // Auto-fill logged-in user details
   useEffect(() => {
-    if (!serviceId) {
-      console.warn("⚠️ serviceId missing — cannot fetch booked dates");
-      return;
-    }
+    const loggedIn = localStorage.getItem("isLoggedIn");
+    const user = JSON.parse(localStorage.getItem("user"));
 
-    fetch(`https://booking-production-5576.up.railway.app/api/bookings/service/${serviceId}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch booked dates");
-        return res.json();
-      })
-      .then((data) => setBookedDates(data))
-      .catch((err) => console.error("Error fetching booked dates:", err));
+    if (!loggedIn || !user) {
+      navigate("/login", {
+        state: { from: "/booknow", message: "Please sign in to continue booking." },
+      });
+    } else {
+      // derive a fallback name from email if fullname is missing
+      const fallbackName = user.email ? user.email.split("@")[0] : "";
+
+      setFormData((prev) => ({
+        ...prev,
+        name: user.fullname || fallbackName,
+        email: user.email || "",
+        phoneNumber: user.phone || "",
+      }));
+    }
+  }, [navigate]);
+
+  // Fetch already booked dates for the service
+  useEffect(() => {
+    if (serviceId) {
+      fetch(`http://localhost:5003/api/bookings/service/${serviceId}`)
+        .then((res) => res.json())
+        .then((data) => setBookedDates(data))
+        .catch((err) => console.error("Error fetching booked dates:", err));
+    }
   }, [serviceId]);
 
-  // --- Handle input changes ---
+  const isDateBooked = (date) => bookedDates.includes(date);
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // --- Submit booking form ---
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setMessage("");
+
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user) return navigate("/login");
 
     try {
-      const res = await fetch(`https://booking-production-5576.up.railway.app/api/bookings`, {
+      const bookingData = { userId: user.id, serviceId, serviceName, ...formData };
+      console.log("📤 Submitting booking data:", bookingData);
+
+      const res = await fetch("http://localhost:5003/api/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, serviceId, serviceName }),
+        body: JSON.stringify(bookingData),
       });
 
       const data = await res.json();
+      setMessage(data.message || data.error);
 
-      if (!res.ok) {
-        setMessage(data.error || "Failed to create booking");
-        return;
-      }
-
-      setMessage("✅ Booking submitted successfully!");
-      setFormData({
-        name: "",
-        email: "",
-        phoneNumber: "",
-        checkInDate: "",
-        checkOutDate: "",
-        modeOfPayment: "",
-        referenceNumber: "",
-      });
-    } catch (error) {
-      console.error("Booking error:", error);
-      setMessage("❌ Failed to submit booking. Please try again.");
+      if (res.ok) setTimeout(() => navigate("/"), 1500);
+    } catch (err) {
+      console.error(err);
+      setMessage("Server error. Please try again.");
     }
   };
 
   return (
-    <div className="booknow-container">
-      <h2>Book: {serviceName || "Service"}</h2>
+    <div className="booking-container">
+      <h2 className="booking-title">Book Now: {serviceName}</h2>
 
-      {message && <p className="message">{message}</p>}
+      <form className="booking-form" onSubmit={handleSubmit}>
+        {/* Name */}
+        <label htmlFor="name">Full Name</label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          value={formData.name}
+          disabled
+          placeholder="Name will appear here automatically"
+        />
 
-      <form onSubmit={handleSubmit}>
-        <input name="name" placeholder="Full Name" value={formData.name} onChange={handleChange} required />
-        <input name="email" placeholder="Email" value={formData.email} onChange={handleChange} required />
-        <input name="phoneNumber" placeholder="Phone Number" value={formData.phoneNumber} onChange={handleChange} required />
+        {/* Email */}
+        <label htmlFor="email">Email Address</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          value={formData.email}
+          disabled
+          placeholder="Your email address"
+        />
 
-        <label>Check-in Date:</label>
-        <input type="date" name="checkInDate" value={formData.checkInDate} onChange={handleChange} required />
+        {/* Phone number */}
+        <label htmlFor="phoneNumber">Phone Number</label>
+        <input
+          type="tel"
+          id="phoneNumber"
+          name="phoneNumber"
+          value={formData.phoneNumber}
+          onChange={handleChange}
+          required
+          placeholder="Your phone number"
+        />
 
-        <label>Check-out Date:</label>
-        <input type="date" name="checkOutDate" value={formData.checkOutDate} onChange={handleChange} required />
-
-        <label>Mode of Payment:</label>
-        <select name="modeOfPayment" value={formData.modeOfPayment} onChange={handleChange} required>
-          <option value="">Select</option>
-          <option value="GCash">GCash</option>
-          <option value="Cash">Cash</option>
-        </select>
-
-        {formData.modeOfPayment === "GCash" && (
-          <div className="gcash-section">
-            <p>Send payment to GCash number: <strong>09XXXXXXXXX</strong></p>
-            <input
-              name="referenceNumber"
-              placeholder="Enter GCash Reference Number"
-              value={formData.referenceNumber}
-              onChange={handleChange}
-              required
-            />
-          </div>
+        {/* Check-in date */}
+        <label htmlFor="checkInDate">Check-In Date</label>
+        <input
+          type="date"
+          id="checkInDate"
+          name="checkInDate"
+          value={formData.checkInDate}
+          onChange={handleChange}
+          required
+          min={new Date().toISOString().split("T")[0]}
+        />
+        {isDateBooked(formData.checkInDate) && (
+          <p className="error-text">❌ This date is already booked.</p>
         )}
 
-        <button type="submit">Submit Booking</button>
+        {/* Check-out date */}
+        <label htmlFor="checkOutDate">Check-Out Date</label>
+        <input
+          type="date"
+          id="checkOutDate"
+          name="checkOutDate"
+          value={formData.checkOutDate}
+          onChange={handleChange}
+          required
+          min={formData.checkInDate || new Date().toISOString().split("T")[0]}
+        />
+
+        {/* Mode of payment */}
+        <label>Mode of Payment</label>
+        <select
+          name="modeOfPayment"
+          value={formData.modeOfPayment}
+          onChange={handleChange}
+        >
+          <option value="online">💳 Online Payment</option>
+          <option value="onsite">🏠 Pay Onsite</option>
+        </select>
+
+        {/* Submit button */}
+        <button type="submit" className="btn-primary">
+          Confirm Booking
+        </button>
+
+        {message && <p className="booking-message">{message}</p>}
       </form>
     </div>
   );
