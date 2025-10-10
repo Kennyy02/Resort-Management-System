@@ -77,25 +77,32 @@ app.post("/admin-login", (req, res) => {
 
 app.post("/signup", (req, res) => {
   const { name, phone, password } = req.body;
-  const email = null; // Explicitly set email to null for phone-only signup
 
   if (!name || !phone || !password)
     return res.status(400).json({ error: "Name, phone, and password are required" });
 
   db.query("SELECT * FROM users WHERE phone = ?", [phone], (err, results) => {
-    if (err) return res.status(500).json({ error: "Database error" });
+    if (err) {
+      console.error("❌ DB error during duplicate check:", err);
+      return res.status(500).json({ error: "Database error during duplicate check" });
+    }
+
     if (results.length > 0) return res.status(400).json({ error: "Account already exists" });
 
     bcrypt.hash(password, 10, (err, hash) => {
-      if (err) return res.status(500).json({ error: "Error hashing password" });
+      if (err) {
+        console.error("❌ Error hashing password:", err);
+        return res.status(500).json({ error: "Error hashing password" });
+      }
 
+      // ✅ Only insert the fields you're actually sending
       db.query(
-        "INSERT INTO users (name, phone, email, password) VALUES (?, ?, ?, ?)",
-        [name, phone, email, hash],
+        "INSERT INTO users (name, phone, password) VALUES (?, ?, ?)",
+        [name, phone, hash],
         (err) => {
           if (err) {
             console.error("❌ DB error during insert:", err);
-            return res.status(500).json({ error: "Database error" });
+            return res.status(500).json({ error: "Database error during insert" });
           }
           res.json({ message: "User registered successfully" });
         }
