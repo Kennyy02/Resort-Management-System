@@ -4,18 +4,21 @@ const cors = require('cors');
 const nodemailer = require('nodemailer');
 
 const app = express();
-const PORT = process.env.PORT || 5003; // ✅ Railway assigns dynamic ports
+const PORT = process.env.PORT || 5003; // ✅ Use Railway-assigned port
 
-// ✅ CORS setup for frontend domain
-app.use(cors({
+// ✅ CORS configuration (must be before routes and middleware)
+const corsOptions = {
   origin: 'https://emzbayviewmountainresort.up.railway.app',
   methods: ['GET', 'POST', 'PUT', 'OPTIONS'],
+  allowedHeaders: ['Content-Type'],
   credentials: true
-}));
+};
 
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // ✅ Handle preflight requests
 app.use(express.json());
 
-// ✅ MySQL connection using Railway environment variables
+// ✅ MySQL setup
 const db = mysql.createConnection({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -32,7 +35,7 @@ db.connect((err) => {
   console.log("✅ Connected to booking database");
 });
 
-// ✅ Nodemailer setup using Railway environment variables
+// ✅ Nodemailer setup
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -49,12 +52,12 @@ transporter.verify((error, success) => {
   }
 });
 
-// ✅ Health check route for Railway
+// ✅ Health check route
 app.get('/', (req, res) => {
   res.send('Booking service is running 🚀');
 });
 
-// ✅ Create Booking
+// ✅ Create booking
 app.post('/api/bookings', async (req, res) => {
   try {
     const { name, email, phoneNumber, checkInDate, checkOutDate, serviceId, serviceName, modeOfPayment } = req.body;
@@ -89,7 +92,7 @@ app.post('/api/bookings', async (req, res) => {
   }
 });
 
-// ✅ Get All Bookings
+// ✅ Get all bookings
 app.get('/api/bookings', (req, res) => {
   db.query("SELECT * FROM bookings ORDER BY created_at DESC", (err, results) => {
     if (err) return res.status(500).json({ error: 'Error fetching bookings' });
@@ -97,7 +100,7 @@ app.get('/api/bookings', (req, res) => {
   });
 });
 
-// ✅ Get Booked Dates by Service ID
+// ✅ Get booked dates for a specific service
 app.get('/api/bookings/service/:id', async (req, res) => {
   const { id } = req.params;
 
@@ -113,7 +116,7 @@ app.get('/api/bookings/service/:id', async (req, res) => {
   }
 });
 
-// ✅ Update Booking Status + Send Email
+// ✅ Update booking status and send email
 app.put('/api/bookings/:id/status', async (req, res) => {
   const { status } = req.body;
   const { id } = req.params;
@@ -172,5 +175,5 @@ app.put('/api/bookings/:id/status', async (req, res) => {
   }
 });
 
-// ✅ Start server on Railway-assigned port
+// ✅ Start the server
 app.listen(PORT, () => console.log(`🚀 Booking service running on port ${PORT}`));
