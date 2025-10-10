@@ -76,15 +76,13 @@ app.post("/admin-login", (req, res) => {
 });
 
 app.post("/signup", (req, res) => {
-  const { name, phone, email, password } = req.body;
+  const { name, phone, password } = req.body;
+  const email = null; // Explicitly set email to null for phone-only signup
 
-  if (!name || !password || (!phone && !email))
-    return res.status(400).json({ error: "Name, password, and either phone or email are required" });
+  if (!name || !phone || !password)
+    return res.status(400).json({ error: "Name, phone, and password are required" });
 
-  const checkSql = phone ? "SELECT * FROM users WHERE phone = ?" : "SELECT * FROM users WHERE email = ?";
-  const checkVal = phone ? phone : email;
-
-  db.query(checkSql, [checkVal], (err, results) => {
+  db.query("SELECT * FROM users WHERE phone = ?", [phone], (err, results) => {
     if (err) return res.status(500).json({ error: "Database error" });
     if (results.length > 0) return res.status(400).json({ error: "Account already exists" });
 
@@ -93,9 +91,12 @@ app.post("/signup", (req, res) => {
 
       db.query(
         "INSERT INTO users (name, phone, email, password) VALUES (?, ?, ?, ?)",
-        [name, phone || null, email || null, hash],
+        [name, phone, email, hash],
         (err) => {
-          if (err) return res.status(500).json({ error: "Database error" });
+          if (err) {
+            console.error("❌ DB error during insert:", err);
+            return res.status(500).json({ error: "Database error" });
+          }
           res.json({ message: "User registered successfully" });
         }
       );
