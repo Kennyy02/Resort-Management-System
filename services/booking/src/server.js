@@ -4,9 +4,14 @@ const cors = require('cors');
 const nodemailer = require('nodemailer');
 
 const app = express();
-const PORT = 5003;
+const PORT = process.env.PORT || 5003; // ✅ Railway uses dynamic ports
 
-app.use(cors());
+app.use(cors({
+    origin: 'https://emzbayviewmountainresort.up.railway.app', // ✅ Frontend domain
+    methods: ['GET', 'POST', 'PUT'],
+    credentials: true
+}));
+
 app.use(express.json());
 
 // --- MySQL Setup ---
@@ -30,8 +35,8 @@ db.connect((err) => {
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: 'emzbayviewmountain@gmail.com',  // ✅ Gmail address
-        pass: 'vbmw askg uute pvox',           // ✅ App Password
+        user: process.env.EMAIL_USER, // ✅ Use Railway env vars
+        pass: process.env.EMAIL_PASS,
     },
 });
 
@@ -42,6 +47,11 @@ transporter.verify((error, success) => {
     } else {
         console.log("✅ Server ready to send emails");
     }
+});
+
+// --- Health Check Endpoint ---
+app.get('/', (req, res) => {
+    res.send('Booking service is running 🚀');
 });
 
 // --- Create Booking ---
@@ -97,7 +107,6 @@ app.put('/api/bookings/:id/status', async (req, res) => {
     }
 
     try {
-        // Update status
         const [result] = await db.promise().query(
             "UPDATE bookings SET status = ? WHERE id = ?",
             [status, id]
@@ -107,7 +116,6 @@ app.put('/api/bookings/:id/status', async (req, res) => {
             return res.status(404).json({ error: 'Booking not found' });
         }
 
-        // Get booking details for email
         const [rows] = await db.promise().query(
             "SELECT name, email, serviceName, checkInDate, checkOutDate FROM bookings WHERE id = ?",
             [id]
@@ -118,10 +126,8 @@ app.put('/api/bookings/:id/status', async (req, res) => {
             return res.status(404).json({ error: 'Booking details not found' });
         }
 
-        // Format dates nicely
         const formatDate = (d) => new Date(d).toLocaleDateString("en-US");
 
-        // Prepare email
         let subject, text;
         if (status === 'approved') {
             subject = "✅ Your Booking Has Been Approved";
@@ -131,11 +137,10 @@ app.put('/api/bookings/:id/status', async (req, res) => {
             text = `Hello ${booking.name},\n\nWe’re sorry, but your reservation for ${booking.serviceName} from ${formatDate(booking.checkInDate)} to ${formatDate(booking.checkOutDate)} has been DECLINED.\n\nPlease contact us for more details.`;
         }
 
-        // Send email with debug logging
         console.log("📤 Sending email to:", booking.email, "with subject:", subject);
 
         const info = await transporter.sendMail({
-            from: 'emzbayviewmountain@gmail.com', // ✅ must match auth.user
+            from: process.env.EMAIL_USER,
             to: booking.email,
             subject,
             text,
@@ -151,4 +156,4 @@ app.put('/api/bookings/:id/status', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => console.log(`🚀 Booking service running on http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Booking service running on port ${PORT}`));
