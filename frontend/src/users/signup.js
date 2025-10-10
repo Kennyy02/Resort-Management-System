@@ -31,7 +31,6 @@ function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Frontend validations
     if (!name || !phone || !password) {
       setMessage("All fields are required.");
       return;
@@ -54,7 +53,6 @@ function Signup() {
       return;
     }
 
-    // Debug log before sending fetch
     console.log("Submitting signup data:", { name, phone, password });
 
     try {
@@ -63,7 +61,6 @@ function Signup() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, phone, password }),
       });
-
 
       const data = await res.json();
       setMessage(data.message || data.error);
