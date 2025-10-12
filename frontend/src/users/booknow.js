@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import './styles/booknow.css';
+import './booknow.css'; // Corrected CSS import path
+
+// Define API URL using environment variable (for production) or localhost (for development)
+const BOOKING_API_URL = process.env.NODE_ENV === 'production'
+    ? process.env.REACT_APP_BOOKING_API_URL
+    : 'http://localhost:5003';
 
 const BookNow = () => {
   const location = useLocation();
@@ -44,7 +49,8 @@ const BookNow = () => {
   // Fetch already booked dates for the service
   useEffect(() => {
     if (serviceId) {
-      fetch(`https://booking-production-5576.up.railway.app/api/bookings/service/${serviceId}`)
+      // *** USING BOOKING_API_URL VARIABLE ***
+      fetch(`${BOOKING_API_URL}/api/bookings/service/${serviceId}`)
         .then((res) => res.json())
         .then((data) => setBookedDates(data))
         .catch((err) => console.error("Error fetching booked dates:", err));
@@ -69,7 +75,8 @@ const BookNow = () => {
       const bookingData = { userId: user.id, serviceId, serviceName, ...formData };
       console.log("📤 Submitting booking data:", bookingData);
 
-      const res = await fetch("https://booking-production-5576.up.railway.app/api/bookings", {
+      // *** USING BOOKING_API_URL VARIABLE ***
+      const res = await fetch(`${BOOKING_API_URL}/api/bookings`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(bookingData),
