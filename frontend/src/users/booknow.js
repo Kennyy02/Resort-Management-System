@@ -27,6 +27,10 @@ const BookNow = () => {
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Determine if the phone number field should be disabled (i.e., if user.phone already exists)
+  const user = JSON.parse(localStorage.getItem("user"));
+  const isPhoneNumberDisabled = user && user.phone;
 
   // --- Initial Checks and Data Fetching ---
   useEffect(() => {
@@ -48,23 +52,30 @@ const BookNow = () => {
         return; 
     }
 
-    // 3. Auto-fill user data (FIX: Ensure name is always set from user data)
+    // 3. Auto-fill user data (CRITICAL FIX: Ensure name/email are non-empty)
     let userFullName = user.fullname;
-    if (!userFullName && user.email) {
-        // Fallback: Creates a friendly name from email (e.g., "john.doe@gmail.com" -> "John Doe")
-        const emailPrefix = user.email.split("@")[0];
+    let userEmail = user.email || "";
+    let userPhone = user.phone || "";
+    
+    // Fallback logic for Full Name if 'fullname' is missing
+    if (!userFullName && userEmail) {
+        // Creates a friendly name from email (e.g., "john.doe@gmail.com" -> "John Doe")
+        const emailPrefix = userEmail.split("@")[0];
         userFullName = emailPrefix.replace(/[^a-zA-Z.]/g, ' ').split('.')
             .map(word => word.charAt(0).toUpperCase() + word.slice(1))
             .join(' ').trim();
     }
     
-    // Set the state with the user's data
+    // Ensure name is never empty string by falling back to email or a default
+    userFullName = userFullName || userEmail || "Guest User";
+
+    // Set the state with the user's data. This ensures the form is not submitted with blank fields.
     setFormData((prev) => ({
       ...prev,
-      name: userFullName || "", 
-      email: user.email || "", 
-      // CRITICAL FIX: Ensure phone number is present, even if empty string initially
-      phoneNumber: user.phone || "", 
+      // GUARANTEED non-empty fields:
+      name: userFullName, 
+      email: userEmail, 
+      phoneNumber: userPhone, 
     }));
     
     setIsLoading(false); 
@@ -82,7 +93,7 @@ const BookNow = () => {
         console.error("Error fetching booked dates:", err);
       });
 
-  }, [navigate, serviceId]);
+  }, [navigate, serviceId]); // Dependency array
 
   const isDateBooked = (date) => bookedDates.includes(date);
 
@@ -105,17 +116,14 @@ const BookNow = () => {
         ...formData 
     };
 
-    // --- CRITICAL CLIENT-SIDE VALIDATION CHECK ---
-    // If the form has required fields set (like the date fields), 
-    // the browser handles most validation. We double-check complex logic here.
-    
+    // Basic Form Validation 
     if (isDateBooked(bookingData.checkInDate)) {
       setMessage("❌ Check-in date is already booked.");
       setIsSubmitting(false);
       return;
     }
     
-    // Allow check-in and check-out to be EQUAL (same-day stay)
+    // FIX: Allow check-in and check-out to be EQUAL (same-day stay)
     if (bookingData.checkInDate > bookingData.checkOutDate) { 
       setMessage("❌ Check-out date must be the same as or after check-in date.");
       setIsSubmitting(false);
@@ -137,6 +145,12 @@ const BookNow = () => {
           // The backend will now return 'missing' fields in the error response
           const missing = data.missing ? ` (Missing: ${data.missing.join(', ')})` : '';
           console.error("API Error Response:", data); 
+          // If name or email are missing, this will show the user a specific message
+          if (data.missing && (data.missing.includes('name') || data.missing.includes('email'))) {
+              setMessage(`❌ Critical User Data Missing. Please sign out and sign in again.`);
+          } else {
+              setMessage(`❌ Booking failed: ${data.error + missing || 'Server error. Please try again.'}`); 
+          }
           throw new Error(data.error + missing || `Booking failed with status ${res.status}`);
       }
       
@@ -145,6 +159,7 @@ const BookNow = () => {
 
     } catch (err) {
       console.error(err);
+      // Catch the thrown error message
       setMessage(`❌ Booking failed: ${err.message || "Server error. Please try again."}`); 
     } finally {
       setIsSubmitting(false);
@@ -185,7 +200,7 @@ const BookNow = () => {
           disabled 
         />
 
-        {/* Phone number (CRITICAL FIX: Allow editing if user.phone was missing) */}
+        {/* Phone number (CRITICAL: Required if not pre-filled) */}
         <label htmlFor="phoneNumber">Phone Number</label>
         <input
           type="tel"
@@ -193,10 +208,9 @@ const BookNow = () => {
           name="phoneNumber"
           value={formData.phoneNumber}
           onChange={handleChange}
-          required // Ensures user cannot skip this field
+          required 
           placeholder="Enter your phone number"
-          // If the phone number is already set from user data, disable it. Otherwise, enable it.
-          disabled={!!localStorage.getItem("user") && JSON.parse(localStorage.getItem("user")).phone}
+          disabled={isPhoneNumberDisabled} // Disable if phone number already exists on the user profile
         />
 
         {/* Check-in date */}
@@ -223,6 +237,7 @@ const BookNow = () => {
           value={formData.checkOutDate}
           onChange={handleChange}
           required
+          // Allows same-day check-out
           min={formData.checkInDate || new Date().toISOString().split("T")[0]}
         />
 
