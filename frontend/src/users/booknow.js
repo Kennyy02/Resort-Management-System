@@ -44,7 +44,7 @@ const BookNow = () => {
   // Fetch already booked dates for the service
   useEffect(() => {
     if (serviceId) {
-      fetch(`http://localhost:5003/api/bookings/service/${serviceId}`)
+      fetch(`https://booking-production-5576.up.railway.app/api/bookings/service/${serviceId}`)
         .then((res) => res.json())
         .then((data) => setBookedDates(data))
         .catch((err) => console.error("Error fetching booked dates:", err));
@@ -69,7 +69,7 @@ const BookNow = () => {
       const bookingData = { userId: user.id, serviceId, serviceName, ...formData };
       console.log("📤 Submitting booking data:", bookingData);
 
-      const res = await fetch("http://localhost:5003/api/bookings", {
+      const res = await fetch("https://booking-production-5576.up.railway.app/api/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(bookingData),
