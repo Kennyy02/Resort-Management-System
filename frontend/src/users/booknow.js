@@ -11,12 +11,9 @@ const BookNow = () => {
   const location = useLocation();
   const navigate = useNavigate();
   
-  // FIX: Access serviceId and serviceName directly from location.state
-  // Use a default service ID (e.g., 1) and name (e.g., 'Unknown Service')
-  // if the state is missing, but this should be caught during navigation.
   const serviceId = location.state?.serviceId; 
   const serviceName = location.state?.serviceName || 'Unknown Service'; 
-  const servicePrice = location.state?.servicePrice; // Used for display/debugging
+  const servicePrice = location.state?.servicePrice;
 
   const [formData, setFormData] = useState({
     name: "",
@@ -30,7 +27,7 @@ const BookNow = () => {
   const [bookedDates, setBookedDates] = useState([]);
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);  // Combined loading state
+  const [isLoading, setIsLoading] = useState(true);
 
   // --- Initial Checks and Data Fetching ---
   useEffect(() => {
@@ -47,17 +44,24 @@ const BookNow = () => {
 
     // 2. Service ID Check (CRITICAL)
     if (!serviceId) {
-        // If serviceId is missing, something went wrong in the navigation logic
         setMessage("❌ Error: Service details are missing. Please return to Services page.");
         setIsLoading(false);
         return; 
     }
 
-    // 3. Auto-fill user data
-    const fallbackName = user.email ? user.email.split("@")[0] : "";
+    // 3. Auto-fill user data (FIX: Generate user-friendly name)
+    let userFullName = user.fullname;
+    if (!userFullName && user.email) {
+        // Creates a friendly name (e.g., "john.doe@gmail.com" -> "John Doe")
+        const emailPrefix = user.email.split("@")[0];
+        userFullName = emailPrefix.replace(/[^a-zA-Z.]/g, ' ').split('.')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ').trim();
+    }
+    
     setFormData((prev) => ({
       ...prev,
-      name: user.fullname || fallbackName,
+      name: userFullName || "Guest", // Fallback to "Guest"
       email: user.email || "",
       phoneNumber: user.phone || "",
     }));
@@ -77,7 +81,7 @@ const BookNow = () => {
         console.error("Error fetching booked dates:", err);
       });
 
-  }, [navigate, serviceId]); // Added serviceId to dependencies
+  }, [navigate, serviceId]);
 
   const isDateBooked = (date) => bookedDates.includes(date);
 
@@ -93,9 +97,9 @@ const BookNow = () => {
 
     const user = JSON.parse(localStorage.getItem("user"));
     
-    // Ensure all data is present before submission
-    if (!user || !serviceId || !serviceName) {
-        setMessage("❌ Critical booking data missing. Please refresh and try again.");
+    // Check for critical missing data (especially name and phone number which are required by backend)
+    if (!user || !serviceId || !serviceName || !formData.name || !formData.phoneNumber) {
+        setMessage("❌ Critical booking data missing. Ensure name and phone number are present.");
         setIsSubmitting(false);
         if (!user) navigate("/login");
         return;
@@ -107,18 +111,21 @@ const BookNow = () => {
       setIsSubmitting(false);
       return;
     }
-    if (formData.checkInDate >= formData.checkOutDate) {
-      setMessage("❌ Check-out date must be after check-in date.");
+    
+    // FIX: Allow check-in and check-out to be EQUAL (same-day stay)
+    if (formData.checkInDate > formData.checkOutDate) { 
+      setMessage("❌ Check-out date must be the same as or after check-in date.");
       setIsSubmitting(false);
       return;
     }
 
     try {
-      // FIX: Explicitly include serviceId and serviceName in the payload
+      // FIX: Ensure all fields the backend requires are included in the payload
       const bookingData = { 
+          // The backend does not explicitly require userId, but we send it for safety
           userId: user.id, 
-          serviceId: serviceId, // Ensure this non-form field is included
-          serviceName: serviceName, // Ensure this non-form field is included
+          serviceId: serviceId,
+          serviceName: serviceName,
           ...formData 
       };
       
@@ -133,7 +140,6 @@ const BookNow = () => {
       const data = await res.json();
       
       if (!res.ok) {
-          // Log the exact error from the API for better debugging
           console.error("API Error Response:", data); 
           throw new Error(data.error || `Booking failed with status ${res.status}`);
       }
@@ -153,7 +159,6 @@ const BookNow = () => {
     return <div className="loading-container">Loading booking form...</div>
   }
   
-  // If serviceId is null after loading, show error message instead of form
   if (!serviceId) {
     return <div className="booking-container"><h2 className="error-title">Booking Error</h2><p className="error-text">{message}</p></div>;
   }
@@ -162,11 +167,9 @@ const BookNow = () => {
     <div className="booking-container">
       <h2 className="booking-title">Book Now: {serviceName}</h2>
       
-      {/* ... (rest of the form remains the same) */}
-      
       <form className="booking-form" onSubmit={handleSubmit}>
         
-        {/* Name (Auto-filled & Disabled) */}
+        {/* Name (Auto-filled & Disabled) - Visible and User-Friendly */}
         <label htmlFor="name">Full Name</label>
         <input
           type="text"
@@ -222,6 +225,7 @@ const BookNow = () => {
           value={formData.checkOutDate}
           onChange={handleChange}
           required
+          // Allows same-day check-out
           min={formData.checkInDate || new Date().toISOString().split("T")[0]}
         />
 
@@ -246,4 +250,5 @@ const BookNow = () => {
     </div>
   );
 };
+
 export default BookNow;
