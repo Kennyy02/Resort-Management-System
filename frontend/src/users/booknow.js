@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import './booknow.css'; // Corrected CSS import path
+import './styles/booknow.css'; 
 
 // Define API URL using environment variable (for production) or localhost (for development)
 const BOOKING_API_URL = process.env.NODE_ENV === 'production'
