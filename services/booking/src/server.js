@@ -60,7 +60,7 @@ app.get('/api/bookings/service/:serviceId', async (req, res) => {
     }
 });
 
-// --- Create Booking (400 Bad Request FIX) ---
+// --- Create Booking (400 Bad Request FIX - Enhanced Logging) ---
 app.post('/api/bookings', async (req, res) => {
     try {
         const { name, email, phoneNumber, checkInDate, checkOutDate, serviceId, serviceName, modeOfPayment } = req.body;
