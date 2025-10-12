@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import './styles/booknow.css'; // Corrected CSS import path
+import './booknow.css'; 
 
 const BOOKINGS_PER_PAGE = 10;
 
