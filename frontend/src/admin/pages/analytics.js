@@ -7,9 +7,8 @@ import './analytics.css';
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend, Title, BarElement, Filler);
 
-// Use your Railway domain for production, or localhost for dev.
-const API_BASE_URL = 'https://analytics-production-b113.up.railway.app/api/analytics'; 
-// NOTE: I'm hardcoding the domain for clarity, you can adjust your process.env variable.
+// CRITICAL FIX: Use the REACT_APP_ANALYTICS_API environment variable
+const API_BASE_URL = `${process.env.REACT_APP_ANALYTICS_API}/api/analytics`; 
 
 const formatCurrencyPHP = (value) => {
     const numericValue = parseFloat(value);
@@ -25,7 +24,7 @@ const formatCurrencyPHP = (value) => {
 };
 
 // =========================================================================
-// NEW: Summary Card Component
+// Summary Card Components
 // =========================================================================
 const SummaryCard = ({ title, value, icon, color }) => (
     <div className={`p-6 rounded-xl shadow-lg flex items-center justify-between ${color}`}>
@@ -39,9 +38,6 @@ const SummaryCard = ({ title, value, icon, color }) => (
     </div>
 );
 
-// =========================================================================
-// NEW: Analytics Summary Dashboard Section
-// =========================================================================
 const AnalyticsSummary = () => {
     const [summary, setSummary] = useState({
         totalBookingsMonth: 0,
@@ -53,6 +49,7 @@ const AnalyticsSummary = () => {
         const fetchSummaryData = async () => {
             setLoading(true);
             try {
+                // Fetching summary data using the environment variable base URL
                 const [bookingsRes, revenueRes] = await Promise.all([
                     axios.get(`${API_BASE_URL}/summary/total-bookings-month`),
                     axios.get(`${API_BASE_URL}/summary/total-revenue-month`),
@@ -60,7 +57,7 @@ const AnalyticsSummary = () => {
 
                 setSummary({
                     totalBookingsMonth: bookingsRes.data.total_bookings,
-                    totalRevenueMonth: bookingsRes.data.total_revenue,
+                    totalRevenueMonth: revenueRes.data.total_revenue,
                 });
             } catch (err) {
                 console.error("Error fetching summary data:", err);
@@ -102,11 +99,9 @@ const AnalyticsSummary = () => {
 };
 
 // =========================================================================
-// Existing Charts (Monthly Bookings, Service Bookings)
+// Monthly Bookings Chart
 // =========================================================================
-
 const MonthlyBookingsChart = () => {
-    // ... (Your existing MonthlyBookingsChart code remains the same)
     const [chartData, setChartData] = useState({
         labels: [],
         datasets: [{
@@ -197,15 +192,17 @@ const MonthlyBookingsChart = () => {
                     <option>This Year</option>
                 </select>
             </div>
-            <div className="flex-grow h-72"> {/* Added fixed height for Bar/Line charts */}
+            <div className="flex-grow h-72">
                 <Bar data={chartData} options={options} />
             </div>
         </div>
     );
 };
 
+// =========================================================================
+// Bookings by Service Chart
+// =========================================================================
 const ServiceBookingsChart = () => {
-    // ... (Your existing ServiceBookingsChart code remains the same)
     const [chartData, setChartData] = useState({
         labels: [],
         datasets: [{
@@ -296,7 +293,7 @@ const ServiceBookingsChart = () => {
                     <option>Annually</option>
                 </select>
             </div>
-            <div className="flex-grow h-72"> {/* Added fixed height for Bar/Line charts */}
+            <div className="flex-grow h-72">
                 <Bar data={chartData} options={options} />
             </div>
         </div>
@@ -305,7 +302,7 @@ const ServiceBookingsChart = () => {
 
 
 // =========================================================================
-// NEW: Monthly Revenue Trend Chart
+// Monthly Revenue Trend Chart
 // =========================================================================
 const MonthlyRevenueTrendChart = () => {
     const [chartData, setChartData] = useState({
@@ -314,7 +311,7 @@ const MonthlyRevenueTrendChart = () => {
             label: 'Total Revenue',
             data: Array(12).fill(0),
             fill: true,
-            backgroundColor: 'rgba(255, 99, 132, 0.2)', // Different color for revenue
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
             borderColor: 'rgba(255, 99, 132, 1)',
             tension: 0.4,
             pointRadius: 5,
@@ -330,17 +327,14 @@ const MonthlyRevenueTrendChart = () => {
     useEffect(() => {
         const fetchAnnualRevenueData = async () => {
             try {
-                // Fetch data from the new revenue endpoint
                 const response = await axios.get(`${API_BASE_URL}/revenue-by-month`);
                 const data = response.data;
 
                 const revenuePerMonth = Array(12).fill(0);
                 
-                // Filter data for the current year (or the year you want to display)
                 const currentYearData = data.filter(item => item.revenue_year === currentYear);
                 
                 currentYearData.forEach(item => {
-                    // Month is 1-indexed, array is 0-indexed
                     revenuePerMonth[item.revenue_month - 1] = item.total_revenue;
                 });
 
@@ -391,7 +385,6 @@ const MonthlyRevenueTrendChart = () => {
                 grid: { color: 'rgba(0,0,0,0.05)' },
                 ticks: {
                     callback: function(value) {
-                        // Display currency ticks on the Y-axis (e.g., ₱10K)
                         return formatCurrencyPHP(value).replace('₱', '').replace('.00', '');
                     },
                     color: '#6c757d',
@@ -409,14 +402,16 @@ const MonthlyRevenueTrendChart = () => {
     return (
         <div className="chart-card">
             <h2 className="text-xl font-semibold mb-4 text-gray-800">Monthly Revenue Trend ({currentYear})</h2>
-            <div className="flex-grow h-96"> {/* Increased height for line chart visibility */}
+            <div className="flex-grow h-96">
                 <Line data={chartData} options={options} />
             </div>
         </div>
     );
 };
 
-// Removed the old MonthlyBookingCountTrendChart as it's repetitive and replaced by MonthlyRevenueTrendChart
+// =========================================================================
+// Main Dashboard Component
+// =========================================================================
 
 const AnalyticsDashboard = () => {
     return (
