@@ -5,11 +5,37 @@ const cors = require('cors'); // Import cors to allow cross-origin requests
 
 // Initialize Express app
 const app = express();
-const port = 3002; // Using port 3002
+const port = 3002;
+
+// --- CRITICAL CORS FIX: Specify the allowed origin ---
+// This allows your deployed frontend to access this deployed backend.
+const allowedOrigins = [
+    // Your deployed frontend domain (CRITICAL FOR PRODUCTION)
+    'https://emzbayviewmountainresort.up.railway.app', 
+    // Local development origins
+    'http://localhost:3000', 
+    'http://localhost:3001',
+    'http://localhost:3002' 
+];
+
+const corsOptions = {
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps/curl) or if the origin is explicitly allowed
+        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            // Block the request if the origin is not allowed
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true,
+};
 
 // Middleware
 app.use(express.json()); // To parse JSON request bodies
-app.use(cors()); // Enable CORS for all routes, allowing your React app to connect
+app.use(cors(corsOptions)); // Use the customized CORS options
+// ----------------------------------------------------------------
 
 // Database connection pool setup
 const pool = mysql.createPool({
@@ -41,7 +67,6 @@ app.get('/test-db', async (req, res) => {
 // 1. API Endpoint: Get Monthly Booking Trends
 app.get('/api/analytics/bookings-by-month', async (req, res) => {
     try {
-        // NOTE: Uses checkInDate for monthly analysis
         const query = `
             SELECT
                 YEAR(checkInDate) AS booking_year,
@@ -59,10 +84,9 @@ app.get('/api/analytics/bookings-by-month', async (req, res) => {
     }
 });
 
-// 2. NEW API Endpoint: Get Monthly Revenue Trends (CRITICAL FOR NEW CHART)
+// 2. NEW API Endpoint: Get Monthly Revenue Trends
 app.get('/api/analytics/revenue-by-month', async (req, res) => {
     try {
-        // NOTE: Uses transaction_timestamp for monthly revenue analysis
         const query = `
             SELECT
                 YEAR(transaction_timestamp) AS revenue_year,
@@ -138,7 +162,7 @@ app.get('/api/analytics/payment-methods', async (req, res) => {
     try {
         const query = `
             SELECT
-                modeOfPayment, -- Assuming 'modeOfPayment' column in transactions table
+                modeOfPayment,
                 COUNT(*) AS total_payments,
                 SUM(amount) AS total_revenue
             FROM transactions
