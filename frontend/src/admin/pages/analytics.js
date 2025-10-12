@@ -1,390 +1,160 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Line, Bar } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend, Title, BarElement } from 'chart.js';
-import { Filler } from 'chart.js';
-import './analytics.css';
+// Import necessary modules
+const express = require('express');
+const mysql = require('mysql2/promise'); // Using mysql2/promise for async/await
+const cors = require('cors'); // Import cors to allow cross-origin requests
 
-// Register Chart.js components
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend, Title, BarElement, Filler);
+// Initialize Express app
+const app = express();
+const port = 3002; // Using port 3002
 
-const API_BASE_URL = `${process.env.REACT_APP_ANALYTICS_API}/api/analytics`;
+// Middleware
+app.use(express.json()); // To parse JSON request bodies
+app.use(cors()); // Enable CORS for all routes, allowing your React app to connect
 
-const formatCurrencyPHP = (value) => {
-  const numericValue = parseFloat(value);
-  if (isNaN(numericValue)) {
-    return '₱0.00';
-  }
-  return new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(numericValue);
-};
+// Database connection pool setup
+const pool = mysql.createPool({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: process.env.DB_PORT || 3306,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
+});
 
-const MonthlyBookingsChart = () => {
-  const [chartData, setChartData] = useState({
-    labels: [],
-    datasets: [{
-      label: 'Total Bookings',
-      data: [],
-      backgroundColor: 'rgba(102, 51, 153, 0.8)',
-      borderColor: 'rgba(102, 51, 153, 1)',
-      borderWidth: 1,
-      borderRadius: 5,
-    }],
-  });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+// Test database connection endpoint
+app.get('/test-db', async (req, res) => {
+    try {
+        const [rows] = await pool.query('SELECT 1 + 1 AS solution');
+        res.json({ message: 'Database connected successfully!', solution: rows[0].solution });
+    } catch (error) {
+        console.error('Database connection failed:', error);
+        res.status(500).json({ error: 'Database connection failed', details: error.message });
+    }
+});
 
-  useEffect(() => {
-    const fetchBookingData = async () => {
-      try {
-        const response = await axios.get(`${API_BASE_URL}/bookings-by-month`);
-        const data = response.data;
+// ------------------------------------
+// ANALYTICS ENDPOINTS
+// ------------------------------------
 
-        const labels = data.map(item => `${item.booking_month}/${item.booking_year}`);
-        const bookingCounts = data.map(item => item.total_bookings);
+// 1. API Endpoint: Get Monthly Booking Trends
+app.get('/api/analytics/bookings-by-month', async (req, res) => {
+    try {
+        // NOTE: Uses checkInDate for monthly analysis
+        const query = `
+            SELECT
+                YEAR(checkInDate) AS booking_year,
+                MONTH(checkInDate) AS booking_month,
+                COUNT(*) AS total_bookings
+            FROM booking.bookings
+            GROUP BY booking_year, booking_month
+            ORDER BY booking_year, booking_month;
+        `;
+        const [rows] = await pool.query(query);
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching monthly booking trends:', error);
+        res.status(500).json({ error: 'Internal server error', details: error.message });
+    }
+});
 
-        setChartData({
-          labels: labels,
-          datasets: [{
-            ...chartData.datasets[0],
-            data: bookingCounts,
-          }],
-        });
-        setLoading(false);
-      } catch (err) {
-        console.error("Error fetching monthly booking data:", err);
-        setError("Failed to load booking data.");
-        setLoading(false);
-      }
-    };
+// 2. NEW API Endpoint: Get Monthly Revenue Trends (CRITICAL FOR NEW CHART)
+app.get('/api/analytics/revenue-by-month', async (req, res) => {
+    try {
+        // NOTE: Uses transaction_timestamp for monthly revenue analysis
+        const query = `
+            SELECT
+                YEAR(transaction_timestamp) AS revenue_year,
+                MONTH(transaction_timestamp) AS revenue_month,
+                SUM(amount) AS total_revenue
+            FROM transactions
+            WHERE transaction_type = 'Booking'
+            GROUP BY revenue_year, revenue_month
+            ORDER BY revenue_year, revenue_month;
+        `;
+        const [rows] = await pool.query(query);
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching monthly revenue trends:', error);
+        res.status(500).json({ error: 'Internal server error', details: error.message });
+    }
+});
 
-    fetchBookingData();
-  }, []);
+// 3. API Endpoint: Get Bookings by Service Type (Rooms/Cottage)
+app.get('/api/analytics/bookings-by-service', async (req, res) => {
+    try {
+        const query = `
+            SELECT
+                serviceName,
+                COUNT(*) AS total_bookings
+            FROM booking.bookings
+            GROUP BY serviceName
+            ORDER BY total_bookings DESC;
+        `;
+        const [rows] = await pool.query(query);
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching bookings by service type:', error);
+        res.status(500).json({ error: 'Internal server error', details: error.message });
+    }
+});
 
-  if (loading) return <div className="text-center p-4">Loading monthly booking data...</div>;
-  if (error) return <div className="text-center p-4 text-red-500">Error: {error}</div>;
+// 4. API Endpoint: Get Total Bookings for Current Month (SUMMARY CARD)
+app.get('/api/analytics/summary/total-bookings-month', async (req, res) => {
+    try {
+        const query = `
+            SELECT COUNT(*) AS total_bookings
+            FROM booking.bookings
+            WHERE MONTH(checkInDate) = MONTH(CURDATE()) AND YEAR(checkInDate) = YEAR(CURDATE());
+        `;
+        const [rows] = await pool.query(query);
+        res.json(rows[0] || { total_bookings: 0 });
+    } catch (error) {
+        console.error('Error fetching total bookings for month:', error);
+        res.status(500).json({ error: 'Internal server error', details: error.message });
+    }
+});
 
-  const options = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      title: {
-        display: false,
-      },
-      legend: {
-        display: false,
-      },
-      tooltip: {
-        backgroundColor: 'rgba(0,0,0,0.7)',
-        titleColor: '#fff',
-        bodyColor: '#fff',
-        borderColor: 'rgba(255,255,255,0.2)',
-        borderWidth: 1,
-        cornerRadius: 5,
-        displayColors: false,
-      }
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-        grid: {
-          color: 'rgba(0,0,0,0.05)',
-        },
-        ticks: {
-          callback: function(value) {
-            return value >= 1000 ? (value / 1000) + 'K' : value;
-          },
-          color: '#6c757d',
-        },
-        title: {
-          display: false,
-        },
-      },
-      x: {
-        grid: {
-          display: false,
-        },
-        ticks: {
-          color: '#6c757d',
-        },
-        title: {
-          display: false,
-        },
-      },
-    },
-  };
+// 5. API Endpoint: Get Total Revenue for Current Month (SUMMARY CARD)
+app.get('/api/analytics/summary/total-revenue-month', async (req, res) => {
+    try {
+        const query = `
+            SELECT SUM(amount) AS total_revenue
+            FROM transactions
+            WHERE transaction_type = 'Booking'
+            AND MONTH(transaction_timestamp) = MONTH(CURDATE()) AND YEAR(transaction_timestamp) = YEAR(CURDATE());
+        `;
+        const [rows] = await pool.query(query);
+        res.json(rows[0] || { total_revenue: 0 });
+    } catch (error) {
+        console.error('Error fetching total revenue for month:', error);
+        res.status(500).json({ error: 'Internal server error', details: error.message });
+    }
+});
 
-  return (
-    <div className="chart-card">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold text-gray-800">Monthly Booking Trends</h2>
-        <select className="p-2 border border-gray-300 rounded-lg text-sm text-gray-700 focus:ring-purple-500 focus:border-purple-500">
-          <option>Last 6 months</option>
-          <option>Last 12 months</option>
-          <option>This Year</option>
-        </select>
-      </div>
-      <div className="flex-grow">
-        <Bar data={chartData} options={options} />
-      </div>
-    </div>
-  );
-};
+// 6. API Endpoint: Get Popular Payment Methods (For future chart/table)
+app.get('/api/analytics/payment-methods', async (req, res) => {
+    try {
+        const query = `
+            SELECT
+                modeOfPayment, -- Assuming 'modeOfPayment' column in transactions table
+                COUNT(*) AS total_payments,
+                SUM(amount) AS total_revenue
+            FROM transactions
+            WHERE transaction_type = 'Booking'
+            GROUP BY modeOfPayment
+            ORDER BY total_revenue DESC;
+        `;
+        const [rows] = await pool.query(query);
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching payment methods:', error);
+        res.status(500).json({ error: 'Internal server error', details: error.message });
+    }
+});
 
-const ServiceBookingsChart = () => {
-  const [chartData, setChartData] = useState({
-    labels: [],
-    datasets: [{
-      label: 'Bookings',
-      data: [],
-      backgroundColor: 'rgba(102, 51, 153, 0.8)',
-      borderColor: 'rgba(102, 51, 153, 1)',
-      borderWidth: 1,
-      borderRadius: 5,
-    }],
-  });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const fetchServiceData = async () => {
-      try {
-        const response = await axios.get(`${API_BASE_URL}/bookings-by-service`);
-        const data = response.data;
-
-        const labels = data.map(item => item.serviceName);
-        const bookingCounts = data.map(item => item.total_bookings);
-
-        setChartData({
-          labels: labels,
-          datasets: [{
-            ...chartData.datasets[0],
-            data: bookingCounts,
-          }],
-        });
-        setLoading(false);
-      } catch (err) {
-        console.error("Error fetching bookings by service type:", err);
-        setError("Failed to load service bookings data.");
-        setLoading(false);
-      }
-    };
-
-    fetchServiceData();
-  }, []);
-
-  if (loading) return <div className="text-center p-4">Loading service bookings data...</div>;
-  if (error) return <div className="text-center p-4 text-red-500">Error: {error}</div>;
-
-  const options = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      title: {
-        display: false,
-      },
-      legend: {
-        display: false,
-      },
-      tooltip: {
-        backgroundColor: 'rgba(0,0,0,0.7)',
-        titleColor: '#fff',
-        bodyColor: '#fff',
-        borderColor: 'rgba(255,255,255,0.2)',
-        borderWidth: 1,
-        cornerRadius: 5,
-        displayColors: false,
-      }
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-        grid: {
-          color: 'rgba(0,0,0,0.05)',
-        },
-        ticks: {
-          callback: function(value) {
-            return value >= 1000 ? (value / 1000) + 'K' : value;
-          },
-          color: '#6c757d',
-        },
-        title: {
-          display: false,
-        },
-      },
-      x: {
-        grid: {
-          display: false,
-        },
-        ticks: {
-          color: '#6c757d',
-        },
-        title: {
-          display: false,
-        },
-      },
-    },
-  };
-
-  return (
-    <div className="chart-card">
-      <h2 className="text-xl font-semibold mb-4 text-gray-800">Bookings by Service Type</h2>
-      <div className="flex justify-between items-center mb-4">
-        <select className="p-2 border border-gray-300 rounded-lg text-sm text-gray-700 focus:ring-purple-500 focus:border-purple-500">
-          <option>Weekly</option>
-          <option>Monthly</option>
-          <option>Annually</option>
-        </select>
-      </div>
-      <div className="flex-grow">
-        <Bar data={chartData} options={options} />
-      </div>
-    </div>
-  );
-};
-
-const MonthlyBookingCountTrendChart = () => {
-    const [chartData, setChartData] = useState({
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-        datasets: [{
-            label: 'Total Bookings',
-            data: [],
-            fill: true,
-            backgroundColor: 'rgba(102, 51, 153, 0.2)',
-            borderColor: 'rgba(102, 51, 153, 1)',
-            tension: 0.4,
-            pointRadius: 0,
-            pointHitRadius: 10,
-        }],
-    });
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-
-    useEffect(() => {
-        const fetchAnnualBookingCountData = async () => {
-            try {
-                const response = await axios.get(`${API_BASE_URL}/bookings-by-month`);
-                const data = response.data;
-
-                const bookingCountsPerMonth = Array(12).fill(0);
-                data.forEach(item => {
-                    bookingCountsPerMonth[item.booking_month - 1] = item.total_bookings;
-                });
-
-                setChartData(prev => ({
-                    ...prev,
-                    datasets: [{
-                        ...prev.datasets[0],
-                        data: bookingCountsPerMonth,
-                    }],
-                }));
-                setLoading(false);
-            } catch (err) {
-                console.error("Error fetching annual booking count data:", err);
-                setError("Failed to load annual booking count data.");
-                setLoading(false);
-            }
-        };
-        fetchAnnualBookingCountData();
-    }, []);
-
-    if (loading) return <div className="text-center p-4">Loading annual booking count data...</div>;
-    if (error) return <div className="text-center p-4 text-red-500">Error: {error}</div>;
-
-    const options = {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            title: {
-                display: false,
-            },
-            legend: {
-                display: false,
-            },
-            tooltip: {
-                backgroundColor: 'rgba(0,0,0,0.7)',
-                titleColor: '#fff',
-                bodyColor: '#fff',
-                borderColor: 'rgba(255,255,255,0.2)',
-                borderWidth: 1,
-                cornerRadius: 5,
-                displayColors: false,
-                callbacks: {
-                    label: function(context) {
-                        return `Bookings: ${context.parsed.y}`;
-                    }
-                }
-            }
-        },
-        scales: {
-            y: {
-                beginAtZero: true,
-                grid: {
-                    color: 'rgba(0,0,0,0.05)',
-                },
-                ticks: {
-                    callback: function(value) {
-                        return value >= 1000 ? (value / 1000) + 'K' : value;
-                    },
-                    color: '#6c757d',
-                },
-                title: {
-                    display: false,
-                },
-            },
-            x: {
-                grid: {
-                    display: false,
-                },
-                ticks: {
-                    color: '#6c757d',
-                },
-                title: {
-                    display: false,
-                },
-            },
-        },
-    };
-
-    return (
-        <div className="chart-card">
-            <h2 className="text-xl font-semibold mb-4 text-gray-800">Monthly Booking Count Trend</h2>
-            <div className="flex-grow">
-                <Line data={chartData} options={options} />
-            </div>
-        </div>
-    );
-};
-
-
-const AnalyticsDashboard = () => {
-    return (
-        <div className="p-6 bg-gray-100">
-            {/* Top Greeting Section */}
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Em'z Analytics!</h1>
-            </div>
-
-            {/* Main Charts Section - Two above, one below */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Top Row: Monthly Booking Trends */}
-                <div className="lg:col-span-1">
-                    <MonthlyBookingsChart />
-                </div>
-
-                {/* Top Row: Bookings by Service Type */}
-                <div className="lg:col-span-1">
-                    <ServiceBookingsChart />
-                </div>
-            </div>
-
-            {/* Bottom Row: Monthly Booking Count Trend Chart */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6"> {/* Added mt-6 for spacing */}
-                <div className="lg:col-span-2"> {/* Spans both columns */}
-                    <MonthlyBookingCountTrendChart />
-                </div>
-            </div>
-        </div>
-    );
-};
-
-export default AnalyticsDashboard;
+// Start the server
+app.listen(port, () => {
+    console.log(`🚀 Analytics server running on http://localhost:${port}`);
+});
