@@ -44,16 +44,14 @@ transporter.verify((error, success) => {
     }
 });
 
-// --- Get Booked Dates for a Specific Service (FIX for 404) ---
+// --- Get Booked Dates for a Specific Service (404 FIX) ---
 app.get('/api/bookings/service/:serviceId', async (req, res) => {
     const { serviceId } = req.params;
     try {
-        // Query to get all distinct checkInDates for the given serviceId
         const [results] = await db.promise().query(
             "SELECT DISTINCT DATE_FORMAT(checkInDate, '%Y-%m-%d') AS checkInDate FROM bookings WHERE serviceId = ?",
             [serviceId]
         );
-        // Map the results to an array of date strings (e.g., ["2025-10-20", "2025-10-21"])
         const bookedDates = results.map(row => row.checkInDate);
         res.json(bookedDates);
     } catch (err) {
@@ -62,20 +60,26 @@ app.get('/api/bookings/service/:serviceId', async (req, res) => {
     }
 });
 
-// --- Create Booking (Target of 400 Bad Request) ---
+// --- Create Booking (400 Bad Request FIX) ---
 app.post('/api/bookings', async (req, res) => {
     try {
         const { name, email, phoneNumber, checkInDate, checkOutDate, serviceId, serviceName, modeOfPayment } = req.body;
 
-        if (!name || !email || !phoneNumber || !checkInDate || !checkOutDate || !serviceId || !serviceName || !modeOfPayment) {
-            console.error("Missing required fields for booking:", req.body);
-            return res.status(400).json({ error: 'All required fields must be provided' });
+        // CRITICAL CHECK: Identify which field is missing and log it
+        const requiredFields = { name, email, phoneNumber, checkInDate, checkOutDate, serviceId, serviceName, modeOfPayment };
+        const missingFields = Object.keys(requiredFields).filter(key => !requiredFields[key]);
+
+        if (missingFields.length > 0) {
+            console.error("❌ Missing required fields for booking:", missingFields.join(', '));
+            // Return 400 with the list of missing fields
+            return res.status(400).json({ error: 'All required fields must be provided', missing: missingFields });
         }
+        // END CRITICAL CHECK
 
         const formattedCheckIn = new Date(checkInDate).toISOString().split('T')[0];
         const formattedCheckOut = new Date(checkOutDate).toISOString().split('T')[0];
 
-        // Check for conflicts (only checking checkInDate for simplicity, adjust if check-out date needs blocking)
+        // Check for conflicts
         const [conflicts] = await db.promise().query(
             "SELECT id FROM bookings WHERE serviceId = ? AND checkInDate = ?",
             [serviceId, formattedCheckIn]
