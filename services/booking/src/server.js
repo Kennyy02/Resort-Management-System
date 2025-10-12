@@ -44,18 +44,38 @@ transporter.verify((error, success) => {
     }
 });
 
-// --- Create Booking ---
+// --- Get Booked Dates for a Specific Service (FIX for 404) ---
+app.get('/api/bookings/service/:serviceId', async (req, res) => {
+    const { serviceId } = req.params;
+    try {
+        // Query to get all distinct checkInDates for the given serviceId
+        const [results] = await db.promise().query(
+            "SELECT DISTINCT DATE_FORMAT(checkInDate, '%Y-%m-%d') AS checkInDate FROM bookings WHERE serviceId = ?",
+            [serviceId]
+        );
+        // Map the results to an array of date strings (e.g., ["2025-10-20", "2025-10-21"])
+        const bookedDates = results.map(row => row.checkInDate);
+        res.json(bookedDates);
+    } catch (err) {
+        console.error("❌ Error fetching booked dates by serviceId:", err.message);
+        res.status(500).json({ error: 'Error fetching booked dates' });
+    }
+});
+
+// --- Create Booking (Target of 400 Bad Request) ---
 app.post('/api/bookings', async (req, res) => {
     try {
         const { name, email, phoneNumber, checkInDate, checkOutDate, serviceId, serviceName, modeOfPayment } = req.body;
 
         if (!name || !email || !phoneNumber || !checkInDate || !checkOutDate || !serviceId || !serviceName || !modeOfPayment) {
+            console.error("Missing required fields for booking:", req.body);
             return res.status(400).json({ error: 'All required fields must be provided' });
         }
 
         const formattedCheckIn = new Date(checkInDate).toISOString().split('T')[0];
         const formattedCheckOut = new Date(checkOutDate).toISOString().split('T')[0];
 
+        // Check for conflicts (only checking checkInDate for simplicity, adjust if check-out date needs blocking)
         const [conflicts] = await db.promise().query(
             "SELECT id FROM bookings WHERE serviceId = ? AND checkInDate = ?",
             [serviceId, formattedCheckIn]
@@ -129,9 +149,13 @@ app.put('/api/bookings/:id/status', async (req, res) => {
         } else if (status === 'declined') {
             subject = "❌ Your Booking Has Been Declined";
             text = `Hello ${booking.name},\n\nWe’re sorry, but your reservation for ${booking.serviceName} from ${formatDate(booking.checkInDate)} to ${formatDate(booking.checkOutDate)} has been DECLINED.\n\nPlease contact us for more details.`;
+        } else {
+             // For 'pending', no email is typically sent here, just the status update.
+             res.json({ message: `Status updated to ${status}` });
+             return;
         }
 
-        // Send email with debug logging
+        // Send email
         console.log("📤 Sending email to:", booking.email, "with subject:", subject);
 
         const info = await transporter.sendMail({
