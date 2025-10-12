@@ -1,19 +1,27 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import './booknow.css';
+import './styles/booknow.css'; // Corrected CSS import path
 
 const BOOKINGS_PER_PAGE = 10;
+
+// Define API URL using environment variable (for production) or localhost (for development)
+const BOOKING_API_URL = process.env.NODE_ENV === 'production'
+    ? process.env.REACT_APP_BOOKING_API_URL
+    : 'http://localhost:5003';
 
 function AdminBookNow() {
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [actionDetails, setActionDetails] = useState(null); // { id, newStatus }
 
     const fetchBookings = useCallback(async () => {
         setLoading(true);
         setError(null);
         try {
-            const res = await fetch('https://booking-production-5576.up.railway.app/api/bookings');
+            // *** USING BOOKING_API_URL VARIABLE ***
+            const res = await fetch(`${BOOKING_API_URL}/api/bookings`);
             if (!res.ok) {
                 const errorText = await res.text();
                 throw new Error(`Failed to fetch bookings: ${res.status} ${res.statusText} - ${errorText}`);
@@ -38,13 +46,22 @@ function AdminBookNow() {
         fetchBookings();
     }, [fetchBookings]);
 
-    const updateStatus = async (id, newStatus) => {
-        if (!window.confirm(`Are you sure you want to change the status of booking ID ${id} to "${newStatus}"?`)) {
-            return;
-        }
+    // Function to show the custom confirmation modal
+    const showConfirm = (id, newStatus) => {
+        setActionDetails({ id, newStatus });
+        setShowConfirmModal(true);
+    };
+
+    // Function to handle the actual status update after confirmation
+    const confirmUpdateStatus = async () => {
+        if (!actionDetails) return;
+        const { id, newStatus } = actionDetails;
+
+        setShowConfirmModal(false); // Hide modal immediately
 
         try {
-            const res = await fetch(`https://booking-production-5576.up.railway.app/api/bookings/${id}/status`, {
+            // *** USING BOOKING_API_URL VARIABLE ***
+            const res = await fetch(`${BOOKING_API_URL}/api/bookings/${id}/status`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: newStatus }),
@@ -55,10 +72,12 @@ function AdminBookNow() {
                 throw new Error(errorData.error || 'Failed to update status');
             }
 
+            // Refetch data to show the updated status
             fetchBookings();
         } catch (err) {
             console.error('Error updating status:', err);
-            alert(`Failed to update status: ${err.message}`);
+            // Replace alert() with a state-based message display in a real app
+            console.error(`Failed to update status: ${err.message}`); 
         }
     };
 
@@ -83,7 +102,8 @@ function AdminBookNow() {
                 <p className="status-message error-message">
                     Error: {error}
                     <br />
-                    Please ensure the backend server is running and accessible at `http://localhost:5003`.
+                    Please ensure the backend service is running and accessible at 
+                    `{BOOKING_API_URL}`.
                 </p>
             ) : bookings.length === 0 ? (
                 <p className="status-message no-bookings-message">No bookings found.</p>
@@ -126,13 +146,13 @@ function AdminBookNow() {
                                         {booking.status === 'pending' && (
                                             <>
                                                 <button
-                                                    onClick={() => updateStatus(booking.id, 'approved')}
+                                                    onClick={() => showConfirm(booking.id, 'approved')}
                                                     className="action-button approve-button"
                                                 >
                                                     Approve
                                                 </button>
                                                 <button
-                                                    onClick={() => updateStatus(booking.id, 'declined')}
+                                                    onClick={() => showConfirm(booking.id, 'declined')}
                                                     className="action-button decline-button"
                                                 >
                                                     Decline
@@ -174,6 +194,22 @@ function AdminBookNow() {
                     >
                         Next
                     </button>
+                </div>
+            )}
+            
+            {/* Custom Confirmation Modal UI (Replaces window.confirm/alert) */}
+            {showConfirmModal && actionDetails && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <h3>Confirm Status Change</h3>
+                        <p>Are you sure you want to change the status of booking ID {actionDetails.id} to 
+                           <strong className={`status-${actionDetails.newStatus}`}> "{actionDetails.newStatus}"</strong>?
+                        </p>
+                        <div className="modal-actions">
+                            <button onClick={() => setShowConfirmModal(false)} className="action-button decline-button">Cancel</button>
+                            <button onClick={confirmUpdateStatus} className="action-button approve-button">Confirm</button>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>
