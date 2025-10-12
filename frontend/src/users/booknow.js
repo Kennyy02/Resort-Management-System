@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-// Removed: import './styles/booknow.css'; to resolve the compilation error.
+import './styles/booknow.css'; // RESTORING ORIGINAL CSS IMPORT
 
 // Define API URL using environment variable (for production) or localhost (for development)
 const BOOKING_API_URL = process.env.NODE_ENV === 'production'
@@ -20,13 +20,13 @@ const BookNow = () => {
     phoneNumber: "",
     checkInDate: "",
     checkOutDate: "",
-    modeOfPayment: "onsite", // Updated default to 'onsite'
+    modeOfPayment: "online", // Reverting default payment mode to original
   });
 
   const [bookedDates, setBookedDates] = useState([]);
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true); 
 
 
   // Auto-fill logged-in user details & Authentication check
@@ -92,7 +92,7 @@ const BookNow = () => {
       return navigate("/login");
     }
 
-    // Basic Form Validation
+    // Basic Form Validation (retained from previous fixes)
     if (isDateBooked(formData.checkInDate)) {
       setMessage("❌ Check-in date is already booked.");
       setIsSubmitting(false);
@@ -115,52 +115,51 @@ const BookNow = () => {
       });
 
       const data = await res.json();
-      setMessage(res.ok ? `✅ ${data.message || 'Booking successful!'}` : `❌ ${data.error || 'Booking failed.'}`);
+      // Reverting message handling to original simplicity
+      setMessage(data.message || data.error); 
 
-      if (res.ok) setTimeout(() => navigate("/"), 2000);
+      if (res.ok) setTimeout(() => navigate("/"), 1500); // Reverting delay
     } catch (err) {
       console.error(err);
-      setMessage("❌ Server error. Please check your network and try again.");
+      setMessage("Server error. Please try again."); // Reverting message
     } finally {
       setIsSubmitting(false);
     }
   };
 
   if (isLoading) {
-    return <div className="p-8 text-center text-gray-600">Loading user data...</div>
+    return <div>Loading user data...</div>
   }
 
   return (
-    <div className="booking-container p-4 sm:p-8 max-w-lg mx-auto bg-white shadow-xl rounded-xl my-8">
-      <h2 className="booking-title text-2xl font-bold text-center mb-6 text-indigo-700">Book Now: {serviceName}</h2>
+    <div className="booking-container">
+      <h2 className="booking-title">Book Now: {serviceName}</h2>
 
-      <form className="booking-form space-y-4" onSubmit={handleSubmit}>
-        {/* Name (Auto-filled & Disabled) */}
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700">Full Name</label>
+      <form className="booking-form" onSubmit={handleSubmit}>
+        {/* Name (Auto-filled & Disabled) - PLACEHOLDER REMOVED */}
+        <label htmlFor="name">Full Name</label>
         <input
           type="text"
           id="name"
           name="name"
           value={formData.name}
           disabled
-          className="w-full p-3 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
-          placeholder="Registered name (Read Only)"
+          // Placeholder removed so the user's name shows up automatically
         />
 
-        {/* Email (Auto-filled & Disabled) */}
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email Address</label>
+        {/* Email (Auto-filled & Disabled) - PLACEHOLDER REMOVED */}
+        <label htmlFor="email">Email Address</label>
         <input
           type="email"
           id="email"
           name="email"
           value={formData.email}
           disabled
-          className="w-full p-3 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
-          placeholder="Registered email (Read Only)"
+          // Placeholder removed so the user's email shows up automatically
         />
 
         {/* Phone number */}
-        <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">Phone Number</label>
+        <label htmlFor="phoneNumber">Phone Number</label>
         <input
           type="tel"
           id="phoneNumber"
@@ -168,12 +167,11 @@ const BookNow = () => {
           value={formData.phoneNumber}
           onChange={handleChange}
           required
-          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
           placeholder="Your phone number"
         />
 
         {/* Check-in date */}
-        <label htmlFor="checkInDate" className="block text-sm font-medium text-gray-700">Check-In Date</label>
+        <label htmlFor="checkInDate">Check-In Date</label>
         <input
           type="date"
           id="checkInDate"
@@ -181,15 +179,14 @@ const BookNow = () => {
           value={formData.checkInDate}
           onChange={handleChange}
           required
-          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
           min={new Date().toISOString().split("T")[0]}
         />
         {isDateBooked(formData.checkInDate) && (
-          <p className="error-text text-red-500 text-sm mt-1">❌ This date is already booked.</p>
+          <p className="error-text">❌ This date is already booked.</p>
         )}
 
         {/* Check-out date */}
-        <label htmlFor="checkOutDate" className="block text-sm font-medium text-gray-700">Check-Out Date</label>
+        <label htmlFor="checkOutDate">Check-Out Date</label>
         <input
           type="date"
           id="checkOutDate"
@@ -197,28 +194,26 @@ const BookNow = () => {
           value={formData.checkOutDate}
           onChange={handleChange}
           required
-          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
           min={formData.checkInDate || new Date().toISOString().split("T")[0]}
         />
 
         {/* Mode of payment */}
-        <label className="block text-sm font-medium text-gray-700">Mode of Payment</label>
+        <label>Mode of Payment</label>
         <select
           name="modeOfPayment"
           value={formData.modeOfPayment}
           onChange={handleChange}
-          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
         >
-          <option value="online">💳 Online Payment (Pre-paid)</option>
-          <option value="onsite">🏠 Pay Onsite (Upon Arrival)</option>
+          <option value="online">💳 Online Payment</option>
+          <option value="onsite">🏠 Pay Onsite</option>
         </select>
 
         {/* Submit button */}
-        <button type="submit" className="w-full mt-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition duration-300 disabled:bg-indigo-300" disabled={isSubmitting}>
+        <button type="submit" className="btn-primary" disabled={isSubmitting}>
           {isSubmitting ? 'Processing...' : 'Confirm Booking'}
         </button>
 
-        {message && <p className={`booking-message mt-4 p-3 rounded-lg text-center ${message.startsWith('✅') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{message}</p>}
+        {message && <p className="booking-message">{message}</p>}
       </form>
     </div>
   );
