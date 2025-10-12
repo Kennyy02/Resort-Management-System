@@ -13,7 +13,6 @@ const BookNow = () => {
   
   const serviceId = location.state?.serviceId; 
   const serviceName = location.state?.serviceName || 'Unknown Service'; 
-  const servicePrice = location.state?.servicePrice;
 
   const [formData, setFormData] = useState({
     name: "",
@@ -42,28 +41,30 @@ const BookNow = () => {
       return; 
     }
 
-    // 2. Service ID Check (CRITICAL)
+    // 2. Service ID Check
     if (!serviceId) {
         setMessage("❌ Error: Service details are missing. Please return to Services page.");
         setIsLoading(false);
         return; 
     }
 
-    // 3. Auto-fill user data (FIX: Generate user-friendly name)
+    // 3. Auto-fill user data (FIX: Ensure name is always set from user data)
     let userFullName = user.fullname;
     if (!userFullName && user.email) {
-        // Creates a friendly name (e.g., "john.doe@gmail.com" -> "John Doe")
+        // Fallback: Creates a friendly name from email (e.g., "john.doe@gmail.com" -> "John Doe")
         const emailPrefix = user.email.split("@")[0];
         userFullName = emailPrefix.replace(/[^a-zA-Z.]/g, ' ').split('.')
             .map(word => word.charAt(0).toUpperCase() + word.slice(1))
             .join(' ').trim();
     }
     
+    // Set the state with the user's data
     setFormData((prev) => ({
       ...prev,
-      name: userFullName || "Guest", // Fallback to "Guest"
-      email: user.email || "",
-      phoneNumber: user.phone || "",
+      name: userFullName || "", 
+      email: user.email || "", 
+      // CRITICAL FIX: Ensure phone number is present, even if empty string initially
+      phoneNumber: user.phone || "", 
     }));
     
     setIsLoading(false); 
@@ -97,38 +98,31 @@ const BookNow = () => {
 
     const user = JSON.parse(localStorage.getItem("user"));
     
-    // Check for critical missing data (especially name and phone number which are required by backend)
-    if (!user || !serviceId || !serviceName || !formData.name || !formData.phoneNumber) {
-        setMessage("❌ Critical booking data missing. Ensure name and phone number are present.");
-        setIsSubmitting(false);
-        if (!user) navigate("/login");
-        return;
-    }
+    const bookingData = { 
+        userId: user.id, // For tracking
+        serviceId: serviceId,
+        serviceName: serviceName,
+        ...formData 
+    };
 
-    // Basic Form Validation 
-    if (isDateBooked(formData.checkInDate)) {
+    // --- CRITICAL CLIENT-SIDE VALIDATION CHECK ---
+    // If the form has required fields set (like the date fields), 
+    // the browser handles most validation. We double-check complex logic here.
+    
+    if (isDateBooked(bookingData.checkInDate)) {
       setMessage("❌ Check-in date is already booked.");
       setIsSubmitting(false);
       return;
     }
     
-    // FIX: Allow check-in and check-out to be EQUAL (same-day stay)
-    if (formData.checkInDate > formData.checkOutDate) { 
+    // Allow check-in and check-out to be EQUAL (same-day stay)
+    if (bookingData.checkInDate > bookingData.checkOutDate) { 
       setMessage("❌ Check-out date must be the same as or after check-in date.");
       setIsSubmitting(false);
       return;
     }
 
     try {
-      // FIX: Ensure all fields the backend requires are included in the payload
-      const bookingData = { 
-          // The backend does not explicitly require userId, but we send it for safety
-          userId: user.id, 
-          serviceId: serviceId,
-          serviceName: serviceName,
-          ...formData 
-      };
-      
       console.log("📤 Submitting booking data:", bookingData);
       
       const res = await fetch(`${BOOKING_API_URL}/api/bookings`, {
@@ -140,8 +134,10 @@ const BookNow = () => {
       const data = await res.json();
       
       if (!res.ok) {
+          // The backend will now return 'missing' fields in the error response
+          const missing = data.missing ? ` (Missing: ${data.missing.join(', ')})` : '';
           console.error("API Error Response:", data); 
-          throw new Error(data.error || `Booking failed with status ${res.status}`);
+          throw new Error(data.error + missing || `Booking failed with status ${res.status}`);
       }
       
       setMessage(`✅ Booking successful! Your status is: ${data.status || 'Pending'}`);
@@ -169,14 +165,14 @@ const BookNow = () => {
       
       <form className="booking-form" onSubmit={handleSubmit}>
         
-        {/* Name (Auto-filled & Disabled) - Visible and User-Friendly */}
+        {/* Name (Auto-filled & Disabled) */}
         <label htmlFor="name">Full Name</label>
         <input
           type="text"
           id="name"
           name="name"
           value={formData.name}
-          disabled
+          disabled 
         />
 
         {/* Email (Auto-filled & Disabled) */}
@@ -186,10 +182,10 @@ const BookNow = () => {
           id="email"
           name="email"
           value={formData.email}
-          disabled
+          disabled 
         />
 
-        {/* Phone number */}
+        {/* Phone number (CRITICAL FIX: Allow editing if user.phone was missing) */}
         <label htmlFor="phoneNumber">Phone Number</label>
         <input
           type="tel"
@@ -197,8 +193,10 @@ const BookNow = () => {
           name="phoneNumber"
           value={formData.phoneNumber}
           onChange={handleChange}
-          required
-          placeholder="Your phone number"
+          required // Ensures user cannot skip this field
+          placeholder="Enter your phone number"
+          // If the phone number is already set from user data, disable it. Otherwise, enable it.
+          disabled={!!localStorage.getItem("user") && JSON.parse(localStorage.getItem("user")).phone}
         />
 
         {/* Check-in date */}
@@ -225,7 +223,6 @@ const BookNow = () => {
           value={formData.checkOutDate}
           onChange={handleChange}
           required
-          // Allows same-day check-out
           min={formData.checkInDate || new Date().toISOString().split("T")[0]}
         />
 
@@ -235,6 +232,7 @@ const BookNow = () => {
           name="modeOfPayment"
           value={formData.modeOfPayment}
           onChange={handleChange}
+          required
         >
           <option value="online">💳 Online Payment</option>
           <option value="onsite">🏠 Pay Onsite</option>
