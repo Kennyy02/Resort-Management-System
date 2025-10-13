@@ -117,34 +117,39 @@ body {
     transform: translateY(-1px);
 }
 
-/* ✅ Pagination to match Manage Booking */
+/* ✅ New Pagination Style */
 .pagination {
     display: flex;
     justify-content: center;
-    gap: 0.5rem;
+    gap: 8px;
     margin-top: 1.5rem;
     flex-wrap: wrap;
 }
 
 .pagination button {
-    padding: 8px 14px;
-    border-radius: 20px;
-    border: 2px solid #5E6D58;
-    background-color: transparent;
-    color: #5E6D58;
-    font-size: 0.9rem;
+    padding: 6px 14px;
+    border: 1px solid #dcdcdc;
+    background-color: #f8f9fa;
+    border-radius: 6px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    font-size: 14px;
+    color: #555;
+    transition: all 0.2s ease-in-out;
+}
+
+.pagination button:hover:not(:disabled) {
+    background-color: #e9ecef;
+}
+
+.pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .pagination button.active {
     background-color: #5E6D58;
     color: white;
-}
-
-.pagination button:hover {
-    background-color: #7C9271;
-    color: white;
+    border-color: #5E6D58;
 }
 
 /* ✅ Mobile Responsive */
