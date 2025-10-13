@@ -19,7 +19,8 @@ const corsOptions = {
         }
         return callback(null, true);
     },
-    methods: "GET,HEAD,PUT,PATCH,POST",
+    // *** FIX: Explicitly include OPTIONS for the CORS preflight check ***
+    methods: "GET,HEAD,PUT,PATCH,POST,OPTIONS", 
     credentials: true,
 };
 
