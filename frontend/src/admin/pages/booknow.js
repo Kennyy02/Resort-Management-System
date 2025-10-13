@@ -1,219 +1,209 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import './booknow.css'; 
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import "./contactview.css";
 
-const BOOKINGS_PER_PAGE = 10;
+const MESSAGES_PER_PAGE = 10;
 
-// Define API URL using environment variable (for production) or localhost (for development)
-const BOOKING_API_URL = process.env.NODE_ENV === 'production'
-    ? process.env.REACT_APP_BOOKING_API_URL
-    : 'http://localhost:5003';
+export default function ContactView() {
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [filter, setFilter] = useState("all");
+  const [sort, setSort] = useState("newest");
+  const [currentPage, setCurrentPage] = useState(1);
 
-function AdminBookNow() {
-    const [bookings, setBookings] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [showConfirmModal, setShowConfirmModal] = useState(false);
-    const [actionDetails, setActionDetails] = useState(null); // { id, newStatus }
+  useEffect(() => {
+    fetchMessages();
+  }, []);
 
-    const fetchBookings = useCallback(async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            // *** USING BOOKING_API_URL VARIABLE ***
-            const res = await fetch(`${BOOKING_API_URL}/api/bookings`);
-            if (!res.ok) {
-                const errorText = await res.text();
-                throw new Error(`Failed to fetch bookings: ${res.status} ${res.statusText} - ${errorText}`);
-            }
-            const data = await res.json();
-            if (Array.isArray(data)) {
-                setBookings(data);
-            } else {
-                setError('Invalid data format received: Expected an array.');
-                setBookings([]);
-            }
-        } catch (err) {
-            console.error('Error fetching bookings:', err);
-            setError(`Error fetching bookings: ${err.message}`);
-            setBookings([]);
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    useEffect(() => {
-        fetchBookings();
-    }, [fetchBookings]);
-
-    // Function to show the custom confirmation modal
-    const showConfirm = (id, newStatus) => {
-        setActionDetails({ id, newStatus });
-        setShowConfirmModal(true);
-    };
-
-    // Function to handle the actual status update after confirmation
-    const confirmUpdateStatus = async () => {
-        if (!actionDetails) return;
-        const { id, newStatus } = actionDetails;
-
-        setShowConfirmModal(false); // Hide modal immediately
-
-        try {
-            // *** USING BOOKING_API_URL VARIABLE ***
-            const res = await fetch(`${BOOKING_API_URL}/api/bookings/${id}/status`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status: newStatus }),
-            });
-
-            if (!res.ok) {
-                const errorData = await res.json();
-                throw new Error(errorData.error || 'Failed to update status');
-            }
-
-            // Refetch data to show the updated status
-            fetchBookings();
-        } catch (err) {
-            console.error('Error updating status:', err);
-            // Replace alert() with a state-based message display in a real app
-            console.error(`Failed to update status: ${err.message}`); 
-        }
-    };
-
-    const indexOfLastBooking = currentPage * BOOKINGS_PER_PAGE;
-    const indexOfFirstBooking = indexOfLastBooking - BOOKINGS_PER_PAGE;
-    const currentBookings = bookings.slice(indexOfFirstBooking, indexOfLastBooking);
-
-    const totalPages = Math.ceil(bookings.length / BOOKINGS_PER_PAGE);
-    const pageNumbers = [];
-    for (let i = 1; i <= totalPages; i++) {
-        pageNumbers.push(i);
+  const fetchMessages = async () => {
+    setLoading(true);
+    try {
+      const { data } = await axios.get(
+        `${process.env.REACT_APP_CONTACT_API}/api/messages`
+      );
+      setMessages(data);
+      setError(null);
+    } catch (err) {
+      setError(
+        "Failed to load messages. Please check the server and database connection."
+      );
+      console.error("Error fetching messages:", err);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
+  const toggleStatus = async (id, currentStatus) => {
+    if (currentStatus === "answered") return;
+    try {
+      await axios.put(
+        `${process.env.REACT_APP_CONTACT_API}/api/messages/${id}/status`,
+        { status: "answered" }
+      );
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === id ? { ...msg, status: "answered" } : msg
+        )
+      );
+    } catch (err) {
+      alert("Failed to update status.");
+      console.error(err);
+    }
+  };
 
+  let visibleMessages = [...messages];
+  if (filter === "answered")
+    visibleMessages = visibleMessages.filter((m) => m.status === "answered");
+  if (filter === "notAnswered")
+    visibleMessages = visibleMessages.filter((m) => m.status !== "answered");
+
+  visibleMessages.sort((a, b) =>
+    sort === "newest"
+      ? new Date(b.created_at) - new Date(a.created_at)
+      : new Date(a.created_at) - new Date(b.created_at)
+  );
+
+  const totalPages = Math.ceil(visibleMessages.length / MESSAGES_PER_PAGE);
+  const currentMessages = visibleMessages.slice(
+    (currentPage - 1) * MESSAGES_PER_PAGE,
+    currentPage * MESSAGES_PER_PAGE
+  );
+
+  // ✅ Pagination logic (Prev 1 2 3 Next)
+  const MAX_VISIBLE_PAGES = 3;
+  const startPage =
+    Math.floor((currentPage - 1) / MAX_VISIBLE_PAGES) * MAX_VISIBLE_PAGES + 1;
+  const endPage = Math.min(startPage + MAX_VISIBLE_PAGES - 1, totalPages);
+  const visiblePages = Array.from(
+    { length: endPage - startPage + 1 },
+    (_, i) => startPage + i
+  );
+
+  if (loading)
     return (
-        <div className="admin-bookings-card">
-            <h2 className="admin-bookings-title">Booking Management</h2>
-            {loading ? (
-                <p className="status-message loading-message">Loading bookings...</p>
-            ) : error ? (
-                <p className="status-message error-message">
-                    Error: {error}
-                    <br />
-                    Please ensure the backend service is running and accessible at 
-                    `{BOOKING_API_URL}`.
-                </p>
-            ) : bookings.length === 0 ? (
-                <p className="status-message no-bookings-message">No bookings found.</p>
-            ) : (
-                <div className="table-responsive">
-                    <table className="bookings-table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Phone Number</th>
-                                <th>Service</th>
-                                <th>Check-in</th>
-                                <th>Check-out</th>
-                                <th>Mode of Payment</th>
-                                <th>Date Submitted</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {currentBookings.map((booking) => (
-                                <tr key={booking.id}>
-                                    <td>{booking.id}</td>
-                                    <td>{booking.name}</td>
-                                    <td>{booking.email}</td>
-                                    <td>{booking.phoneNumber || 'N/A'}</td>
-                                    <td>{booking.serviceName}</td>
-                                    <td>{booking.checkInDate ? new Date(booking.checkInDate).toLocaleDateString() : 'N/A'}</td>
-                                    <td>{booking.checkOutDate ? new Date(booking.checkOutDate).toLocaleDateString() : 'N/A'}</td>
-                                    <td className="capitalize">{booking.modeOfPayment || 'N/A'}</td>
-                                    <td>{booking.created_at ? new Date(booking.created_at).toLocaleString() : 'N/A'}</td>
-                                    <td>
-                                        <span className={`status-badge status-${booking.status}`}>
-                                            {booking.status}
-                                        </span>
-                                    </td>
-                                    <td className="action-buttons">
-                                        {booking.status === 'pending' && (
-                                            <>
-                                                <button
-                                                    onClick={() => showConfirm(booking.id, 'approved')}
-                                                    className="action-button approve-button"
-                                                >
-                                                    Approve
-                                                </button>
-                                                <button
-                                                    onClick={() => showConfirm(booking.id, 'declined')}
-                                                    className="action-button decline-button"
-                                                >
-                                                    Decline
-                                                </button>
-                                            </>
-                                        )}
-                                        {booking.status === 'approved' && <span>✅ Approved</span>}
-                                        {booking.status === 'declined' && <span>❌ Declined</span>}
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            )}
-
-            {bookings.length > BOOKINGS_PER_PAGE && (
-                <div className="pagination-controls">
-                    <button
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        disabled={currentPage === 1}
-                        className="pagination-button"
-                    >
-                        Previous
-                    </button>
-                    {pageNumbers.map(number => (
-                        <button
-                            key={number}
-                            onClick={() => handlePageChange(number)}
-                            className={`pagination-button ${currentPage === number ? 'active' : ''}`}
-                        >
-                            {number}
-                        </button>
-                    ))}
-                    <button
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={currentPage === totalPages}
-                        className="pagination-button"
-                    >
-                        Next
-                    </button>
-                </div>
-            )}
-            
-            {/* Custom Confirmation Modal UI (Replaces window.confirm/alert) */}
-            {showConfirmModal && actionDetails && (
-                <div className="modal-overlay">
-                    <div className="modal-content">
-                        <h3>Confirm Status Change</h3>
-                        <p>Are you sure you want to change the status of booking ID {actionDetails.id} to 
-                           <strong className={`status-${actionDetails.newStatus}`}> "{actionDetails.newStatus}"</strong>?
-                        </p>
-                        <div className="modal-actions">
-                            <button onClick={() => setShowConfirmModal(false)} className="action-button decline-button">Cancel</button>
-                            <button onClick={confirmUpdateStatus} className="action-button approve-button">Confirm</button>
-                        </div>
-                    </div>
-                </div>
-            )}
-        </div>
+      <p className="status-message loading-message">Loading messages...</p>
     );
-}
+  if (error) return <p className="status-message error-message">{error}</p>;
 
-export default AdminBookNow;
+  return (
+    <div className="admin-contact-card">
+      <h2>Guest Messages</h2>
+
+      <div className="filter-controls">
+        <div>
+          <label>Filter: </label>
+          <select
+            value={filter}
+            onChange={(e) => {
+              setFilter(e.target.value);
+              setCurrentPage(1);
+            }}
+          >
+            <option value="all">All</option>
+            <option value="answered">Answered</option>
+            <option value="notAnswered">Not answered</option>
+          </select>
+        </div>
+        <div>
+          <label>Sort: </label>
+          <select
+            value={sort}
+            onChange={(e) => {
+              setSort(e.target.value);
+              setCurrentPage(1);
+            }}
+          >
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+          </select>
+        </div>
+      </div>
+
+      {currentMessages.length === 0 ? (
+        <p className="status-message no-data">No messages found.</p>
+      ) : (
+        <>
+          <div className="table-responsive">
+            <table className="contact-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Message</th>
+                  <th>Date Submitted</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentMessages.map((msg) => (
+                  <tr key={msg.id}>
+                    <td>{msg.name}</td>
+                    <td>{msg.email}</td>
+                    <td>{msg.message}</td>
+                    <td>{new Date(msg.created_at).toLocaleString()}</td>
+                    <td>
+                      <span
+                        className={`status-badge status-${
+                          msg.status === "answered" ? "answered" : "pending"
+                        }`}
+                      >
+                        {msg.status === "answered"
+                          ? "Answered"
+                          : "Not Answered"}
+                      </span>
+                    </td>
+                    <td>
+                      {msg.status !== "answered" && (
+                        <button
+                          className="action-button answered-button"
+                          onClick={() => toggleStatus(msg.id, msg.status)}
+                        >
+                          Mark as Answered
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* ✅ Pagination like “Prev 1 2 3 Next” */}
+          {totalPages > 1 && (
+            <div className="pagination">
+              <button
+                className="pagination-button"
+                onClick={() => setCurrentPage((p) => p - 1)}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </button>
+
+              {visiblePages.map((page) => (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`pagination-button ${
+                    currentPage === page ? "active" : ""
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+
+              <button
+                className="pagination-button"
+                onClick={() => setCurrentPage((p) => p + 1)}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
