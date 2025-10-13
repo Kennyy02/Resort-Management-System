@@ -3,10 +3,11 @@ const mysql = require('mysql2/promise');
 const cors = require('cors');
 
 const app = express();
-const port = 3002;
+// CRITICAL FIX: Use the port provided by the hosting environment (Railway)
+const dynamicPort = process.env.PORT || 3002;
 
 const allowedOrigins = [
-    'https://emzbayviewmountainresort.up.railway.app', // CRITICAL: This is your deployed frontend domain
+    'https://emzbayviewmountainresort.up.railway.app', // CORS FIX
     'http://localhost:3000', 
     'http://localhost:3001',
     'http://localhost:3002' 
@@ -156,6 +157,6 @@ app.get('/api/analytics/payment-methods', async (req, res) => {
     }
 });
 
-app.listen(port, () => {
-    console.log(`🚀 Analytics server running on http://localhost:${port}`);
+app.listen(dynamicPort, () => {
+    console.log(`🚀 Analytics server running on http://localhost:${dynamicPort}`);
 });
