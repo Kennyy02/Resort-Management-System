@@ -1,362 +1,99 @@
-/* Global styles for the component container */
-body {
-    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f4f7f6;
-    color: #333;
-    margin: 0;
-    padding: 0;
+.contactus-container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background-color: #f8f9fa;
 }
 
-.admin-contact-card {
-    width: 100%;
-    max-width: 1200px; /* Constrain max width for better desktop appearance */
-    margin: 0 auto; /* Center the content */
-    padding: 2rem;
-    background-color: transparent;
+/* Title */
+.contactus-container h2 {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #2f4f4f;
 }
 
-.admin-contact-card h2 {
-    text-align: center;
-    color: #4C5A48; /* Dark Green/Olive */
-    margin-bottom: 2rem;
-    font-size: 2.5em;
-    font-weight: 700;
-    letter-spacing: -0.5px;
+/* Table Wrapper */
+.table-wrapper {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-/* Filter and Sort Controls */
-.filter-controls {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
-    flex-wrap: wrap;
-    padding: 0 0.5rem;
+/* Table */
+.contactus-table {
+  width: 100%;
+  border-collapse: collapse;
 }
 
-.filter-controls > div {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+.contactus-table th,
+.contactus-table td {
+  padding: 12px;
+  border-bottom: 1px solid #e0e0e0;
+  text-align: left;
+  font-size: 14px;
 }
 
-.filter-controls label {
-    font-weight: 600;
-    color: #5E6D58; /* Medium Green/Olive */
+.contactus-table th {
+  background: #eaf3ec;
+  color: #2f4f4f;
+  font-weight: 600;
 }
 
-.filter-controls select {
-    padding: 0.5rem 0.75rem;
-    border-radius: 8px; /* Rounded corners */
-    border: 1px solid #ddd;
-    background-color: #ffffff;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    transition: border-color 0.2s;
-    cursor: pointer;
+.contactus-table tr:hover {
+  background-color: #f1f5f1;
 }
 
-.filter-controls select:focus {
-    border-color: #7C9271; /* Focus color */
-    outline: none;
+/* Status Tag */
+.status {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 12px;
 }
 
-/* Status Messages */
-.status-message {
-    text-align: center;
-    font-size: 1.1em;
-    padding: 1rem;
-    border-radius: 8px;
-    margin-top: 2rem;
-    font-weight: 500;
+.status.answered {
+  background-color: #c1eac5;
+  color: #2f4f4f;
 }
 
-.status-message.loading-message {
-    color: #5E6D58;
-    background-color: #DCE4D8;
-    border: 1px solid #AABF9D;
+.status.pending {
+  background-color: #f8d7da;
+  color: #721c24;
 }
 
-.status-message.error-message {
-    color: #c0392b;
-    background-color: #fce7e5;
-    border: 1px solid #c0392b;
-}
-
-.status-message.no-data {
-    color: #555;
-    background-color: #f0f0f0;
-    border: 1px solid #ccc;
-}
-
-/* Table styles */
-.table-responsive {
-    width: 100%;
-    overflow-x: auto;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1); /* Stronger shadow for better visibility */
-}
-
-.contact-table {
-    width: 100%;
-    min-width: 700px; /* Ensures readable width before responsive mode */
-    border-collapse: separate;
-    border-spacing: 0;
-    background-color: #ffffff;
-}
-
-.contact-table th,
-.contact-table td {
-    padding: 14px 18px; /* Increased padding */
-    text-align: left;
-    border-bottom: 1px solid #f0f0f0;
-    vertical-align: middle;
-}
-
-.contact-table td.message-content {
-    /* Limit message column height and enable scroll if content is too long */
-    max-height: 80px; 
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 3; /* Limit to 3 lines */
-    -webkit-box-orient: vertical;
-}
-
-.contact-table th {
-    background-color: #5E6D58; /* Darker Green/Olive */
-    color: #ffffff;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 0.85em;
-    letter-spacing: 0.5px;
-}
-
-/* Rounded corners for table header */
-.contact-table thead tr th:first-child {
-    border-top-left-radius: 12px;
-}
-.contact-table thead tr th:last-child {
-    border-top-right-radius: 12px;
-}
-
-.contact-table tbody tr:last-child td {
-    border-bottom: none; /* Remove border from last row */
-}
-
-.contact-table tbody tr:hover {
-    background-color: #E6EAE4;
-    transition: background-color 0.3s;
-}
-
-/* Status Badges */
-.status-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 6px 10px;
-    border-radius: 20px; /* Pill shape */
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 0.75em;
-    line-height: 1; /* Fix vertical alignment */
-}
-
-.status-pending {
-    background-color: #f9e79f; /* Light Yellow/Orange */
-    color: #8f6c00;
-}
-
-.status-answered {
-    background-color: #DCE4D8; /* Very light green/olive */
-    color: #4C5A48;
-}
-
-.icon-badge {
-    margin-right: 2px;
-}
-
-/* Action Buttons for Contact View */
-.action-button {
-    padding: 8px 12px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
-    font-size: 0.85em;
-    min-width: 140px;
-    text-align: center;
-}
-
-.answered-button {
-    background-color: #7C9271;
-    color: #ffffff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.answered-button:hover:not(:disabled) {
-    background-color: #6A7C5F;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
-}
-
-.answered-disabled {
-    background-color: #ccc;
-    color: #666;
-    cursor: not-allowed;
-    box-shadow: none;
-    opacity: 0.8;
-}
-
-/* Pagination Styles */
-.pagination-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 1.5rem;
-    padding: 0 0.5rem;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
-.pagination-summary {
-    font-size: 0.9em;
-    color: #666;
-    font-weight: 500;
-}
-
+/* Pagination */
 .pagination {
-    display: flex;
-    gap: 8px; /* Reduced gap for a more compact look */
-    flex-wrap: wrap;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 16px;
+  gap: 8px;
 }
 
-.pagination-button {
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #ffffff;
-    cursor: pointer;
-    font-size: 0.9em;
-    color: #555;
-    transition: background-color 0.2s, border-color 0.2s;
-    min-width: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
+.pagination button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 4px;
+  background-color: #eaf3ec;
+  color: #2f4f4f;
+  cursor: pointer;
+  transition: background 0.2s;
 }
 
-.pagination-button:hover:not(:disabled):not(.active) {
-    background-color: #f0f0f0;
-    border-color: #7C9271;
+.pagination button:hover {
+  background-color: #d4e6d6;
 }
 
-.pagination-button:disabled {
-    cursor: not-allowed;
-    opacity: 0.5;
+.pagination span {
+  font-size: 14px;
+  color: #555;
 }
 
-.pagination-button.active {
-    background-color: #7C9271; /* Active color */
-    color: #ffffff;
-    border-color: #7C9271;
-    font-weight: 600;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.pagination-button.page-number {
-    min-width: 38px;
-    padding: 8px;
-}
-
-/* Mobile Responsive - Reworked for better card view */
+/* Responsive */
 @media (max-width: 768px) {
-    .admin-contact-card {
-        padding: 1rem;
-    }
-
-    .filter-controls {
-        justify-content: space-between;
-    }
-    
-    /* Make the table display as stacked cards */
-    .contact-table, 
-    .contact-table tbody, 
-    .contact-table tr, 
-    .contact-table td {
-        display: block;
-        width: 100%;
-    }
-
-    .contact-table thead {
-        display: none; /* Hide header row */
-    }
-
-    .contact-table tr {
-        margin-bottom: 1rem;
-        border: 1px solid #e0e0e0;
-        border-radius: 10px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        padding: 0.5rem;
-        background-color: #ffffff;
-    }
-    
-    .contact-table tbody tr:hover {
-        background-color: #ffffff; /* Override hover for stacked cards */
-    }
-
-    .contact-table td {
-        border-bottom: 1px solid #f5f5f5; /* Lighter separator */
-        text-align: right;
-        padding: 10px 15px;
-        padding-left: 50%; /* Give space for the label */
-        position: relative;
-        word-wrap: break-word;
-        white-space: normal; /* Allow text wrapping in card view */
-        /* Reset line clamp for card view */
-        display: block; 
-        overflow: visible;
-        max-height: none;
-        -webkit-line-clamp: unset;
-    }
-    
-    /* Ensure the last cell of the card has no border */
-    .contact-table tr:last-child td:last-child {
-        border-bottom: none;
-    }
-    
-    /* CRITICAL FIX: The data-label content is displayed here */
-    .contact-table td::before {
-        content: attr(data-label);
-        position: absolute;
-        left: 15px;
-        width: calc(50% - 30px);
-        padding-right: 10px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        text-align: left;
-        font-weight: 600;
-        color: #4C5A48;
-    }
-
-    .action-button {
-        width: 100%;
-        margin-top: 0.5rem;
-    }
-    
-    .pagination-container {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .pagination {
-        justify-content: center;
-        width: 100%;
-    }
-    
-    .pagination-button {
-        padding: 10px 12px;
-    }
+  .contactus-table th, .contactus-table td {
+    font-size: 12px;
+    padding: 8px;
+  }
 }
