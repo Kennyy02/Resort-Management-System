@@ -15,7 +15,7 @@ export default function ContactView() {
     const fetchMessages = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`${process.env.REACT_APP_CONTACT_API}/api/messages`);
+            const response = await axios.get(`${process.env.REACT_APP_CONTACTUS_API}/api/messages`);
             setMessages(response.data);
             setError(null);
         } catch (err) {
@@ -37,7 +37,7 @@ export default function ContactView() {
 
         const newStatus = 'answered';
         try {
-            await axios.put(`${process.env.REACT_APP_CONTACT_API}/api/messages/${id}/status`, { status: newStatus });
+            await axios.put(`${process.env.REACT_APP_CONTACTUS_API}/api/messages/${id}/status`, { status: newStatus });
             setMessages(messages.map(msg => msg.id === id ? { ...msg, status: newStatus } : msg));
         } catch (err) {
             alert('Failed to update status.');
