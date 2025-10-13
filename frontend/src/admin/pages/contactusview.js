@@ -12,9 +12,7 @@ export default function ContactView() {
   const [sort, setSort] = useState("newest");
   const [currentPage, setCurrentPage] = useState(1);
 
-  useEffect(() => {
-    fetchMessages();
-  }, []);
+  useEffect(() => { fetchMessages(); }, []);
 
   const fetchMessages = async () => {
     setLoading(true);
@@ -34,7 +32,6 @@ export default function ContactView() {
 
   const toggleStatus = async (id, currentStatus) => {
     if (currentStatus === "answered") return;
-
     try {
       await axios.put(
         `${process.env.REACT_APP_CONTACT_API}/api/messages/${id}/status`,
@@ -51,19 +48,16 @@ export default function ContactView() {
     }
   };
 
-  // Filtering
   let visibleMessages = [...messages];
   if (filter === "answered") visibleMessages = visibleMessages.filter((m) => m.status === "answered");
   if (filter === "notAnswered") visibleMessages = visibleMessages.filter((m) => m.status !== "answered");
 
-  // Sorting
   visibleMessages.sort((a, b) =>
     sort === "newest"
       ? new Date(b.created_at) - new Date(a.created_at)
       : new Date(a.created_at) - new Date(b.created_at)
   );
 
-  // Pagination
   const totalPages = Math.ceil(visibleMessages.length / MESSAGES_PER_PAGE);
   const currentMessages = visibleMessages.slice(
     (currentPage - 1) * MESSAGES_PER_PAGE,
@@ -77,7 +71,6 @@ export default function ContactView() {
     <div className="admin-contact-card">
       <h2>Guest Messages</h2>
 
-      {/* Filters */}
       <div className="filter-controls">
         <div>
           <label>Filter: </label>
@@ -96,7 +89,6 @@ export default function ContactView() {
         </div>
       </div>
 
-      {/* Messages Table */}
       {currentMessages.length === 0 ? (
         <p className="status-message no-data">No messages found.</p>
       ) : (
@@ -138,12 +130,17 @@ export default function ContactView() {
             </table>
           </div>
 
-          {/* Pagination */}
+          {/* ✅ PRETTY PAGINATION LIKE YOUR SAMPLE */}
           {totalPages > 1 && (
             <div className="pagination">
-              <button onClick={() => setCurrentPage((p) => p - 1)} disabled={currentPage === 1}>
+              <button
+                className="pagination-button"
+                onClick={() => setCurrentPage((p) => p - 1)}
+                disabled={currentPage === 1}
+              >
                 Previous
               </button>
+
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
                 <button
                   key={n}
@@ -153,7 +150,12 @@ export default function ContactView() {
                   {n}
                 </button>
               ))}
-              <button onClick={() => setCurrentPage((p) => p + 1)} disabled={currentPage === totalPages}>
+
+              <button
+                className="pagination-button"
+                onClick={() => setCurrentPage((p) => p + 1)}
+                disabled={currentPage === totalPages}
+              >
                 Next
               </button>
             </div>
