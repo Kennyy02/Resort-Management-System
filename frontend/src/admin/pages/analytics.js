@@ -7,11 +7,12 @@ import './analytics.css';
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend, Title, BarElement, Filler);
 
-// CRITICAL FIX: Use the REACT_APP_ANALYTICS_API environment variable
+// CRITICAL FIX 1: Use the REACT_APP_ANALYTICS_API environment variable for deployment
 const API_BASE_URL = `${process.env.REACT_APP_ANALYTICS_API}/api/analytics`; 
 
 const formatCurrencyPHP = (value) => {
     const numericValue = parseFloat(value);
+    // Improved check for NaN or zero
     if (isNaN(numericValue) || numericValue === 0) {
         return '₱0.00';
     }
@@ -24,10 +25,10 @@ const formatCurrencyPHP = (value) => {
 };
 
 // =========================================================================
-// Summary Card Components (No change needed here)
+// Summary Card Components (Restored from working version)
 // =========================================================================
 const SummaryCard = ({ title, value, icon, color }) => (
-    <div className={`p-6 rounded-xl shadow-lg flex items-center justify-between ${color}`}>
+    <div className={`p-6 rounded-xl shadow-lg flex items-center justify-between ${color} text-white`}>
         <div>
             <p className="text-sm font-medium opacity-80">{title}</p>
             <h3 className="text-3xl font-bold mt-1">{value}</h3>
@@ -49,15 +50,21 @@ const AnalyticsSummary = () => {
         const fetchSummaryData = async () => {
             setLoading(true);
             try {
-                // Fetching summary data using the environment variable base URL
+                // We will use a date object to display the *client's* current month
+                const currentMonth = new Date().toLocaleString('en-US', { month: 'long', year: 'numeric' });
+                const currentYear = new Date().getFullYear();
+
+                // Fetching summary data
                 const [bookingsRes, revenueRes] = await Promise.all([
-                    axios.get(`${API_BASE_URL}/summary/total-bookings-month`),
-                    axios.get(`${API_BASE_URL}/summary/total-revenue-month`),
+                    // CRITICAL FIX 3: Pass the current year from the client to the server
+                    // We must assume the server has an endpoint that accepts a year query param
+                    axios.get(`${API_BASE_URL}/summary/total-bookings-month?year=${currentYear}`),
+                    axios.get(`${API_BASE_URL}/summary/total-revenue-month?year=${currentYear}`),
                 ]);
 
                 setSummary({
-                    totalBookingsMonth: bookingsRes.data.total_bookings,
-                    totalRevenueMonth: revenueRes.data.total_revenue,
+                    totalBookingsMonth: bookingsRes.data.total_bookings || 0,
+                    totalRevenueMonth: revenueRes.data.total_revenue || 0,
                 });
             } catch (err) {
                 console.error("Error fetching summary data:", err);
@@ -71,35 +78,35 @@ const AnalyticsSummary = () => {
 
     const revenueValue = formatCurrencyPHP(summary.totalRevenueMonth);
     const bookingsValue = summary.totalBookingsMonth;
-    const currentMonth = new Date().toLocaleString('en-US', { month: 'long', year: 'numeric' });
+    const currentMonthDisplay = new Date().toLocaleString('en-US', { month: 'long', year: 'numeric' });
 
     if (loading) return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <SummaryCard title="Loading..." value="---" icon="..." color="bg-gray-200 text-gray-700" />
-            <SummaryCard title="Loading..." value="---" icon="..." color="bg-gray-200 text-gray-700" />
+            <SummaryCard title="Loading..." value="---" icon="⏳" color="bg-gray-400" />
+            <SummaryCard title="Loading..." value="---" icon="⏳" color="bg-gray-400" />
         </div>
     );
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <SummaryCard
-                title={`Total Bookings (${currentMonth})`}
+                title={`Total Bookings (${currentMonthDisplay})`}
                 value={bookingsValue}
                 icon="🛏️"
-                color="bg-purple-600 text-white"
+                color="bg-purple-600"
             />
             <SummaryCard
-                title={`Total Revenue (${currentMonth})`}
+                title={`Total Revenue (${currentMonthDisplay})`}
                 value={revenueValue}
                 icon="💰"
-                color="bg-green-600 text-white"
+                color="bg-green-600"
             />
         </div>
     );
 };
 
 // =========================================================================
-// Monthly Bookings Chart
+// Monthly Bookings Chart (Bar)
 // =========================================================================
 const MonthlyBookingsChart = () => {
     const [chartData, setChartData] = useState({
@@ -122,13 +129,11 @@ const MonthlyBookingsChart = () => {
                 const response = await axios.get(`${API_BASE_URL}/bookings-by-month`);
                 const data = response.data;
                 
-                // 💥 FIX START: Check if data is an array and not empty
+                // CRITICAL FIX 2: Crash prevention check
                 if (!Array.isArray(data) || data.length === 0) {
                     setLoading(false);
-                    // This returns an empty chart, preventing the crash
-                    return; 
+                    return; // Exit if no data
                 }
-                // 💥 FIX END
 
                 const labels = data.map(item => `${item.booking_month}/${item.booking_year}`);
                 const bookingCounts = data.map(item => item.total_bookings);
@@ -153,8 +158,7 @@ const MonthlyBookingsChart = () => {
 
     if (loading) return <div className="text-center p-4">Loading monthly booking data...</div>;
     if (error) return <div className="text-center p-4 text-red-500">Error: {error}</div>;
-    // Add check for no data after loading, if desired.
-    if (chartData.labels.length === 0 && !loading && !error) return <div className="text-center p-4 text-gray-500">No booking data available yet.</div>;
+    if (chartData.labels.length === 0) return <div className="text-center p-4 text-gray-500">No booking data available yet.</div>;
 
 
     const options = {
@@ -211,7 +215,7 @@ const MonthlyBookingsChart = () => {
 };
 
 // =========================================================================
-// Bookings by Service Chart
+// Service Bookings Chart (Bar)
 // =========================================================================
 const ServiceBookingsChart = () => {
     const [chartData, setChartData] = useState({
@@ -234,12 +238,11 @@ const ServiceBookingsChart = () => {
                 const response = await axios.get(`${API_BASE_URL}/bookings-by-service`);
                 const data = response.data;
 
-                // 💥 FIX START: Check if data is an array and not empty
+                // CRITICAL FIX 2: Crash prevention check
                 if (!Array.isArray(data) || data.length === 0) {
                     setLoading(false);
-                    return; // Exit the function gracefully
+                    return;
                 }
-                // 💥 FIX END
 
                 const labels = data.map(item => item.serviceName);
                 const bookingCounts = data.map(item => item.total_bookings);
@@ -264,8 +267,7 @@ const ServiceBookingsChart = () => {
 
     if (loading) return <div className="text-center p-4">Loading service bookings data...</div>;
     if (error) return <div className="text-center p-4 text-red-500">Error: {error}</div>;
-    // Add check for no data after loading, if desired.
-    if (chartData.labels.length === 0 && !loading && !error) return <div className="text-center p-4 text-gray-500">No service booking data available yet.</div>;
+    if (chartData.labels.length === 0) return <div className="text-center p-4 text-gray-500">No service booking data available yet.</div>;
 
 
     const options = {
@@ -321,72 +323,70 @@ const ServiceBookingsChart = () => {
     );
 };
 
-
 // =========================================================================
-// Monthly Revenue Trend Chart
+// Monthly Booking Count Trend Chart (Line) - Renamed for clarity
 // =========================================================================
-const MonthlyRevenueTrendChart = () => {
+const MonthlyBookingCountTrendChart = () => {
     const [chartData, setChartData] = useState({
         labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
         datasets: [{
-            label: 'Total Revenue',
-            data: Array(12).fill(0),
+            label: 'Total Bookings',
+            data: Array(12).fill(0), // Initialize with 0s
             fill: true,
-            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-            borderColor: 'rgba(255, 99, 132, 1)',
+            backgroundColor: 'rgba(102, 51, 153, 0.2)',
+            borderColor: 'rgba(102, 51, 153, 1)',
             tension: 0.4,
             pointRadius: 5,
-            pointBackgroundColor: 'rgba(255, 99, 132, 1)',
+            pointBackgroundColor: 'rgba(102, 51, 153, 1)',
             pointBorderColor: '#fff',
             pointHoverRadius: 7,
         }],
     });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
     useEffect(() => {
-        const fetchAnnualRevenueData = async () => {
+        const fetchAnnualBookingCountData = async () => {
             try {
-                const response = await axios.get(`${API_BASE_URL}/revenue-by-month`);
+                const response = await axios.get(`${API_BASE_URL}/bookings-by-month`);
                 const data = response.data;
-                
-                // 💥 FIX START: Check if data is an array
-                if (!Array.isArray(data)) {
-                    setLoading(false);
-                    return; // Exit the function gracefully
-                }
-                // 💥 FIX END
 
-                const revenuePerMonth = Array(12).fill(0);
-                
-                const currentYearData = data.filter(item => item.revenue_year === currentYear);
-                
-                currentYearData.forEach(item => {
-                    revenuePerMonth[item.revenue_month - 1] = item.total_revenue;
+                // CRITICAL FIX 2: Crash prevention check
+                if (!Array.isArray(data) || data.length === 0) {
+                    setLoading(false);
+                    return;
+                }
+
+                const bookingCountsPerMonth = Array(12).fill(0);
+                data.forEach(item => {
+                    // Only display data for the current year (or filter by year if necessary)
+                    const currentYear = new Date().getFullYear();
+                    if (item.booking_year === currentYear) {
+                        bookingCountsPerMonth[item.booking_month - 1] = item.total_bookings;
+                    }
                 });
 
                 setChartData(prev => ({
                     ...prev,
                     datasets: [{
                         ...prev.datasets[0],
-                        data: revenuePerMonth,
+                        data: bookingCountsPerMonth,
                     }],
                 }));
                 setLoading(false);
             } catch (err) {
-                console.error("Error fetching annual revenue data:", err);
-                setError("Failed to load annual revenue data.");
+                console.error("Error fetching annual booking count data:", err);
+                setError("Failed to load annual booking count data.");
                 setLoading(false);
             }
         };
-        fetchAnnualRevenueData();
-    }, [currentYear]);
+        fetchAnnualBookingCountData();
+    }, []);
 
-    if (loading) return <div className="text-center p-4">Loading annual revenue data...</div>;
+    if (loading) return <div className="text-center p-4">Loading annual booking count data...</div>;
     if (error) return <div className="text-center p-4 text-red-500">Error: {error}</div>;
-    // Add check for no data after loading, if desired.
-    if (chartData.datasets[0].data.every(d => d === 0) && !loading && !error) return <div className="text-center p-4 text-gray-500">No revenue data available for this year.</div>;
+    // Check for no data after filtering
+    if (chartData.datasets[0].data.every(d => d === 0)) return <div className="text-center p-4 text-gray-500">No booking count data available for this year.</div>;
 
     const options = {
         responsive: true,
@@ -404,7 +404,7 @@ const MonthlyRevenueTrendChart = () => {
                 displayColors: true,
                 callbacks: {
                     label: function(context) {
-                        return `Revenue: ${formatCurrencyPHP(context.parsed.y)}`;
+                        return `Bookings: ${context.parsed.y}`;
                     }
                 }
             }
@@ -415,7 +415,7 @@ const MonthlyRevenueTrendChart = () => {
                 grid: { color: 'rgba(0,0,0,0.05)' },
                 ticks: {
                     callback: function(value) {
-                        return formatCurrencyPHP(value).replace('₱', '').replace('.00', '');
+                        return value >= 1000 ? (value / 1000) + 'K' : value;
                     },
                     color: '#6c757d',
                 },
@@ -431,7 +431,7 @@ const MonthlyRevenueTrendChart = () => {
 
     return (
         <div className="chart-card">
-            <h2 className="text-xl font-semibold mb-4 text-gray-800">Monthly Revenue Trend ({currentYear})</h2>
+            <h2 className="text-xl font-semibold mb-4 text-gray-800">Monthly Booking Count Trend ({new Date().getFullYear()})</h2>
             <div className="flex-grow h-96">
                 <Line data={chartData} options={options} />
             </div>
@@ -440,9 +440,8 @@ const MonthlyRevenueTrendChart = () => {
 };
 
 // =========================================================================
-// Main Dashboard Component (No change needed here)
+// Main Dashboard Component
 // =========================================================================
-
 const AnalyticsDashboard = () => {
     return (
         <div className="p-6 bg-gray-100 min-h-screen">
@@ -452,7 +451,7 @@ const AnalyticsDashboard = () => {
                 <p className="text-gray-600">Overview of booking and revenue performance.</p>
             </div>
 
-            {/* Top Row: Summary Cards */}
+            {/* Top Row: Summary Cards (Added back) */}
             <AnalyticsSummary />
 
             {/* Middle Row: Monthly Booking Trends and Service Bookings */}
@@ -465,10 +464,10 @@ const AnalyticsDashboard = () => {
                 </div>
             </div>
 
-            {/* Bottom Row: Monthly Revenue Trend Chart */}
+            {/* Bottom Row: Monthly Booking Count Trend Chart */}
             <div className="grid grid-cols-1 gap-6 mt-6">
                 <div className="col-span-1">
-                    <MonthlyRevenueTrendChart />
+                    <MonthlyBookingCountTrendChart />
                 </div>
             </div>
         </div>
