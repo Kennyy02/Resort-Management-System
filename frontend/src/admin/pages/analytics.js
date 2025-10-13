@@ -44,9 +44,11 @@ const AnalyticsSummary = () => {
         const fetchSummaryData = async () => {
             setLoading(true);
             try {
+                // NOTE: Your backend is hardcoded to 2025, but using current year for consistency
                 const currentYear = new Date().getFullYear();
 
                 const [bookingsRes, revenueRes] = await Promise.all([
+                    // Assuming your backend uses the URL structure you provided in the error logs
                     axios.get(`${API_BASE_URL}/summary/total-bookings-month?year=${currentYear}`),
                     axios.get(`${API_BASE_URL}/summary/total-revenue-month?year=${currentYear}`),
                 ]);
@@ -109,27 +111,33 @@ const MonthlyBookingsChart = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    // FIX: Month names for better chart labels
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
     useEffect(() => {
         const fetchBookingData = async () => {
             try {
                 const response = await axios.get(`${API_BASE_URL}/bookings-by-month`);
                 const data = response.data;
-                
-                if (!Array.isArray(data) || data.length === 0) {
-                    setLoading(false);
-                    return;
-                }
+                
+                if (!Array.isArray(data) || data.length === 0) {
+                    setLoading(false);
+                    return;
+                }
 
-                const labels = data.map(item => `${item.booking_month}/${item.booking_year}`);
+                // FIX: Use month name abbreviations for better display
+                const labels = data.map(item => `${monthNames[item.booking_month - 1]} ${item.booking_year}`);
                 const bookingCounts = data.map(item => item.total_bookings);
 
-                setChartData({
+                setChartData(prev => ({ // Use functional update for safety
                     labels: labels,
                     datasets: [{
-                        ...chartData.datasets[0],
+                        ...prev.datasets[0], // Spread existing styles
                         data: bookingCounts,
+                        // Ensure key styles are explicitly set
+                        backgroundColor: 'rgba(102, 51, 153, 0.8)',
                     }],
-                });
+                }));
                 setLoading(false);
             } catch (err) {
                 console.error("Error fetching monthly booking data:", err);
@@ -143,7 +151,8 @@ const MonthlyBookingsChart = () => {
 
     if (loading) return <div className="text-center p-4">Loading monthly booking data...</div>;
     if (error) return <div className="text-center p-4 text-red-500">Error: {error}</div>;
-    if (chartData.labels.length === 0) return <div className="text-center p-4 text-gray-500">No booking data available yet.</div>;
+    // FIX: Use datasets length check for reliability
+    if (chartData.datasets[0].data.length === 0) return <div className="text-center p-4 text-gray-500">No booking data available yet.</div>;
 
 
     const options = {
@@ -220,21 +229,22 @@ const ServiceBookingsChart = () => {
                 const response = await axios.get(`${API_BASE_URL}/bookings-by-service`);
                 const data = response.data;
 
-                if (!Array.isArray(data) || data.length === 0) {
-                    setLoading(false);
-                    return;
-                }
+                if (!Array.isArray(data) || data.length === 0) {
+                    setLoading(false);
+                    return;
+                }
 
                 const labels = data.map(item => item.serviceName);
                 const bookingCounts = data.map(item => item.total_bookings);
 
-                setChartData({
+                setChartData(prev => ({
                     labels: labels,
                     datasets: [{
-                        ...chartData.datasets[0],
+                        ...prev.datasets[0],
                         data: bookingCounts,
+                        backgroundColor: 'rgba(102, 51, 153, 0.8)',
                     }],
-                });
+                }));
                 setLoading(false);
             } catch (err) {
                 console.error("Error fetching bookings by service type:", err);
@@ -329,17 +339,17 @@ const MonthlyBookingCountTrendChart = () => {
                 const response = await axios.get(`${API_BASE_URL}/bookings-by-month`);
                 const data = response.data;
 
-                if (!Array.isArray(data) || data.length === 0) {
-                    setLoading(false);
-                    return;
-                }
+                if (!Array.isArray(data) || data.length === 0) {
+                    setLoading(false);
+                    return;
+                }
 
                 const bookingCountsPerMonth = Array(12).fill(0);
                 data.forEach(item => {
-                    const currentYear = new Date().getFullYear();
-                    if (item.booking_year === currentYear) {
+                    const currentYear = new Date().getFullYear();
+                    if (item.booking_year === currentYear) {
                         bookingCountsPerMonth[item.booking_month - 1] = item.total_bookings;
-                    }
+                    }
                 });
 
                 setChartData(prev => ({
@@ -361,7 +371,7 @@ const MonthlyBookingCountTrendChart = () => {
 
     if (loading) return <div className="text-center p-4">Loading annual booking count data...</div>;
     if (error) return <div className="text-center p-4 text-red-500">Error: {error}</div>;
-    if (chartData.datasets[0].data.every(d => d === 0)) return <div className="text-center p-4 text-gray-500">No booking count data available for this year.</div>;
+    if (chartData.datasets[0].data.every(d => d === 0)) return <div className="text-center p-4 text-gray-500">No booking count data available for this year.</div>;
 
     const options = {
         responsive: true,
@@ -416,7 +426,8 @@ const MonthlyBookingCountTrendChart = () => {
 
 const AnalyticsDashboard = () => {
     return (
-        <div className="p-6 bg-gray-100 min-h-screen">
+        // FIX: Added w-full to ensure it takes the available width next to the sidebar
+        <div className="p-6 bg-gray-100 min-h-screen w-full"> 
             <div className="mb-8">
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">Em'z Analytics Dashboard 📊</h1>
                 <p className="text-gray-600">Overview of booking and revenue performance.</p>
