@@ -19,7 +19,7 @@ const corsOptions = {
         }
         return callback(null, true);
     },
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    methods: "GET,HEAD,PUT,PATCH,POST",
     credentials: true,
 };
 
