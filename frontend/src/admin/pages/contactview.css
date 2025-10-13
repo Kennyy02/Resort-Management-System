@@ -1,99 +1,192 @@
-.contactus-container {
-  padding: 20px;
-  font-family: Arial, sans-serif;
-  background-color: #f8f9fa;
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
+    margin: 0;
+    padding: 0;
 }
 
-/* Title */
-.contactus-container h2 {
-  font-size: 24px;
-  font-weight: 600;
-  margin-bottom: 20px;
-  color: #2f4f4f;
+.admin-contact-card {
+    width: 100%;
+    padding: 2rem;
+    background-color: transparent;
 }
 
-/* Table Wrapper */
-.table-wrapper {
-  background: #ffffff;
-  border-radius: 8px;
-  padding: 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+.admin-contact-card h2 {
+    text-align: center;
+    color: #4C5A48;
+    margin-bottom: 1.5rem;
+    font-size: 2.2em;
+    font-weight: 600;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 10px;
 }
 
-/* Table */
-.contactus-table {
-  width: 100%;
-  border-collapse: collapse;
+.filter-controls {
+    display: flex;
+    justify-content: flex-start;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
 }
 
-.contactus-table th,
-.contactus-table td {
-  padding: 12px;
-  border-bottom: 1px solid #e0e0e0;
-  text-align: left;
-  font-size: 14px;
+.filter-controls label {
+    font-weight: 500;
 }
 
-.contactus-table th {
-  background: #eaf3ec;
-  color: #2f4f4f;
-  font-weight: 600;
+.filter-controls select {
+    padding: 0.5rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
 }
 
-.contactus-table tr:hover {
-  background-color: #f1f5f1;
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
 }
 
-/* Status Tag */
-.status {
-  padding: 4px 10px;
-  border-radius: 4px;
-  font-weight: bold;
-  font-size: 12px;
+.contact-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-.status.answered {
-  background-color: #c1eac5;
-  color: #2f4f4f;
+.contact-table th,
+.contact-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
 }
 
-.status.pending {
-  background-color: #f8d7da;
-  color: #721c24;
+.contact-table th {
+    background-color: #5E6D58;
+    color: #ffffff;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9em;
 }
 
-/* Pagination */
+.contact-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.contact-table tbody tr:hover {
+    background-color: #E6EAE4;
+}
+
+.status-badge {
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: 600;
+    text-transform: capitalize;
+    font-size: 0.85em;
+}
+
+.status-pending {
+    background-color: #f0ad4e;
+    color: white;
+}
+
+.status-answered {
+    background-color: #7C9271;
+    color: white;
+}
+
+.action-button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    font-size: 0.9em;
+    min-width: 120px;
+}
+
+.answered-button {
+    background-color: #7C9271;
+    color: #ffffff;
+}
+
+.answered-button:hover {
+    background-color: #6A7C5F;
+    transform: translateY(-1px);
+}
+
+/* ✅ Pagination to match Manage Booking */
 .pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 16px;
-  gap: 8px;
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
 }
 
 .pagination button {
-  padding: 8px 14px;
-  border: none;
-  border-radius: 4px;
-  background-color: #eaf3ec;
-  color: #2f4f4f;
-  cursor: pointer;
-  transition: background 0.2s;
+    padding: 8px 14px;
+    border-radius: 20px;
+    border: 2px solid #5E6D58;
+    background-color: transparent;
+    color: #5E6D58;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.pagination button.active {
+    background-color: #5E6D58;
+    color: white;
 }
 
 .pagination button:hover {
-  background-color: #d4e6d6;
+    background-color: #7C9271;
+    color: white;
 }
 
-.pagination span {
-  font-size: 14px;
-  color: #555;
-}
-
-/* Responsive */
+/* ✅ Mobile Responsive */
 @media (max-width: 768px) {
-  .contactus-table th, .contactus-table td {
-    font-size: 12px;
-    padding: 8px;
-  }
+    .contact-table, .contact-table tbody, .contact-table tr, .contact-table td, .contact-table th {
+        display: block;
+    }
+
+    .contact-table thead {
+        display: none;
+    }
+
+    .contact-table tr {
+        margin-bottom: 1rem;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        padding: 0.5rem;
+    }
+
+    .contact-table td {
+        border-bottom: 1px dashed #eee;
+        text-align: right;
+        padding-left: 50%;
+        position: relative;
+        word-wrap: break-word;
+    }
+
+    .contact-table td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 10px;
+        width: calc(50% - 20px);
+        padding-right: 10px;
+        white-space: nowrap;
+        text-align: left;
+        font-weight: 600;
+        color: #4C5A48;
+    }
+
+    .action-button {
+        width: 100%;
+        margin-top: 0.5rem;
+    }
 }
