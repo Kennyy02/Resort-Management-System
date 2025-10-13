@@ -1,21 +1,25 @@
 :root {
-    --primary-purple: #8fbc8f;
-    --light-purple: #a6d9a6;
-    --extra-light-purple: #c2e6c2;
-    --background-light-grey: #f8f9fa;
-    --text-dark: #343a40;
-    --text-medium: #6c757d;
+    --primary-sage: #8fbc8f;
+    --light-sage: #a6d9a6;
+    --extra-light-sage: #c2e6c2;
+    
+    /* Chart.js Color Variables for Sage Green */
+    --chart-bar-fill: rgba(143, 188, 143, 0.8); /* Using --primary-sage with opacity */
+    --chart-line-fill: rgba(143, 188, 143, 0.2);
+    --chart-border-color: #8fbc8f; /* --primary-sage */
+    
+    --background-light-grey: #f3f4f6;
+    --text-dark: #1f2937;
+    --text-medium: #4b5563;
     --shadow-color: rgba(0, 0, 0, 0.05);
     --hover-shadow-color: rgba(0, 0, 0, 0.1);
 }
 
 body {
-    font-family: "Inter", sans-serif;
     background-color: var(--background-light-grey);
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    color: var(--text-dark);
 }
 
 .chart-card {
@@ -29,11 +33,6 @@ body {
     display: flex;
     flex-direction: column;
     width: 100%;
-    height: 350px;
-}
-
-.chart-card.flex-col.items-center.justify-center {
-    height: auto;
 }
 
 .chart-card:hover {
@@ -41,21 +40,9 @@ body {
     box-shadow: 0 8px 16px var(--hover-shadow-color);
 }
 
-select {
-    border-color: #e2e8f0;
-    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-}
-
-select:focus {
-    border-color: var(--primary-purple);
-    box-shadow: 0 0 0 3px #c2e6c2;
+/* Ensure the focus ring uses the sage color scheme */
+select.focus\:ring-purple-500:focus {
+    border-color: var(--primary-sage);
+    box-shadow: 0 0 0 3px var(--extra-light-sage);
     outline: none;
-}
-
-h1, h2, h3, h4, h5, h6 {
-    color: var(--text-dark);
-}
-
-p, span, div {
-    color: var(--text-medium);
 }
