@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import "./contactview.css";
-import { ChevronLeft, ChevronRight, CheckCircle, Clock } from 'lucide-react';
 
 const API_BASE_URL = process.env.REACT_APP_CONTACT_API || 'http://localhost:8081';
 const MESSAGES_PER_PAGE = 10;
