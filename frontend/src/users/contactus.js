@@ -15,9 +15,7 @@ const ContactUs = () => {
     setStatus('Sending message...');
 
     try {
-      // --- CRITICAL FIX: Use the CONTACT API environment variable for deployment ---
       await axios.post(`${process.env.REACT_APP_CONTACT_API}/api/contact`, form);
-      // Ensure you have added the REACT_APP_CONTACT_API variable to your Railway frontend service!
       setStatus('✅ Message sent successfully!');
       setForm({ name: '', email: '', message: '' });
     } catch (error) {
