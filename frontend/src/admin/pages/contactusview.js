@@ -12,7 +12,9 @@ export default function ContactView() {
   const [sort, setSort] = useState("newest");
   const [currentPage, setCurrentPage] = useState(1);
 
-  useEffect(() => { fetchMessages(); }, []);
+  useEffect(() => {
+    fetchMessages();
+  }, []);
 
   const fetchMessages = async () => {
     setLoading(true);
@@ -23,7 +25,9 @@ export default function ContactView() {
       setMessages(data);
       setError(null);
     } catch (err) {
-      setError("Failed to load messages. Please check the server and database connection.");
+      setError(
+        "Failed to load messages. Please check the server and database connection."
+      );
       console.error("Error fetching messages:", err);
     } finally {
       setLoading(false);
@@ -49,8 +53,10 @@ export default function ContactView() {
   };
 
   let visibleMessages = [...messages];
-  if (filter === "answered") visibleMessages = visibleMessages.filter((m) => m.status === "answered");
-  if (filter === "notAnswered") visibleMessages = visibleMessages.filter((m) => m.status !== "answered");
+  if (filter === "answered")
+    visibleMessages = visibleMessages.filter((m) => m.status === "answered");
+  if (filter === "notAnswered")
+    visibleMessages = visibleMessages.filter((m) => m.status !== "answered");
 
   visibleMessages.sort((a, b) =>
     sort === "newest"
@@ -64,7 +70,20 @@ export default function ContactView() {
     currentPage * MESSAGES_PER_PAGE
   );
 
-  if (loading) return <p className="status-message loading-message">Loading messages...</p>;
+  // ✅ Pagination logic to show limited page numbers (e.g., 1 2 3)
+  const MAX_VISIBLE_PAGES = 3;
+  const startPage =
+    Math.floor((currentPage - 1) / MAX_VISIBLE_PAGES) * MAX_VISIBLE_PAGES + 1;
+  const endPage = Math.min(startPage + MAX_VISIBLE_PAGES - 1, totalPages);
+  const visiblePages = Array.from(
+    { length: endPage - startPage + 1 },
+    (_, i) => startPage + i
+  );
+
+  if (loading)
+    return (
+      <p className="status-message loading-message">Loading messages...</p>
+    );
   if (error) return <p className="status-message error-message">{error}</p>;
 
   return (
@@ -74,7 +93,13 @@ export default function ContactView() {
       <div className="filter-controls">
         <div>
           <label>Filter: </label>
-          <select value={filter} onChange={(e) => { setFilter(e.target.value); setCurrentPage(1); }}>
+          <select
+            value={filter}
+            onChange={(e) => {
+              setFilter(e.target.value);
+              setCurrentPage(1);
+            }}
+          >
             <option value="all">All</option>
             <option value="answered">Answered</option>
             <option value="notAnswered">Not answered</option>
@@ -82,7 +107,13 @@ export default function ContactView() {
         </div>
         <div>
           <label>Sort: </label>
-          <select value={sort} onChange={(e) => { setSort(e.target.value); setCurrentPage(1); }}>
+          <select
+            value={sort}
+            onChange={(e) => {
+              setSort(e.target.value);
+              setCurrentPage(1);
+            }}
+          >
             <option value="newest">Newest first</option>
             <option value="oldest">Oldest first</option>
           </select>
@@ -113,13 +144,22 @@ export default function ContactView() {
                     <td>{msg.message}</td>
                     <td>{new Date(msg.created_at).toLocaleString()}</td>
                     <td>
-                      <span className={`status-badge status-${msg.status === "answered" ? "answered" : "pending"}`}>
-                        {msg.status === "answered" ? "Answered" : "Not Answered"}
+                      <span
+                        className={`status-badge status-${
+                          msg.status === "answered" ? "answered" : "pending"
+                        }`}
+                      >
+                        {msg.status === "answered"
+                          ? "Answered"
+                          : "Not Answered"}
                       </span>
                     </td>
                     <td>
                       {msg.status !== "answered" && (
-                        <button className="action-button answered-button" onClick={() => toggleStatus(msg.id, msg.status)}>
+                        <button
+                          className="action-button answered-button"
+                          onClick={() => toggleStatus(msg.id, msg.status)}
+                        >
                           Mark as Answered
                         </button>
                       )}
@@ -130,7 +170,7 @@ export default function ContactView() {
             </table>
           </div>
 
-          {/* ✅ PRETTY PAGINATION LIKE YOUR SAMPLE */}
+          {/* ✅ Pagination like "Prev 1 2 3 Next" */}
           {totalPages > 1 && (
             <div className="pagination">
               <button
@@ -141,13 +181,15 @@ export default function ContactView() {
                 Previous
               </button>
 
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
+              {visiblePages.map((page) => (
                 <button
-                  key={n}
-                  onClick={() => setCurrentPage(n)}
-                  className={`pagination-button ${currentPage === n ? "active" : ""}`}
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`pagination-button ${
+                    currentPage === page ? "active" : ""
+                  }`}
                 >
-                  {n}
+                  {page}
                 </button>
               ))}
 
