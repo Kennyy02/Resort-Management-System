@@ -1,13 +1,8 @@
 :root {
+    --primary-purple: #663399;
     --primary-sage: #8fbc8f;
     --light-sage: #a6d9a6;
     --extra-light-sage: #c2e6c2;
-    
-    /* Chart.js Color Variables for Sage Green */
-    --chart-bar-fill: rgba(143, 188, 143, 0.8); /* Using --primary-sage with opacity */
-    --chart-line-fill: rgba(143, 188, 143, 0.2);
-    --chart-border-color: #8fbc8f; /* --primary-sage */
-    
     --background-light-grey: #f3f4f6;
     --text-dark: #1f2937;
     --text-medium: #4b5563;
@@ -40,7 +35,6 @@ body {
     box-shadow: 0 8px 16px var(--hover-shadow-color);
 }
 
-/* Ensure the focus ring uses the sage color scheme */
 select.focus\:ring-purple-500:focus {
     border-color: var(--primary-sage);
     box-shadow: 0 0 0 3px var(--extra-light-sage);
