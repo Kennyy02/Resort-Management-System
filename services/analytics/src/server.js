@@ -1,18 +1,12 @@
-// Import necessary modules
 const express = require('express');
-const mysql = require('mysql2/promise'); // Using mysql2/promise for async/await
-const cors = require('cors'); // Import cors to allow cross-origin requests
+const mysql = require('mysql2/promise');
+const cors = require('cors');
 
-// Initialize Express app
 const app = express();
 const port = 3002;
 
-// --- CRITICAL CORS FIX: Specify the allowed origin ---
-// This allows your deployed frontend to access this deployed backend.
 const allowedOrigins = [
-    // Your deployed frontend domain (CRITICAL FOR PRODUCTION)
     'https://emzbayviewmountainresort.up.railway.app', 
-    // Local development origins
     'http://localhost:3000', 
     'http://localhost:3001',
     'http://localhost:3002' 
@@ -20,11 +14,9 @@ const allowedOrigins = [
 
 const corsOptions = {
     origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps/curl) or if the origin is explicitly allowed
         if (!origin || allowedOrigins.indexOf(origin) !== -1) {
             callback(null, true);
         } else {
-            // Block the request if the origin is not allowed
             callback(new Error('Not allowed by CORS'));
         }
     },
@@ -32,24 +24,20 @@ const corsOptions = {
     credentials: true,
 };
 
-// Middleware
-app.use(express.json()); // To parse JSON request bodies
-app.use(cors(corsOptions)); // Use the customized CORS options
-// ----------------------------------------------------------------
+app.use(express.json());
+app.use(cors(corsOptions));
 
-// Database connection pool setup
 const pool = mysql.createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME, // This should be 'railway' based on your screenshot
+    database: process.env.DB_NAME,
     port: process.env.DB_PORT || 3306,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
 });
 
-// Test database connection endpoint
 app.get('/test-db', async (req, res) => {
     try {
         const [rows] = await pool.query('SELECT 1 + 1 AS solution');
@@ -60,11 +48,6 @@ app.get('/test-db', async (req, res) => {
     }
 });
 
-// ------------------------------------
-// ANALYTICS ENDPOINTS
-// ------------------------------------
-
-// 1. API Endpoint: Get Monthly Booking Trends
 app.get('/api/analytics/bookings-by-month', async (req, res) => {
     try {
         const query = `
@@ -72,7 +55,7 @@ app.get('/api/analytics/bookings-by-month', async (req, res) => {
                 YEAR(checkInDate) AS booking_year,
                 MONTH(checkInDate) AS booking_month,
                 COUNT(*) AS total_bookings
-            FROM bookings  /* FIXED: Removed 'booking.' prefix */
+            FROM bookings
             GROUP BY booking_year, booking_month
             ORDER BY booking_year, booking_month;
         `;
@@ -84,7 +67,6 @@ app.get('/api/analytics/bookings-by-month', async (req, res) => {
     }
 });
 
-// 2. NEW API Endpoint: Get Monthly Revenue Trends
 app.get('/api/analytics/revenue-by-month', async (req, res) => {
     try {
         const query = `
@@ -105,14 +87,13 @@ app.get('/api/analytics/revenue-by-month', async (req, res) => {
     }
 });
 
-// 3. API Endpoint: Get Bookings by Service Type (Rooms/Cottage)
 app.get('/api/analytics/bookings-by-service', async (req, res) => {
     try {
         const query = `
             SELECT
                 serviceName,
                 COUNT(*) AS total_bookings
-            FROM bookings /* FIXED: Removed 'booking.' prefix */
+            FROM bookings
             GROUP BY serviceName
             ORDER BY total_bookings DESC;
         `;
@@ -124,13 +105,12 @@ app.get('/api/analytics/bookings-by-service', async (req, res) => {
     }
 });
 
-// 4. API Endpoint: Get Total Bookings for Current Month (SUMMARY CARD)
 app.get('/api/analytics/summary/total-bookings-month', async (req, res) => {
     try {
         const query = `
             SELECT COUNT(*) AS total_bookings
-            FROM bookings /* FIXED: Removed 'booking.' prefix */
-            WHERE MONTH(checkInDate) = MONTH(CURDATE()) AND YEAR(checkInDate) = YEAR(CURDATE());
+            FROM bookings
+            WHERE MONTH(checkInDate) = MONTH(CURDATE()) AND YEAR(checkInDate) = 2025;
         `;
         const [rows] = await pool.query(query);
         res.json(rows[0] || { total_bookings: 0 });
@@ -140,14 +120,13 @@ app.get('/api/analytics/summary/total-bookings-month', async (req, res) => {
     }
 });
 
-// 5. API Endpoint: Get Total Revenue for Current Month (SUMMARY CARD)
 app.get('/api/analytics/summary/total-revenue-month', async (req, res) => {
     try {
         const query = `
             SELECT SUM(amount) AS total_revenue
             FROM transactions
             WHERE transaction_type = 'Booking'
-            AND MONTH(transaction_timestamp) = MONTH(CURDATE()) AND YEAR(transaction_timestamp) = YEAR(CURDATE());
+            AND MONTH(transaction_timestamp) = MONTH(CURDATE()) AND YEAR(transaction_timestamp) = 2025;
         `;
         const [rows] = await pool.query(query);
         res.json(rows[0] || { total_revenue: 0 });
@@ -157,7 +136,6 @@ app.get('/api/analytics/summary/total-revenue-month', async (req, res) => {
     }
 });
 
-// 6. API Endpoint: Get Popular Payment Methods (For future chart/table)
 app.get('/api/analytics/payment-methods', async (req, res) => {
     try {
         const query = `
@@ -178,7 +156,6 @@ app.get('/api/analytics/payment-methods', async (req, res) => {
     }
 });
 
-// Start the server
 app.listen(port, () => {
     console.log(`🚀 Analytics server running on http://localhost:${port}`);
 });
