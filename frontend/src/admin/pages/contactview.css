@@ -22,6 +22,8 @@ body {
     padding-bottom: 10px;
 }
 
+/* ========================= Filters ========================= */
+
 .filter-controls {
     display: flex;
     justify-content: flex-start;
@@ -39,6 +41,8 @@ body {
     border-radius: 6px;
     border: 1px solid #ccc;
 }
+
+/* ========================= Table Styling ========================= */
 
 .table-responsive {
     width: 100%;
@@ -78,6 +82,8 @@ body {
     background-color: #E6EAE4;
 }
 
+/* ========================= Status Badge ========================= */
+
 .status-badge {
     padding: 5px 10px;
     border-radius: 5px;
@@ -95,6 +101,8 @@ body {
     background-color: #7C9271;
     color: white;
 }
+
+/* ========================= Action Button ========================= */
 
 .action-button {
     padding: 8px 12px;
@@ -117,42 +125,45 @@ body {
     transform: translateY(-1px);
 }
 
-/* ✅ New Pagination Style */
+/* ========================= Pagination (Styled Like Sample) ========================= */
+
 .pagination {
     display: flex;
     justify-content: center;
-    gap: 8px;
+    gap: 0.5rem;
     margin-top: 1.5rem;
     flex-wrap: wrap;
 }
 
-.pagination button {
-    padding: 6px 14px;
-    border: 1px solid #dcdcdc;
-    background-color: #f8f9fa;
-    border-radius: 6px;
+.pagination-button {
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1.5px solid #5E6D58;
+    background-color: transparent;
+    color: #5E6D58;
+    font-size: 0.9rem;
     cursor: pointer;
-    font-size: 14px;
-    color: #555;
-    transition: all 0.2s ease-in-out;
+    transition: all 0.2s ease;
 }
 
-.pagination button:hover:not(:disabled) {
-    background-color: #e9ecef;
+.pagination-button:hover:not(:disabled) {
+    background-color: #7C9271;
+    color: white;
 }
 
-.pagination button:disabled {
+.pagination-button.active {
+    background-color: #5E6D58;
+    color: white;
+    font-weight: 600;
+}
+
+.pagination-button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
 
-.pagination button.active {
-    background-color: #5E6D58;
-    color: white;
-    border-color: #5E6D58;
-}
+/* ========================= Mobile Responsive ========================= */
 
-/* ✅ Mobile Responsive */
 @media (max-width: 768px) {
     .contact-table, .contact-table tbody, .contact-table tr, .contact-table td, .contact-table th {
         display: block;
