@@ -8,14 +8,19 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip,
 
 const API_BASE_URL = `${process.env.REACT_APP_ANALYTICS_API}/api/analytics`;
 
+// Define sage green colors to match the CSS variables for consistency
+const SAGE_GREEN_PRIMARY = 'rgba(143, 188, 143, 1)'; // #8fbc8f
+const SAGE_GREEN_BAR_FILL = 'rgba(143, 188, 143, 0.8)';
+const SAGE_GREEN_LINE_FILL = 'rgba(143, 188, 143, 0.2)';
+
 const MonthlyBookingsChart = () => {
     const [chartData, setChartData] = useState({
         labels: [],
         datasets: [{
             label: 'Total Bookings',
             data: [],
-            backgroundColor: 'rgba(102, 51, 153, 0.8)',
-            borderColor: 'rgba(102, 51, 153, 1)',
+            backgroundColor: SAGE_GREEN_BAR_FILL, // Updated to Sage Green
+            borderColor: SAGE_GREEN_PRIMARY, // Updated to Sage Green
             borderWidth: 1,
             borderRadius: 5,
         }],
@@ -121,8 +126,8 @@ const ServiceBookingsChart = () => {
         datasets: [{
             label: 'Bookings',
             data: [],
-            backgroundColor: 'rgba(102, 51, 153, 0.8)',
-            borderColor: 'rgba(102, 51, 153, 1)',
+            backgroundColor: SAGE_GREEN_BAR_FILL, // Updated to Sage Green
+            borderColor: SAGE_GREEN_PRIMARY, // Updated to Sage Green
             borderWidth: 1,
             borderRadius: 5,
         }],
@@ -228,11 +233,11 @@ const MonthlyBookingCountTrendChart = () => {
             label: 'Total Bookings',
             data: Array(12).fill(0),
             fill: true,
-            backgroundColor: 'rgba(102, 51, 153, 0.2)',
-            borderColor: 'rgba(102, 51, 153, 1)',
+            backgroundColor: SAGE_GREEN_LINE_FILL, // Updated to Sage Green
+            borderColor: SAGE_GREEN_PRIMARY, // Updated to Sage Green
             tension: 0.4,
             pointRadius: 5,
-            pointBackgroundColor: 'rgba(102, 51, 153, 1)',
+            pointBackgroundColor: SAGE_GREEN_PRIMARY, // Updated to Sage Green
             pointBorderColor: '#fff',
             pointHoverRadius: 7,
         }],
@@ -333,25 +338,20 @@ const MonthlyBookingCountTrendChart = () => {
 const AnalyticsDashboard = () => {
     return (
         <div className="p-6 bg-gray-100">
-            {/* Top Greeting Section */}
             <div className="mb-8">
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">Em'z Analytics!</h1>
             </div>
 
-            {/* Main Charts Section - Two above, one below */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Top Row: Monthly Booking Trends */}
                 <div className="lg:col-span-1">
                     <MonthlyBookingsChart />
                 </div>
 
-                {/* Top Row: Bookings by Service Type */}
                 <div className="lg:col-span-1">
                     <ServiceBookingsChart />
                 </div>
             </div>
 
-            {/* Bottom Row: Monthly Booking Count Trend Chart */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
                 <div className="lg:col-span-2">
                     <MonthlyBookingCountTrendChart />
