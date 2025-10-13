@@ -1,9 +1,6 @@
-/* admin/pages/dashboard.css */
-
-/* --- General Theme Colors --- */
 :root {
-    --primary-purple: #663399;
-    --light-purple: #9966cc;
+    --primary-sage: #8fbc8f;
+    --light-sage: #a6d9a6;
     --background-light-grey: #f8f9fa;
     --text-dark: #343a40;
     --text-medium: #6c757d;
@@ -11,8 +8,6 @@
     --card-hover-shadow: rgba(0, 0, 0, 0.1);
 }
 
-/* --- Base Body Styling (ensure this is applied globally, e.g., in App.css or index.css) --- */
-/* This ensures consistent font and background across your app. */
 body {
     font-family: "Inter", sans-serif;
     background-color: var(--background-light-grey);
@@ -22,108 +17,104 @@ body {
     color: var(--text-dark);
 }
 
-/* --- Dashboard Container --- */
 .dashboard-container {
-    display: flex; /* Use flexbox to arrange sidebar and main content side-by-side */
-    min-height: 100vh; /* Ensure the container takes at least the full viewport height */
-    background-color: var(--background-light-grey); /* Match body background */
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--background-light-grey);
 }
 
-/* --- Sidebar Styling --- */
 .dashboard-sidebar {
-    width: 250px; /* Fixed width for the sidebar */
-    background-color: white; /* White background for the sidebar */
-    padding: 1.5rem 1rem; /* Padding inside the sidebar */
-    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05); /* Subtle shadow on the right edge */
-    position: fixed; /* KEY: Makes the sidebar stay in place regardless of scrolling */
-    left: 0; /* Aligns the sidebar to the left edge of the viewport */
-    top: 0; /* Aligns the sidebar to the top edge of the viewport */
-    height: 100vh; /* Makes the sidebar take up the full height of the viewport */
+    width: 250px;
+    background-color: white;
+    padding: 1.5rem 1rem;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
     display: flex;
-    flex-direction: column; /* Arranges header, navigation, and footer vertically */
-    z-index: 1000; /* Ensures the sidebar stays on top of other content if there's any overlap */
-    border-right: 1px solid #e0e0e0; /* Adds a subtle separator line on the right */
-    overflow-y: auto; /* Allows the sidebar content itself to scroll if it overflows */
+    flex-direction: column;
+    z-index: 1000;
+    border-right: 1px solid #e0e0e0;
+    overflow-y: auto;
 }
 
 .sidebar-header {
     padding-bottom: 1.5rem;
-    border-bottom: 1px solid #eee; /* Separator for the header section */
+    border-bottom: 1px solid #eee;
     margin-bottom: 1.5rem;
-    text-align: center; /* Centers the title text */
+    text-align: center;
 }
 
 .sidebar-title {
-    font-size: 1.75rem; /* Larger font size for the title */
-    font-weight: 700; /* Bold font weight */
-    color: var(--primary-purple); /* Uses the primary purple color */
-    margin: 0; /* Removes default margins */
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--primary-sage);
+    margin: 0;
 }
 
 .sidebar-nav-cards {
-    flex-grow: 1; /* Allows the navigation cards section to take up available vertical space */
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
-    gap: 0.75rem; /* Adds space between individual navigation cards */
+    gap: 0.75rem;
 }
 
 .card {
-    background-color: #f0f2f5; /* Light grey background for inactive cards */
-    padding: 0.8rem 1rem; /* Padding inside each navigation card */
-    border-radius: 0.75rem; /* Rounded corners for the cards */
-    cursor: pointer; /* Indicates the cards are clickable */
+    background-color: #f0f2f5;
+    padding: 0.8rem 1rem;
+    border-radius: 0.75rem;
+    cursor: pointer;
     font-size: 1rem;
-    color: var(--text-dark); /* Dark text color */
-    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease; /* Smooth transitions for hover effects */
+    color: var(--text-dark);
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
     display: flex;
-    align-items: center; /* Vertically aligns icon and text */
-    gap: 0.75rem; /* Space between icon and text */
-    font-weight: 500; /* Medium font weight */
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 500;
 }
 
 .card:hover {
-    background-color: var(--light-purple); /* Lighter purple background on hover */
-    color: white; /* White text on hover */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow on hover */
+    background-color: var(--light-sage);
+    color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .card.active-card {
-    background-color: var(--primary-purple); /* Primary purple background for the active card */
-    color: white; /* White text for the active card */
-    font-weight: 600; /* Bolder font weight for active card */
-    box-shadow: 0 4px 10px rgba(102, 51, 153, 0.3); /* More prominent shadow for active card */
+    background-color: var(--primary-sage);
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(143, 188, 143, 0.3);
 }
 
-/* --- Sidebar Footer (for logout button) --- */
 .sidebar-footer {
     padding-top: 1.5rem;
-    border-top: 1px solid #eee; /* Separator for the footer section */
+    border-top: 1px solid #eee;
     margin-top: 1.5rem;
-    text-align: center; /* Centers the content (e.g., logout button) */
+    text-align: center;
 }
 
 .logout-button {
-    background-color: #dc3545; /* Red background for logout button */
-    color: white; /* White text color */
+    background-color: #dc3545;
+    color: white;
     padding: 0.75rem 1.5rem;
-    border: none; /* Removes default border */
-    border-radius: 0.5rem; /* Rounded corners for the button */
-    cursor: pointer; /* Indicates the button is clickable */
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
     font-size: 1rem;
     font-weight: 600;
-    transition: background-color 0.2s ease; /* Smooth transition for hover effect */
+    transition: background-color 0.2s ease;
 }
 
 .logout-button:hover {
-    background-color: #c82333; /* Darker red on hover */
+    background-color: #c82333;
 }
 
-/* --- Main Content Area --- */
 .dashboard-main {
-    flex-grow: 1; /* Allows the main content area to take up all remaining horizontal space */
-    margin-left: 250px; /* KEY: Pushes the main content to the right by the exact width of the fixed sidebar */
-    padding: 1.5rem; /* Padding around the content within the main area */
-    background-color: var(--background-light-grey); /* Matches the overall background */
-    overflow-y: auto; /* KEY: Allows the content within this area to scroll independently if it overflows vertically */
-    height: 100vh; /* Ensures the main content area also takes full viewport height for proper scrolling */
+    flex-grow: 1;
+    margin-left: 250px;
+    padding: 1.5rem;
+    background-color: var(--background-light-grey);
+    overflow-y: auto;
+    height: 100vh;
 }
