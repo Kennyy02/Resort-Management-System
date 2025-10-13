@@ -51,16 +51,16 @@ app.get('/test-db', async (req, res) => {
 
 app.get('/api/analytics/bookings-by-month', async (req, res) => {
     try {
-        // FIX: Added .trim() to clean up leading/trailing whitespace
+        // CLEANUP FIX: Use .trim() and remove initial blank line
         const query = `
-            SELECT
-                YEAR(checkInDate) AS booking_year,
-                MONTH(checkInDate) AS booking_month,
-                COUNT(*) AS total_bookings
-            FROM bookings
-            GROUP BY booking_year, booking_month
-            ORDER BY booking_year, booking_month;
-        `.trim();
+SELECT
+    YEAR(checkInDate) AS booking_year,
+    MONTH(checkInDate) AS booking_month,
+    COUNT(*) AS total_bookings
+FROM bookings
+GROUP BY booking_year, booking_month
+ORDER BY booking_year, booking_month;
+        `.trim();
         const [rows] = await pool.query(query);
         res.json(rows);
     } catch (error) {
@@ -71,17 +71,17 @@ app.get('/api/analytics/bookings-by-month', async (req, res) => {
 
 app.get('/api/analytics/revenue-by-month', async (req, res) => {
     try {
-        // FIX: Added .trim() to clean up leading/trailing whitespace
+        // CLEANUP FIX: Use .trim() and remove initial blank line
         const query = `
-            SELECT
-                YEAR(transaction_timestamp) AS revenue_year,
-                MONTH(transaction_timestamp) AS revenue_month,
-                SUM(amount) AS total_revenue
-            FROM transactions
-            WHERE transaction_type = 'Booking'
-            GROUP BY revenue_year, revenue_month
-            ORDER BY revenue_year, revenue_month;
-        `.trim();
+SELECT
+    YEAR(transaction_timestamp) AS revenue_year,
+    MONTH(transaction_timestamp) AS revenue_month,
+    SUM(amount) AS total_revenue
+FROM transactions
+WHERE transaction_type = 'Booking'
+GROUP BY revenue_year, revenue_month
+ORDER BY revenue_year, revenue_month;
+        `.trim();
         const [rows] = await pool.query(query);
         res.json(rows);
     } catch (error) {
@@ -92,15 +92,15 @@ app.get('/api/analytics/revenue-by-month', async (req, res) => {
 
 app.get('/api/analytics/bookings-by-service', async (req, res) => {
     try {
-        // FIX: Added .trim() to clean up leading/trailing whitespace
+        // CLEANUP FIX: Use .trim() and remove initial blank line
         const query = `
-            SELECT
-                serviceName,
-                COUNT(*) AS total_bookings
-            FROM bookings
-            GROUP BY serviceName
-            ORDER BY total_bookings DESC;
-        `.trim();
+SELECT
+    serviceName,
+    COUNT(*) AS total_bookings
+FROM bookings
+GROUP BY serviceName
+ORDER BY total_bookings DESC;
+        `.trim();
         const [rows] = await pool.query(query);
         res.json(rows);
     } catch (error) {
@@ -111,12 +111,12 @@ app.get('/api/analytics/bookings-by-service', async (req, res) => {
 
 app.get('/api/analytics/summary/total-bookings-month', async (req, res) => {
     try {
-        // FIX: Added .trim() to clean up leading/trailing whitespace
+        // CLEANUP FIX: Use .trim() and remove initial blank line
         const query = `
-            SELECT COUNT(*) AS total_bookings
-            FROM bookings
-            WHERE MONTH(checkInDate) = MONTH(CURDATE()) AND YEAR(checkInDate) = 2025;
-        `.trim();
+SELECT COUNT(*) AS total_bookings
+FROM bookings
+WHERE MONTH(checkInDate) = MONTH(CURDATE()) AND YEAR(checkInDate) = 2025;
+        `.trim();
         const [rows] = await pool.query(query);
         res.json(rows[0] || { total_bookings: 0 });
     } catch (error) {
@@ -127,13 +127,13 @@ app.get('/api/analytics/summary/total-bookings-month', async (req, res) => {
 
 app.get('/api/analytics/summary/total-revenue-month', async (req, res) => {
     try {
-        // FIX: Added .trim() to clean up leading/trailing whitespace
+        // CLEANUP FIX: Use .trim() and remove initial blank line
         const query = `
-            SELECT SUM(amount) AS total_revenue
-            FROM transactions
-            WHERE transaction_type = 'Booking'
-            AND MONTH(transaction_timestamp) = MONTH(CURDATE()) AND YEAR(transaction_timestamp) = 2025;
-        `.trim();
+SELECT SUM(amount) AS total_revenue
+FROM transactions
+WHERE transaction_type = 'Booking'
+AND MONTH(transaction_timestamp) = MONTH(CURDATE()) AND YEAR(transaction_timestamp) = 2025;
+        `.trim();
         const [rows] = await pool.query(query);
         res.json(rows[0] || { total_revenue: 0 });
     } catch (error) {
@@ -144,17 +144,17 @@ app.get('/api/analytics/summary/total-revenue-month', async (req, res) => {
 
 app.get('/api/analytics/payment-methods', async (req, res) => {
     try {
-        // FIX: Added .trim() to clean up leading/trailing whitespace
+        // CLEANUP FIX: Use .trim() and remove initial blank line
         const query = `
-            SELECT
-                modeOfPayment,
-                COUNT(*) AS total_payments,
-                SUM(amount) AS total_revenue
-            FROM transactions
-            WHERE transaction_type = 'Booking'
-            GROUP BY modeOfPayment
-            ORDER BY total_revenue DESC;
-        `.trim();
+SELECT
+    modeOfPayment,
+    COUNT(*) AS total_payments,
+    SUM(amount) AS total_revenue
+FROM transactions
+WHERE transaction_type = 'Booking'
+GROUP BY modeOfPayment
+ORDER BY total_revenue DESC;
+        `.trim();
         const [rows] = await pool.query(query);
         res.json(rows);
     } catch (error) {
