@@ -1,208 +1,216 @@
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f4f7f6;
-    color: #333;
-    margin: 0;
-    padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f7f6;
+  color: #333;
+  margin: 0;
+  padding: 0;
 }
 
 .admin-contact-card {
-    width: 100%;
-    padding: 2rem;
-    background-color: transparent;
+  width: 100%;
+  padding: 2rem;
+  background-color: transparent;
 }
 
 .admin-contact-card h2 {
-    text-align: center;
-    color: #4C5A48;
-    margin-bottom: 1.5rem;
-    font-size: 2.2em;
-    font-weight: 600;
-    border-bottom: 2px solid #e0e0e0;
-    padding-bottom: 10px;
+  text-align: center;
+  color: #4C5A48;
+  margin-bottom: 1.5rem;
+  font-size: 2.2em;
+  font-weight: 600;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 10px;
 }
 
 /* ========================= Filters ========================= */
-
 .filter-controls {
-    display: flex;
-    justify-content: flex-start;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    flex-wrap: wrap;
+  display: flex;
+  justify-content: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
 }
 
 .filter-controls label {
-    font-weight: 500;
+  font-weight: 500;
 }
 
 .filter-controls select {
-    padding: 0.5rem;
-    border-radius: 6px;
-    border: 1px solid #ccc;
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
 }
 
 /* ========================= Table Styling ========================= */
-
 .table-responsive {
-    width: 100%;
-    overflow-x: auto;
+  width: 100%;
+  overflow-x: auto;
 }
 
 .contact-table {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: #ffffff;
-    border-radius: 8px;
-    overflow: hidden;
-    margin-top: 1rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .contact-table th,
 .contact-table td {
-    padding: 12px 15px;
-    text-align: left;
-    border-bottom: 1px solid #e0e0e0;
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .contact-table th {
-    background-color: #5E6D58;
-    color: #ffffff;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 0.9em;
+  background-color: #5E6D58;
+  color: #ffffff;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.9em;
 }
 
 .contact-table tbody tr:nth-child(even) {
-    background-color: #f9f9f9;
+  background-color: #f9f9f9;
 }
 
 .contact-table tbody tr:hover {
-    background-color: #E6EAE4;
+  background-color: #E6EAE4;
 }
 
 /* ========================= Status Badge ========================= */
-
 .status-badge {
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-weight: 600;
-    text-transform: capitalize;
-    font-size: 0.85em;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-weight: 600;
+  text-transform: capitalize;
+  font-size: 0.85em;
 }
 
 .status-pending {
-    background-color: #f0ad4e;
-    color: white;
+  background-color: #f0ad4e;
+  color: white;
 }
 
 .status-answered {
-    background-color: #7C9271;
-    color: white;
+  background-color: #7C9271;
+  color: white;
 }
 
 /* ========================= Action Button ========================= */
-
 .action-button {
-    padding: 8px 12px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    font-size: 0.9em;
-    min-width: 120px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  font-size: 0.9em;
+  min-width: 120px;
 }
 
 .answered-button {
-    background-color: #7C9271;
-    color: #ffffff;
+  background-color: #7C9271;
+  color: #ffffff;
 }
 
 .answered-button:hover {
-    background-color: #6A7C5F;
-    transform: translateY(-1px);
+  background-color: #6A7C5F;
+  transform: translateY(-1px);
 }
 
-/* ========================= Pagination (Styled Like Sample) ========================= */
-
+/* ========================= Pagination ========================= */
 .pagination {
-    display: flex;
-    justify-content: center;
-    gap: 0.5rem;
-    margin-top: 1.5rem;
-    flex-wrap: wrap;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 1.8rem;
+  flex-wrap: wrap;
+  font-family: 'Segoe UI', sans-serif;
 }
 
 .pagination-button {
-    padding: 8px 14px;
-    border-radius: 8px;
-    border: 1.5px solid #5E6D58;
-    background-color: transparent;
-    color: #5E6D58;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
+  padding: 8px 16px;
+  border: 1px solid #bfcab7;
+  border-radius: 6px;
+  background-color: #fff;
+  color: #4c5a48;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  min-width: 70px;
 }
 
 .pagination-button:hover:not(:disabled) {
-    background-color: #7C9271;
-    color: white;
+  background-color: #7c9271;
+  color: #fff;
+  border-color: #7c9271;
 }
 
 .pagination-button.active {
-    background-color: #5E6D58;
-    color: white;
-    font-weight: 600;
+  background-color: #5e6d58;
+  color: #fff;
+  border-color: #5e6d58;
+  font-weight: 600;
 }
 
 .pagination-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+  background-color: #f0f0f0;
+  color: #aaa;
+  cursor: not-allowed;
+  border-color: #ddd;
+  opacity: 0.6;
+}
+
+.pagination button:not(:first-child):not(:last-child) {
+  min-width: 40px;
+  padding: 7px 12px;
 }
 
 /* ========================= Mobile Responsive ========================= */
-
 @media (max-width: 768px) {
-    .contact-table, .contact-table tbody, .contact-table tr, .contact-table td, .contact-table th {
-        display: block;
-    }
+  .contact-table, .contact-table tbody, .contact-table tr, .contact-table td, .contact-table th {
+    display: block;
+  }
 
-    .contact-table thead {
-        display: none;
-    }
+  .contact-table thead {
+    display: none;
+  }
 
-    .contact-table tr {
-        margin-bottom: 1rem;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        padding: 0.5rem;
-    }
+  .contact-table tr {
+    margin-bottom: 1rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    padding: 0.5rem;
+  }
 
-    .contact-table td {
-        border-bottom: 1px dashed #eee;
-        text-align: right;
-        padding-left: 50%;
-        position: relative;
-        word-wrap: break-word;
-    }
+  .contact-table td {
+    border-bottom: 1px dashed #eee;
+    text-align: right;
+    padding-left: 50%;
+    position: relative;
+    word-wrap: break-word;
+  }
 
-    .contact-table td::before {
-        content: attr(data-label);
-        position: absolute;
-        left: 10px;
-        width: calc(50% - 20px);
-        padding-right: 10px;
-        white-space: nowrap;
-        text-align: left;
-        font-weight: 600;
-        color: #4C5A48;
-    }
+  .contact-table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 10px;
+    width: calc(50% - 20px);
+    padding-right: 10px;
+    white-space: nowrap;
+    text-align: left;
+    font-weight: 600;
+    color: #4C5A48;
+  }
 
-    .action-button {
-        width: 100%;
-        margin-top: 0.5rem;
-    }
+  .action-button {
+    width: 100%;
+    margin-top: 0.5rem;
+  }
 }
