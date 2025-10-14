@@ -31,30 +31,24 @@ const AboutUs = () => {
   useEffect(() => {
     const fetchAboutUsContent = async () => {
       try {
-        const generalResponse = await axios.get(GENERAL_API_URL);
+        const [generalResponse, facilitiesResponse, policiesResponse] = await Promise.all([
+          axios.get(GENERAL_API_URL),
+          axios.get(FACILITIES_API_URL),
+          axios.get(POLICIES_API_URL),
+        ]);
+
         const generalContent = generalResponse.data.length > 0
           ? generalResponse.data[0].content
           : 'No general information available.';
 
-        const facilitiesResponse = await axios.get(FACILITIES_API_URL);
-        const facilitiesList = facilitiesResponse.data;
-
-        const policiesResponse = await axios.get(POLICIES_API_URL);
-        const policiesList = policiesResponse.data;
-
         setAboutUsData({
           general: generalContent,
-          facilities: facilitiesList,
-          policies: policiesList,
+          facilities: facilitiesResponse.data,
+          policies: policiesResponse.data,
         });
       } catch (err) {
         console.error('Error fetching About Us content:', err);
         setError('Failed to load About Us content. Please try again later.');
-        setAboutUsData({
-          general: 'Could not load general information.',
-          facilities: [],
-          policies: [],
-        });
       } finally {
         setLoading(false);
       }
@@ -81,9 +75,9 @@ const AboutUs = () => {
         return (
           <>
             <h2>General Information</h2>
-            <ul>
+            <ul className="info-list">
               {aboutUsData.general
-                .split(/\r?\n/) // split by new line
+                .split(/\r?\n/)
                 .filter(line => line.trim() !== "")
                 .map((line, index) => (
                   <li key={index} dangerouslySetInnerHTML={{ __html: line }}></li>
@@ -91,12 +85,13 @@ const AboutUs = () => {
             </ul>
           </>
         );
+
       case 'facilities':
         return (
           <>
             <h2>Our Facilities</h2>
             {aboutUsData.facilities.length > 0 ? (
-              <ul>
+              <ul className="facility-list">
                 {aboutUsData.facilities.map((facility) => (
                   <li key={facility.id}>
                     <strong>{facility.name}</strong>
@@ -109,19 +104,20 @@ const AboutUs = () => {
             )}
           </>
         );
+
       case 'policies':
         return (
           <>
             <h2>Resort Policies</h2>
             {Object.keys(groupedPolicies).length > 0 ? (
               Object.entries(groupedPolicies).map(([categoryLabel, policies]) => (
-                <div key={categoryLabel}>
+                <div key={categoryLabel} className="policy-section">
                   <h3>{categoryLabel}</h3>
-                  <ul>
-                    {policies.map((policy) => (
+                  <ol className="policy-list">
+                    {policies.map((policy, index) => (
                       <li key={policy.id} dangerouslySetInnerHTML={{ __html: policy.policy_text }}></li>
                     ))}
-                  </ul>
+                  </ol>
                 </div>
               ))
             ) : (
@@ -129,6 +125,7 @@ const AboutUs = () => {
             )}
           </>
         );
+
       default:
         return null;
     }
