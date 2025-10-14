@@ -9,7 +9,7 @@
 .aboutus-fullpage h1 {
   font-size: 3rem;
   font-weight: 700;
-  color: #8a9a5b;
+  color: #8a9a5b; /* sage green */
   text-align: center;
   margin-bottom: 2rem;
 }
@@ -65,7 +65,7 @@
   padding-left: 0.5rem;
 }
 
-/* List styles for all sections */
+/* List styles */
 .info-list,
 .facility-list,
 .policy-list {
@@ -81,9 +81,11 @@
   font-size: 1rem;
 }
 
-/* Numbered and bullet styles */
-.info-list li::marker,
-.facility-list li::marker,
+/* Numbered list style */
+.policy-list {
+  list-style-type: decimal;
+}
+
 .policy-list li::marker {
   color: #8a9a5b;
   font-weight: 600;
