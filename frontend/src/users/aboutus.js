@@ -77,33 +77,35 @@ const AboutUs = () => {
         return (
           <div className="plain-section">
             <h2>General Information</h2>
-            <ul>
+            <div className="plain-text">
               {aboutUsData.general
                 .split(/\r?\n/)
                 .filter((line) => line.trim() !== "")
                 .map((line, index) => (
-                  <li key={index}>{line}</li>
+                  <p key={index}>{line}</p>
                 ))}
-            </ul>
+            </div>
           </div>
         );
 
       case "facilities":
         return (
           <div className="plain-section">
-            <h2>Our Facilities</h2>
-            {aboutUsData.facilities.length > 0 ? (
-              <ul>
-                {aboutUsData.facilities.map((facility) => (
-                  <li key={facility.id}>
-                    <strong>{facility.name}</strong>
-                    {facility.description && <p>{facility.description}</p>}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>No facilities information available.</p>
-            )}
+            <h2>Facilities</h2>
+            <div className="plain-text">
+              {aboutUsData.facilities.length > 0 ? (
+                aboutUsData.facilities.map((facility) => (
+                  <div key={facility.id} className="facility-item">
+                    <p>
+                      <strong>{facility.name}</strong>
+                      {facility.description && ` – ${facility.description}`}
+                    </p>
+                  </div>
+                ))
+              ) : (
+                <p>No facilities information available.</p>
+              )}
+            </div>
           </div>
         );
 
