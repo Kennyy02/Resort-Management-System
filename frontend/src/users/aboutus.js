@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import './styles/aboutus.css';
 
-// API URLs
 const BASE_URL = process.env.REACT_APP_ABOUTUS_API;
 
 const GENERAL_API_URL = `${BASE_URL}/pre/api/aboutus`;
@@ -12,56 +11,59 @@ const POLICIES_API_URL = `${BASE_URL}/pre/api/policies`;
 const AboutUs = () => {
   const [activeTab, setActiveTab] = useState('general');
   const [aboutUsData, setAboutUsData] = useState({
-    general: 'Loading General Information...',
+    general: '',
     facilities: [],
     policies: [],
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const policyCategories = useMemo(() => ({
-    'terms_booking': 'Terms of Payment & Booking Policies',
-    'check_in_out': 'Check-in & Check-out Policies',
-    'occupancy_room_service': 'Occupancy & Room Service',
-    'safety_conduct': 'Safety Precautions, Risk Control & Proper Conduct',
-    'swimming_pool_rules': 'Swimming Pool Rules',
-    'other_policies': 'Other Resort Policies',
-  }), []);
+  const policyCategories = useMemo(
+    () => ({
+      terms_booking: 'Terms of Payment & Booking Policies',
+      check_in_out: 'Check-in & Check-out Policies',
+      occupancy_room_service: 'Occupancy & Room Service',
+      safety_conduct: 'Safety Precautions, Risk Control & Proper Conduct',
+      swimming_pool_rules: 'Swimming Pool Rules',
+      other_policies: 'Other Resort Policies',
+    }),
+    []
+  );
 
   useEffect(() => {
-    const fetchAboutUsContent = async () => {
+    const fetchData = async () => {
       try {
-        const [generalResponse, facilitiesResponse, policiesResponse] = await Promise.all([
+        const [generalRes, facilitiesRes, policiesRes] = await Promise.all([
           axios.get(GENERAL_API_URL),
           axios.get(FACILITIES_API_URL),
           axios.get(POLICIES_API_URL),
         ]);
 
-        const generalContent = generalResponse.data.length > 0
-          ? generalResponse.data[0].content
-          : 'No general information available.';
+        const generalContent =
+          generalRes.data.length > 0
+            ? generalRes.data[0].content
+            : 'No general information available.';
 
         setAboutUsData({
           general: generalContent,
-          facilities: facilitiesResponse.data,
-          policies: policiesResponse.data,
+          facilities: facilitiesRes.data,
+          policies: policiesRes.data,
         });
       } catch (err) {
-        console.error('Error fetching About Us content:', err);
-        setError('Failed to load About Us content. Please try again later.');
+        console.error('Error fetching data:', err);
+        setError('Failed to load content.');
       } finally {
         setLoading(false);
       }
     };
-
-    fetchAboutUsContent();
+    fetchData();
   }, []);
 
   const groupedPolicies = useMemo(() => {
     return aboutUsData.policies.reduce((acc, policy) => {
-      const categoryLabel = policyCategories[policy.category] || 'Uncategorized';
-      if (!acc[categoryLabel]) acc[categoryLabel] = [];
-      acc[categoryLabel].push(policy);
+      const label = policyCategories[policy.category] || 'Uncategorized';
+      if (!acc[label]) acc[label] = [];
+      acc[label].push(policy);
       return acc;
     }, {});
   }, [aboutUsData.policies, policyCategories]);
@@ -73,57 +75,63 @@ const AboutUs = () => {
     switch (activeTab) {
       case 'general':
         return (
-          <>
+          <div className="content-section">
             <h2>General Information</h2>
-            <ul className="info-list">
+            <ul className="styled-list">
               {aboutUsData.general
                 .split(/\r?\n/)
-                .filter(line => line.trim() !== "")
+                .filter((line) => line.trim() !== '')
                 .map((line, index) => (
-                  <li key={index} dangerouslySetInnerHTML={{ __html: line }}></li>
-              ))}
+                  <li
+                    key={index}
+                    dangerouslySetInnerHTML={{ __html: line }}
+                  ></li>
+                ))}
             </ul>
-          </>
+          </div>
         );
 
       case 'facilities':
         return (
-          <>
+          <div className="content-section">
             <h2>Our Facilities</h2>
             {aboutUsData.facilities.length > 0 ? (
-              <ul className="facility-list">
+              <ul className="styled-list">
                 {aboutUsData.facilities.map((facility) => (
                   <li key={facility.id}>
                     <strong>{facility.name}</strong>
-                    {facility.description && <p>{facility.description}</p>}
+                    {facility.description && (
+                      <p>{facility.description}</p>
+                    )}
                   </li>
                 ))}
               </ul>
             ) : (
               <p>No facilities information available.</p>
             )}
-          </>
+          </div>
         );
 
       case 'policies':
         return (
-          <>
+          <div className="content-section">
             <h2>Resort Policies</h2>
-            {Object.keys(groupedPolicies).length > 0 ? (
-              Object.entries(groupedPolicies).map(([categoryLabel, policies]) => (
-                <div key={categoryLabel} className="policy-section">
-                  <h3>{categoryLabel}</h3>
-                  <ol className="policy-list">
-                    {policies.map((policy, index) => (
-                      <li key={policy.id} dangerouslySetInnerHTML={{ __html: policy.policy_text }}></li>
-                    ))}
-                  </ol>
-                </div>
-              ))
-            ) : (
-              <p>No policies information available.</p>
-            )}
-          </>
+            {Object.keys(groupedPolicies).map((category) => (
+              <div key={category} className="policy-section">
+                <h3>{category}</h3>
+                <ul className="styled-list numbered">
+                  {groupedPolicies[category].map((policy) => (
+                    <li
+                      key={policy.id}
+                      dangerouslySetInnerHTML={{
+                        __html: policy.policy_text,
+                      }}
+                    ></li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         );
 
       default:
