@@ -9,7 +9,7 @@
 .aboutus-fullpage h1 {
   font-size: 3rem;
   font-weight: 700;
-  color: #8a9a5b; /* sage green */
+  color: #8a9a5b;
   text-align: center;
   margin-bottom: 2rem;
 }
@@ -40,23 +40,24 @@
   color: #fff;
 }
 
-/* Content container */
+/* Main content area */
 .tab-content {
-  max-width: 1000px;
+  max-width: 900px;
   margin: 0 auto;
   font-size: 1rem;
   line-height: 1.8;
   color: #333;
 }
 
-/* Section titles */
-.tab-content h2 {
+/* Section styling */
+.content-section h2 {
   color: #8a9a5b;
   text-align: center;
   margin-bottom: 1.5rem;
 }
 
-.tab-content h3 {
+.policy-section h3,
+.content-section h3 {
   color: #8a9a5b;
   margin-top: 2rem;
   margin-bottom: 1rem;
@@ -65,34 +66,52 @@
   padding-left: 0.5rem;
 }
 
-/* List styles */
-.info-list,
-.facility-list,
-.policy-list {
-  padding-left: 2rem;
+/* Unified bullet and numbered list */
+.styled-list {
+  list-style: none;
+  padding-left: 0;
   margin: 0;
 }
 
-.info-list li,
-.facility-list li,
-.policy-list li {
-  margin-bottom: 0.75rem;
+.styled-list li {
+  position: relative;
+  padding-left: 2rem;
+  margin-bottom: 1rem;
   line-height: 1.7;
   font-size: 1rem;
+  color: #333;
 }
 
-/* Numbered list style */
-.policy-list {
-  list-style-type: decimal;
-}
-
-.policy-list li::marker {
+.styled-list li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  top: 0.1rem;
+  font-size: 1.5rem;
   color: #8a9a5b;
-  font-weight: 600;
 }
 
-/* Separate each policy category */
-.policy-section {
+.styled-list.numbered {
+  counter-reset: list-counter;
+}
+
+.styled-list.numbered li {
+  counter-increment: list-counter;
+}
+
+.styled-list.numbered li::before {
+  content: counter(list-counter) ".";
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: #8a9a5b;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+/* Section divider like Policies */
+.policy-section,
+.content-section {
   margin-bottom: 2.5rem;
   border-bottom: 1px solid #e0e0e0;
   padding-bottom: 1.5rem;
@@ -117,13 +136,11 @@
     font-size: 0.95rem;
   }
 
-  .tab-content h3 {
-    font-size: 1rem;
+  .styled-list li {
+    padding-left: 1.5rem;
   }
 
-  .info-list,
-  .facility-list,
-  .policy-list {
-    padding-left: 1.5rem;
+  .styled-list li::before {
+    font-size: 1.2rem;
   }
 }
