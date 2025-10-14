@@ -31,30 +31,24 @@ const AboutUs = () => {
   useEffect(() => {
     const fetchAboutUsContent = async () => {
       try {
-        const generalResponse = await axios.get(GENERAL_API_URL);
+        const [generalResponse, facilitiesResponse, policiesResponse] = await Promise.all([
+          axios.get(GENERAL_API_URL),
+          axios.get(FACILITIES_API_URL),
+          axios.get(POLICIES_API_URL),
+        ]);
+
         const generalContent = generalResponse.data.length > 0
           ? generalResponse.data[0].content
           : 'No general information available.';
 
-        const facilitiesResponse = await axios.get(FACILITIES_API_URL);
-        const facilitiesList = facilitiesResponse.data;
-
-        const policiesResponse = await axios.get(POLICIES_API_URL);
-        const policiesList = policiesResponse.data;
-
         setAboutUsData({
           general: generalContent,
-          facilities: facilitiesList,
-          policies: policiesList,
+          facilities: facilitiesResponse.data,
+          policies: policiesResponse.data,
         });
       } catch (err) {
         console.error('Error fetching About Us content:', err);
         setError('Failed to load About Us content. Please try again later.');
-        setAboutUsData({
-          general: 'Could not load general information.',
-          facilities: [],
-          policies: [],
-        });
       } finally {
         setLoading(false);
       }
@@ -119,11 +113,11 @@ const AboutUs = () => {
               Object.entries(groupedPolicies).map(([categoryLabel, policies]) => (
                 <div key={categoryLabel} className="policy-section">
                   <h3>{categoryLabel}</h3>
-                  <ul className="policy-list">
-                    {policies.map((policy) => (
+                  <ol className="policy-list">
+                    {policies.map((policy, index) => (
                       <li key={policy.id} dangerouslySetInnerHTML={{ __html: policy.policy_text }}></li>
                     ))}
-                  </ul>
+                  </ol>
                 </div>
               ))
             ) : (
