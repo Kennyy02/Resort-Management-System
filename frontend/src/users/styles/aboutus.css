@@ -1,16 +1,17 @@
-.aboutus-fullpage {
+.aboutus-page {
   width: 100%;
   min-height: 100vh;
   background: #fff;
-  color: #000;
+  color: #333;
   padding: 3rem 2rem;
 }
 
-.aboutus-fullpage h1 {
+/* Title */
+.aboutus-page h1 {
+  text-align: center;
   font-size: 3rem;
   font-weight: 700;
   color: #8a9a5b;
-  text-align: center;
   margin-bottom: 2rem;
 }
 
@@ -18,8 +19,8 @@
 .tabs {
   display: flex;
   justify-content: center;
-  flex-wrap: wrap;
   gap: 1rem;
+  flex-wrap: wrap;
   margin-bottom: 2rem;
 }
 
@@ -40,90 +41,67 @@
   color: #fff;
 }
 
-/* Main content area */
-.tab-content {
-  max-width: 900px;
+/* Content area */
+.content {
+  max-width: 1000px;
   margin: 0 auto;
-  font-size: 1rem;
-  line-height: 1.8;
-  color: #333;
 }
 
-/* Section styling */
-.content-section h2 {
-  color: #8a9a5b;
+/* Plain section — no box! */
+.plain-section {
+  margin-bottom: 2.5rem;
+}
+
+.plain-section h2 {
   text-align: center;
+  color: #8a9a5b;
+  font-size: 1.8rem;
+  font-weight: 600;
   margin-bottom: 1.5rem;
 }
 
-.policy-section h3,
-.content-section h3 {
+.plain-section h3 {
   color: #8a9a5b;
-  margin-top: 2rem;
-  margin-bottom: 1rem;
   font-size: 1.2rem;
   border-left: 4px solid #8a9a5b;
   padding-left: 0.5rem;
-}
-
-/* Unified bullet and numbered list */
-.styled-list {
-  list-style: none;
-  padding-left: 0;
-  margin: 0;
-}
-
-.styled-list li {
-  position: relative;
-  padding-left: 2rem;
+  margin-top: 2rem;
   margin-bottom: 1rem;
-  line-height: 1.7;
+}
+
+/* Lists — clean and simple */
+.plain-section ul,
+.plain-section ol {
+  padding-left: 2rem;
+  margin: 0;
+  list-style-position: outside;
+  line-height: 1.8;
   font-size: 1rem;
-  color: #333;
 }
 
-.styled-list li::before {
-  content: "•";
-  position: absolute;
-  left: 0;
-  top: 0.1rem;
-  font-size: 1.5rem;
+.plain-section li {
+  margin-bottom: 0.75rem;
+}
+
+.plain-section ol li::marker {
   color: #8a9a5b;
-}
-
-.styled-list.numbered {
-  counter-reset: list-counter;
-}
-
-.styled-list.numbered li {
-  counter-increment: list-counter;
-}
-
-.styled-list.numbered li::before {
-  content: counter(list-counter) ".";
   font-weight: 600;
-  font-size: 1.2rem;
-  color: #8a9a5b;
-  position: absolute;
-  left: 0;
-  top: 0;
 }
 
-/* Section divider like Policies */
-.policy-section,
-.content-section {
-  margin-bottom: 2.5rem;
+/* Policy block divider */
+.policy-block {
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
   border-bottom: 1px solid #e0e0e0;
-  padding-bottom: 1.5rem;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .aboutus-fullpage {
+  .aboutus-page {
     padding: 2rem 1rem;
   }
 
-  .aboutus-fullpage h1 {
+  .aboutus-page h1 {
     font-size: 2rem;
   }
 
@@ -132,15 +110,12 @@
     font-size: 0.9rem;
   }
 
-  .tab-content {
-    font-size: 0.95rem;
+  .plain-section h2 {
+    font-size: 1.5rem;
   }
 
-  .styled-list li {
+  .plain-section ul,
+  .plain-section ol {
     padding-left: 1.5rem;
-  }
-
-  .styled-list li::before {
-    font-size: 1.2rem;
   }
 }
