@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import "./styles/aboutus.css";
+// 1. Import the background image
+import aboutusbg from "../components/pictures/aboutusbg.jpg"; 
 
 const BASE_URL = process.env.REACT_APP_ABOUTUS_API;
 
@@ -33,25 +35,40 @@ const AboutUs = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [generalRes, facilitiesRes, policiesRes] = await Promise.all([
+        // Use Promise.allSettled to ensure all promises finish, even if one fails
+        const [generalRes, facilitiesRes, policiesRes] = await Promise.allSettled([
           axios.get(GENERAL_API_URL),
           axios.get(FACILITIES_API_URL),
           axios.get(POLICIES_API_URL),
         ]);
 
+        // Helper to safely get data, checking status first
+        const safeGetData = (res) => (res.status === 'fulfilled' && res.value.data) ? res.value.data : [];
+
+        const generalData = safeGetData(generalRes);
+        const facilitiesData = safeGetData(facilitiesRes);
+        const policiesData = safeGetData(policiesRes);
+
         const generalContent =
-          generalRes.data.length > 0
-            ? generalRes.data[0].content
+          generalData.length > 0
+            ? generalData[0].content
             : "No general information available.";
+            
+        // Check for *any* failure to set error message
+        if (generalRes.status === 'rejected' || facilitiesRes.status === 'rejected' || policiesRes.status === 'rejected') {
+             setError("Warning: Some content failed to load from the server. Check console for details.");
+        }
+
 
         setAboutUsData({
           general: generalContent,
-          facilities: facilitiesRes.data,
-          policies: policiesRes.data,
+          facilities: facilitiesData,
+          policies: policiesData,
         });
       } catch (err) {
+        // This catch block handles network errors outside of the API call responses
         console.error("Error fetching data:", err);
-        setError("Failed to load content.");
+        setError("Failed to load content due to a critical network error.");
       } finally {
         setLoading(false);
       }
@@ -61,7 +78,8 @@ const AboutUs = () => {
 
   const groupedPolicies = useMemo(() => {
     return aboutUsData.policies.reduce((acc, policy) => {
-      const label = policyCategories[policy.category] || "Uncategorized";
+      // Ensure policy.category exists and maps to a label, otherwise use 'Uncategorized'
+      const label = policy.category ? policyCategories[policy.category] || "Uncategorized" : "Uncategorized";
       if (!acc[label]) acc[label] = [];
       acc[label].push(policy);
       return acc;
@@ -70,13 +88,15 @@ const AboutUs = () => {
 
   const renderContent = () => {
     if (loading) return <p>Loading content...</p>;
-    if (error) return <p style={{ color: "red" }}>{error}</p>;
+    
+    // We keep the warning/error message outside the tab content for better visibility
+    // if (error) return <p style={{ color: "red" }}>{error}</p>; 
 
     switch (activeTab) {
       case "general":
         return (
           <div className="plain-section">
-            <h2>General Information</h2>
+            <h2 className="section-title">General Information</h2>
             <div className="plain-text">
               {aboutUsData.general
                 .split(/\r?\n/)
@@ -91,7 +111,7 @@ const AboutUs = () => {
       case "facilities":
         return (
           <div className="plain-section">
-            <h2>Facilities</h2>
+            <h2 className="section-title">Facilities</h2>
             <div className="plain-text">
               {aboutUsData.facilities.length > 0 ? (
                 aboutUsData.facilities.map((facility) => (
@@ -112,17 +132,21 @@ const AboutUs = () => {
       case "policies":
         return (
           <div className="plain-section">
-            <h2>Resort Policies</h2>
-            {Object.keys(groupedPolicies).map((category) => (
-              <div key={category} className="policy-block">
-                <h3>{category}</h3>
-                <ol>
-                  {groupedPolicies[category].map((policy) => (
-                    <li key={policy.id}>{policy.policy_text}</li>
-                  ))}
-                </ol>
-              </div>
-            ))}
+            <h2 className="section-title">Resort Policies</h2>
+            {aboutUsData.policies.length > 0 ? (
+                Object.keys(groupedPolicies).map((category) => (
+                    <div key={category} className="policy-block">
+                      <h3>{category}</h3>
+                      <ol>
+                        {groupedPolicies[category].map((policy) => (
+                          <li key={policy.id}>{policy.policy_text}</li>
+                        ))}
+                      </ol>
+                    </div>
+                ))
+            ) : (
+                <p>No policies information available.</p>
+            )}
           </div>
         );
 
@@ -133,28 +157,49 @@ const AboutUs = () => {
 
   return (
     <div className="aboutus-page">
-      <h1>About Us</h1>
-      <div className="tabs">
-        <button
-          className={activeTab === "general" ? "tab active" : "tab"}
-          onClick={() => setActiveTab("general")}
-        >
-          General Information
-        </button>
-        <button
-          className={activeTab === "facilities" ? "tab active" : "tab"}
-          onClick={() => setActiveTab("facilities")}
-        >
-          Facilities
-        </button>
-        <button
-          className={activeTab === "policies" ? "tab active" : "tab"}
-          onClick={() => setActiveTab("policies")}
-        >
-          Policies
-        </button>
+      
+      {/* 2. Hero Image Section */}
+      <div className="aboutus-hero-section">
+        <img
+          src={aboutusbg}
+          alt="About Us Background"
+          className="aboutus-hero-image"
+        />
+        <div className="aboutus-hero-overlay" />
+        <div className="aboutus-hero-content">
+          <h1 className="hero-title">ABOUT US</h1>
+        </div>
       </div>
-      <div className="content">{renderContent()}</div>
+
+      <div className="aboutus-content-container">
+        {/* 3. Navigation Tabs */}
+        <div className="tabs">
+          <button
+            className={activeTab === "general" ? "tab active" : "tab"}
+            onClick={() => setActiveTab("general")}
+          >
+            General Information
+          </button>
+          <button
+            className={activeTab === "facilities" ? "tab active" : "tab"}
+            onClick={() => setActiveTab("facilities")}
+          >
+            Facilities
+          </button>
+          <button
+            className={activeTab === "policies" ? "tab active" : "tab"}
+            onClick={() => setActiveTab("policies")}
+          >
+            Policies
+          </button>
+        </div>
+        
+        {/* Display Error/Warning outside content area */}
+        {error && <p className="error-message">{error}</p>}
+        
+        {/* 4. Tab Content */}
+        <div className="content">{renderContent()}</div>
+      </div>
     </div>
   );
 };
