@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './styles/services.css';
+// 1. Import the background image
+import tower from '../components/pictures/tower.jpg';
 
 function UserServices() {
     const [services, setServices] = useState([]);
@@ -52,12 +54,13 @@ const fetchServices = async () => {
         console.log(`Navigating to Book Now for service ID: ${serviceId}, Name: ${serviceName}, Price: ${servicePrice}`);
     };
 
+    // Note: The loading/error return must remain at the top level of the component
     if (loading) {
-        return <div className="user-services-container loading">Loading services...</div>;
+        return <div className="user-services-page loading">Loading services...</div>;
     }
 
     if (error) {
-        return <div className="user-services-container error-message">{error}</div>;
+        return <div className="user-services-page error-message">{error}</div>;
     }
 
     const rooms = sortedServices.filter(service => service.type === 'room');
@@ -103,56 +106,73 @@ const fetchServices = async () => {
     );
 
     return (
-        <div className="user-services-container">
-            <h2>Our Services</h2>
-            {services.length === 0 ? (
-                <p>No services available at the moment.</p>
-            ) : (
-                <>
-                    <div className="controls-container">
-                        <div className="tabs">
-                            <button
-                                className={activeTab === 'rooms' ? 'tab-button active' : 'tab-button'}
-                                onClick={() => setActiveTab('rooms')}
-                            >
-                                Rooms
-                            </button>
-                            <button
-                                className={activeTab === 'cottages' ? 'tab-button active' : 'tab-button'}
-                                onClick={() => setActiveTab('cottages')}
-                            >
-                                Cottages
-                            </button>
-                        </div>
-                        <div className="sort-controls">
-                            <label htmlFor="sort-by">Sort by:</label>
-                            <select id="sort-by" onChange={(e) => setSortOrder(e.target.value)} value={sortOrder}>
-                                <option value="none">Default</option>
-                                <option value="price_asc">Price: Low to High</option>
-                                <option value="price_desc">Price: High to Low</option>
-                            </select>
-                        </div>
-                    </div>
+        <div className="user-services-page">
+            
+            {/* 2. Hero Image Section */}
+            <div className="services-hero-section">
+                <img
+                    src={tower}
+                    alt="Services Background"
+                    className="services-hero-image"
+                />
+                <div className="services-hero-overlay" />
+                <div className="services-hero-content">
+                    <h1 className="hero-title">Our Services</h1>
+                </div>
+            </div>
 
-                    <div className="services-content">
-                        {activeTab === 'rooms' && rooms.length > 0 && (
-                            <div className="service-section">
-                                <h3 className="section-title">Rooms</h3>
-                                {renderServiceCards(rooms)}
+            {/* 3. Main Content Container */}
+            <div className="user-services-container">
+                {/* Removed the original h2 tag "Our Services" */}
+                {services.length === 0 ? (
+                    <p>No services available at the moment.</p>
+                ) : (
+                    <>
+                        <div className="controls-container">
+                            <div className="tabs">
+                                <button
+                                    className={activeTab === 'rooms' ? 'tab-button active' : 'tab-button'}
+                                    onClick={() => setActiveTab('rooms')}
+                                >
+                                    Rooms
+                                </button>
+                                <button
+                                    className={activeTab === 'cottages' ? 'tab-button active' : 'tab-button'}
+                                    onClick={() => setActiveTab('cottages')}
+                                >
+                                    Cottages
+                                </button>
                             </div>
-                        )}
-                        {activeTab === 'cottages' && cottages.length > 0 && (
-                            <div className="service-section">
-                                <h3 className="section-title">Cottages</h3>
-                                {renderServiceCards(cottages)}
+                            <div className="sort-controls">
+                                <label htmlFor="sort-by">Sort by:</label>
+                                <select id="sort-by" onChange={(e) => setSortOrder(e.target.value)} value={sortOrder}>
+                                    <option value="none">Default</option>
+                                    <option value="price_asc">Price: Low to High</option>
+                                    <option value="price_desc">Price: High to Low</option>
+                                </select>
                             </div>
-                        )}
-                        {(activeTab === 'rooms' && rooms.length === 0) || (activeTab === 'cottages' && cottages.length === 0) ? (
-                            <p className="no-services-message">No {activeTab} available at the moment.</p>
-                        ) : null}
-                    </div>
-                </>
-            )}
+                        </div>
+
+                        <div className="services-content">
+                            {activeTab === 'rooms' && rooms.length > 0 && (
+                                <div className="service-section">
+                                    <h3 className="section-title">Rooms</h3>
+                                    {renderServiceCards(rooms)}
+                                </div>
+                            )}
+                            {activeTab === 'cottages' && cottages.length > 0 && (
+                                <div className="service-section">
+                                    <h3 className="section-title">Cottages</h3>
+                                    {renderServiceCards(cottages)}
+                                </div>
+                            )}
+                            {(activeTab === 'rooms' && rooms.length === 0) || (activeTab === 'cottages' && cottages.length === 0) ? (
+                                <p className="no-services-message">No {activeTab} available at the moment.</p>
+                            ) : null}
+                        </div>
+                    </>
+                )}
+            </div>
         </div>
     );
 }
