@@ -54,7 +54,7 @@ const ContactUs = () => {
                     <h2>Resort Contact Info</h2>
                     <p>
                         <strong>Address:</strong>
-                        <span>Sitio Tabing Ilog, Brgy. Ulan-Ulan, Dingalan, Aurora</span>
+                        <span>Dacutan Balatasa, Bulalacao, Oriental Mindoro</span>
                     </p>
                     <p>
                         <strong>Facebook:</strong>{' '}
