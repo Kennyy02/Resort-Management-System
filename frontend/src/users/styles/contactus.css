@@ -1,160 +1,239 @@
+/* --- PAGE WRAPPER & HERO --- */
+.contact-page {
+    width: 100%;
+    min-height: 100vh;
+    padding: 0;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #fff;
+}
+
+.contact-hero-section {
+    position: relative;
+    width: 100%;
+    height: 350px; 
+    overflow: hidden;
+    margin-bottom: 30px; 
+}
+
+.contact-hero-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 30%; /* Adjust to show more mountain/view */
+}
+
+.contact-hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4); 
+    z-index: 5;
+}
+
+.contact-hero-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 10;
+}
+
+.hero-title {
+    color: #fff;
+    font-size: 3.5rem; 
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin: 0;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+/* --- MAIN CONTENT CONTAINER --- */
 .contact-container {
     max-width: 1100px;
-    margin: 5rem auto;
+    margin: 0 auto 5rem auto; /* Adjusted margin to center and give bottom space */
     padding: 0 20px;
     display: flex;
-    gap: 70px;
-    font-family: Arial, sans-serif;
+    /* Use fixed gap instead of padding/margin between sections for consistency */
+    gap: 70px; 
     color: #333;
     box-sizing: border-box;
-    background-color: transparent;
 }
 
 .contact-form {
-    flex: 2;
+    /* Changed flex distribution to give the form more space */
+    flex: 3; 
     display: flex;
     flex-direction: column;
-    padding-right: 40px;
+    /* Removed padding-right to use the gap property */
+    padding-right: 0; 
     box-sizing: border-box;
 }
 
 .contact-form h2 {
-    font-size: 2.5rem;
-    margin-bottom: 2.5rem;
-    font-weight: normal;
-    letter-spacing: 0.05em;
-    color: #333;
-    border-bottom: none;
-    padding-bottom: 0;
+    font-size: 2.2rem; /* Slightly smaller for better fit */
+    margin-bottom: 2rem;
+    font-weight: 600; /* Bolder title */
+    color: #5E6D58; /* Sage green color */
+    letter-spacing: 0.02em;
 }
 
 .contact-form input,
 .contact-form textarea {
     width: 100%;
-    padding: 12px 0;
+    padding: 12px 10px; /* Added horizontal padding for better appearance */
     margin-bottom: 25px;
     font-size: 1rem;
-    border: none;
-    border-bottom: 1px solid #ccc;
-    background-color: transparent;
+    border: 1px solid #ddd; /* Solid border for clearer input boxes */
+    border-radius: 8px; /* Rounded corners */
+    background-color: #f9f9f9;
     font-family: inherit;
     color: #333;
-    transition: border-color 0.3s ease;
+    transition: all 0.3s ease;
     resize: vertical;
     box-sizing: border-box;
 }
 
 .contact-form input::placeholder,
 .contact-form textarea::placeholder {
-    color: #888;
+    color: #aaa;
     font-size: 0.95rem;
 }
 
 .contact-form input:focus,
 .contact-form textarea:focus {
     outline: none;
-    border-color: #007bff;
+    border-color: #5E6D58;
+    box-shadow: 0 0 5px rgba(94, 109, 88, 0.5);
+    background-color: #fff;
 }
 
 .contact-form button {
-    background-color: #333;
+    background-color: #5E6D58; /* Changed to resort primary color */
     color: #fff;
     border: none;
-    font-weight: bold;
+    font-weight: 600;
     font-size: 1rem;
     letter-spacing: 0.05em;
     cursor: pointer;
     padding: 15px 30px;
     align-self: flex-start;
-    transition: background-color 0.3s ease;
+    transition: all 0.3s ease;
     text-transform: uppercase;
+    border-radius: 50px; /* Pill shape */
 }
 
 .contact-form button:hover {
-    background-color: #555;
-    border-bottom: none;
+    background-color: #4C5A48;
 }
 
 .status-message {
     font-weight: 600;
-    font-size: 0.95rem;
+    font-size: 1rem;
     margin-bottom: 1.5rem;
-    font-style: italic;
+    padding: 10px;
+    border-radius: 6px;
+    text-align: center;
+    background-color: #e6f7e9;
     color: #4CAF50;
 }
 
 .status-message.error {
+    background-color: #fdeaea;
     color: #F44336;
 }
 
 .contact-info {
-    flex: 1;
+    /* Changed flex distribution to be smaller than the form */
+    flex: 2; 
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     color: #333;
     font-family: inherit;
-    padding-left: 60px;
-    border-left: 1px solid #eee;
+    /* Removed custom padding and border to use gap and media query borders */
+    padding-left: 0; 
+    border-left: none;
     box-sizing: border-box;
 }
 
+/* Use a proper heading for Contact Info on desktop */
 .contact-info h2 {
-    display: none;
+    display: block; 
+    font-size: 2.2rem; 
+    margin-bottom: 2rem;
+    font-weight: 600;
+    color: #5E6D58;
 }
 
 .contact-info p {
     font-size: 1rem;
-    margin-bottom: 30px;
+    margin-bottom: 20px; /* Reduced spacing */
     line-height: 1.5;
-    word-wrap: break-word;
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column; /* Stack strong and link vertically */
 }
 
 .contact-info strong {
     font-weight: bold;
-    margin-right: 10px;
-    width: auto;
-    display: inline-block;
+    margin-right: 0;
+    width: 100%;
     color: #333;
     text-transform: uppercase;
-    font-size: 1.1rem;
+    font-size: 0.9rem; /* Smaller, cleaner title for each item */
     margin-bottom: 5px;
+    letter-spacing: 1px;
 }
 
-.contact-info a {
+.contact-info a,
+.contact-info span { /* Added span for non-link elements like address */
     color: #555;
     text-decoration: none;
     font-weight: normal;
-    border-bottom: none;
     transition: color 0.25s ease;
-    flex-grow: 1;
+    font-size: 1.1rem;
 }
 
 .contact-info a:hover {
-    color: #007bff;
+    color: #5E6D58;
     text-decoration: underline;
-    border-bottom: none;
 }
 
+/* --- RESPONSIVE ADJUSTMENTS --- */
 @media (max-width: 992px) {
     .contact-container {
         flex-direction: column;
-        gap: 50px;
+        gap: 0; /* Remove gap when stacking vertically */
         margin: 3rem auto;
+    }
+
+    .contact-hero-section {
+        height: 250px;
+    }
+
+    .hero-title {
+        font-size: 2.5rem;
     }
 
     .contact-form,
     .contact-info {
-        padding-right: 0;
-        padding-left: 0;
-        border-left: none;
+        padding: 0 20px; /* Add horizontal padding back to internal sections */
+        width: 100%;
     }
 
     .contact-info {
+        /* Add a separator line above contact info on mobile */
         padding-top: 40px;
         border-top: 1px solid #eee;
+        order: 2; /* Put contact info below the form */
+    }
+
+    .contact-form {
+        order: 1;
+        margin-bottom: 40px;
     }
 }
 
@@ -162,15 +241,17 @@
     .contact-form h2 {
         font-size: 2rem;
     }
-    .contact-form input,
-    .contact-form textarea {
-        margin-bottom: 20px;
+    .contact-info h2 {
+        font-size: 2rem;
+    }
+    .contact-info p {
+        flex-direction: column;
     }
 }
 
 @media (max-width: 480px) {
     .contact-container {
-        padding: 0 15px;
+        padding: 0; /* Remove main padding, rely on section padding */
     }
     .contact-form h2 {
         font-size: 1.8rem;
