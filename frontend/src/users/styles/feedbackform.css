@@ -94,28 +94,36 @@
     font-weight: 500;
 }
 
-/* Star Rating */
+/* --- STAR RATING FIX --- */
 .star-rating {
     display: flex;
-    font-size: 2rem;
-    color: #ccc;
+    /* Use a large, clean font size */
+    font-size: 2.5rem; 
+    /* Default color (unfilled) */
+    color: #ccc; 
+    margin-top: 5px;
     margin-bottom: 1rem;
     cursor: pointer;
     justify-content: center;
+    /* Ensure only the star character is displayed cleanly */
+    line-height: 1; 
 }
 
 .star-rating .star {
     transition: transform 0.2s, color 0.2s;
-    margin: 0 5px;
+    margin: 0 4px;
+    /* Important: Use a font that renders the unicode star cleanly (non-emoji) */
+    font-family: Arial, sans-serif; 
 }
 
 .star-rating .star.filled {
     color: #f5a623; /* Gold */
-    text-shadow: 0 0 3px #f5a623;
+    text-shadow: 0 0 5px rgba(245, 166, 35, 0.6);
 }
 
+/* Hover effect applies to all stars, but the click sets the 'filled' class */
 .star-rating .star:hover {
-    transform: scale(1.2);
+    transform: scale(1.1);
 }
 
 /* Photo preview */
@@ -137,7 +145,7 @@
 }
 
 .photo-preview img:hover {
-    transform: scale(1.1);
+    transform: scale(1.05);
 }
 
 /* Responsive */
@@ -148,7 +156,11 @@
     }
 
     .star-rating {
-        font-size: 1.6rem;
+        font-size: 2rem;
+    }
+
+    .star-rating .star {
+        margin: 0 2px;
     }
 
     .feedback-form button {
