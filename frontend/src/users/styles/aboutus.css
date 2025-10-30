@@ -1,126 +1,188 @@
+/* --- ABOUT US HERO SECTION STYLES (NEW) --- */
+.aboutus-hero-section {
+    position: relative;
+    width: 100%;
+    /* This height matches a common ratio for hero banners */
+    height: 400px; 
+    overflow: hidden;
+    /* Reset padding from the page wrapper for full-width image */
+    margin-bottom: 30px; 
+}
+
+.aboutus-hero-image {
+    width: 100%;
+    height: 100%;
+    /* Ensure the image covers the section without stretching */
+    object-fit: cover; 
+}
+
+.aboutus-hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* A subtle, dark overlay for text readability */
+    background-color: rgba(0, 0, 0, 0.4); 
+    z-index: 5;
+}
+
+.aboutus-hero-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Center the text */
+    text-align: center;
+    z-index: 10; /* Above the overlay */
+}
+
+.hero-title {
+    color: #fff; /* White text for visibility */
+    font-size: 4rem; 
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin: 0;
+    padding: 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Enhance contrast */
+}
+
+/* --- PAGE CONTAINER AND GENERAL STYLES (MODIFIED) --- */
+
 .aboutus-page {
-  width: 100%;
-  min-height: 100vh;
-  padding: 3rem 2rem;
-  background: #fff;
-  color: #333;
+    width: 100%;
+    min-height: 100vh;
+    /* Remove padding to allow hero to be full width. */
+    padding: 0; 
+    background: #fff;
+    color: #333;
 }
 
-.aboutus-page h1 {
-  text-align: center;
-  color: #8a9a5b;
-  font-size: 2.8rem;
-  font-weight: 700;
-  margin-bottom: 2rem;
+/* Container for tabs and content, now that the hero is full width */
+.aboutus-content-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    /* Add vertical padding to the content area */
+    padding: 2rem 2rem 3rem; 
 }
 
-/* Tabs */
+/* Removed the original .aboutus-page h1 styling since the h1 is now in the hero */
+
+
+/* --- TABS (ORIGINAL STYLES RETAINED) --- */
 .tabs {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 2rem;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
 }
 
 .tab {
-  padding: 0.6rem 1.5rem;
-  border: 2px solid #8a9a5b;
-  border-radius: 50px;
-  background: transparent;
-  color: #8a9a5b;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.3s;
+    padding: 0.6rem 1.5rem;
+    border: 2px solid #8a9a5b;
+    border-radius: 50px;
+    background: transparent;
+    color: #8a9a5b;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
 }
 
 .tab:hover,
 .tab.active {
-  background: #8a9a5b;
-  color: #fff;
+    background: #8a9a5b;
+    color: #fff;
 }
 
-/* Content area */
+/* --- CONTENT AREA (ORIGINAL STYLES RETAINED) --- */
 .content {
-  max-width: 1000px;
-  margin: 0 auto;
+    max-width: 1000px;
+    margin: 0 auto;
 }
 
 /* Section styling */
-.plain-section h2 {
-  color: #8a9a5b;
-  text-align: center;
-  margin-bottom: 1.5rem;
-  font-weight: 700;
+.section-title { /* Changed to use .section-title class for consistency */
+    color: #8a9a5b;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+    font-size: 2rem; /* Added size for clarity */
 }
 
 .plain-section {
-  padding: 1rem 0;
+    padding: 1rem 0;
 }
 
 .plain-text p {
-  margin-bottom: 1rem;
-  line-height: 1.8;
-  font-size: 1rem;
-  color: #333;
+    margin-bottom: 1rem;
+    line-height: 1.8;
+    font-size: 1rem;
+    color: #333;
 }
 
 /* Facility styling */
 .facility-item p {
-  margin-bottom: 0.8rem;
-  line-height: 1.7;
+    margin-bottom: 0.8rem;
+    line-height: 1.7;
 }
 
 /* Policies */
 .policy-block {
-  margin-bottom: 2rem;
-  border-bottom: 1px solid #e0e0e0;
-  padding-bottom: 1.5rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 1.5rem;
 }
 
 .policy-block h3 {
-  color: #8a9a5b;
-  margin-bottom: 1rem;
-  font-size: 1.2rem;
-  border-left: 4px solid #8a9a5b;
-  padding-left: 0.5rem;
+    color: #8a9a5b;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    border-left: 4px solid #8a9a5b;
+    padding-left: 0.5rem;
 }
 
 .policy-block ol {
-  padding-left: 1.5rem;
-  list-style-type: decimal;
+    padding-left: 1.5rem;
+    list-style-type: decimal;
 }
 
 .policy-block li {
-  margin-bottom: 0.75rem;
-  line-height: 1.7;
+    margin-bottom: 0.75rem;
+    line-height: 1.7;
 }
 
 .policy-block li::marker {
-  color: #8a9a5b;
-  font-weight: 600;
+    color: #8a9a5b;
+    font-weight: 600;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-  .aboutus-page {
-    padding: 2rem 1rem;
-  }
+    /* Adjustments for new structure */
+    .aboutus-hero-section {
+        height: 300px;
+    }
+    .hero-title {
+        font-size: 3rem;
+    }
+    .aboutus-content-container {
+        padding: 1.5rem 1rem 2rem;
+    }
+    /* End new adjustments */
 
-  .aboutus-page h1 {
-    font-size: 2rem;
-  }
+    .section-title {
+        font-size: 1.5rem;
+    }
+    .tab {
+        font-size: 0.9rem;
+        padding: 0.5rem 1.2rem;
+    }
 
-  .tab {
-    font-size: 0.9rem;
-    padding: 0.5rem 1.2rem;
-  }
+    .plain-text p {
+        font-size: 0.95rem;
+    }
 
-  .plain-text p {
-    font-size: 0.95rem;
-  }
-
-  .policy-block h3 {
-    font-size: 1rem;
-  }
+    .policy-block h3 {
+        font-size: 1rem;
+    }
 }
