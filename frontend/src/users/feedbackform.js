@@ -3,105 +3,142 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import './styles/feedbackform.css'
 
+// Star Component for Reusability and Clean Code
+const StarRatingInput = ({ rating, setRating }) => {
+    return (
+        <div className="star-rating">
+            {[...Array(5)].map((_, index) => {
+                const starValue = 5 - index; // 5, 4, 3, 2, 1
+                return (
+                    <span
+                        key={starValue}
+                        className={`star ${starValue <= rating ? 'filled' : ''}`}
+                        onClick={() => setRating(starValue)}
+                        // Use a non-emoji star character
+                        dangerouslySetInnerHTML={{ __html: '&#9733;' }} // Unicode BLACK STAR (★)
+                    />
+                );
+            })}
+        </div>
+    );
+};
+
 export default function FeedbackForm({ onSubmitted }) {
-  const [message, setMessage] = useState("");
-  const [rating, setRating] = useState(5);
-  const [photos, setPhotos] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
+    const [message, setMessage] = useState("");
+    const [rating, setRating] = useState(5); // Default to 5 stars
+    const [photos, setPhotos] = useState([]);
+    const [photoPreviews, setPhotoPreviews] = useState([]); // State for image URLs
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [success, setSuccess] = useState(null);
 
-  const navigate = useNavigate();
+    const navigate = useNavigate();
 
-  const handleFileChange = (e) => {
-    setPhotos([...e.target.files]);
-  };
+    const handleFileChange = (e) => {
+        const files = [...e.target.files];
+        setPhotos(files);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+        // Create URLs for image previews
+        const previews = files.map(file => URL.createObjectURL(file));
+        setPhotoPreviews(previews);
+    };
 
-    try {
-      const storedUser = JSON.parse(localStorage.getItem("user"));
-      if (!storedUser) {
-        setError("You must be logged in to submit feedback.");
-        setLoading(false);
-        return;
-      }
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError(null);
+        setSuccess(null);
 
-      const formData = new FormData();
-      formData.append("name", storedUser.name);
-      formData.append(
-        "profilePicture",
-        storedUser.picture ||
-          `https://ui-avatars.com/api/?name=${encodeURIComponent(
-            storedUser.name
-          )}`
-      );
-      formData.append("message", message);
-      formData.append("rating", rating);
+        try {
+            const storedUser = JSON.parse(localStorage.getItem("user"));
+            if (!storedUser) {
+                setError("You must be logged in to submit feedback.");
+                setLoading(false);
+                return;
+            }
 
-      photos.forEach((file) => {
-        formData.append("photos", file);
-      });
+            const formData = new FormData();
+            formData.append("name", storedUser.name);
+            formData.append(
+                "profilePicture",
+                storedUser.picture ||
+                    `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                        storedUser.name
+                    )}`
+            );
+            formData.append("message", message);
+            formData.append("rating", rating);
 
-      const res = await fetch(`${process.env.REACT_APP_RATINGS_API}/feedbacks`, {
-        method: "POST",
-        body: formData,
-      });
+            photos.forEach((file) => {
+                formData.append("photos", file);
+            });
 
-      if (!res.ok) throw new Error("Failed to submit feedback");
+            const res = await fetch(`${process.env.REACT_APP_RATINGS_API}/feedbacks`, {
+                method: "POST",
+                body: formData,
+            });
 
-      setMessage("");
-      setRating(5);
-      setPhotos([]);
+            if (!res.ok) throw new Error("Failed to submit feedback");
 
-      setSuccess("✅ Feedback submitted successfully!");
-      if (onSubmitted) onSubmitted();
+            // Reset form fields
+            setMessage("");
+            setRating(5);
+            setPhotos([]);
+            setPhotoPreviews([]);
 
-      setTimeout(() => {
-        navigate("/feedback"); // change to your actual route if different
-      }, 2000);
-    } catch (err) {
-      console.error(err);
-      setError("❌ Failed to submit feedback");
-    } finally {
-      setLoading(false);
-    }
-  };
+            setSuccess("✅ Feedback submitted successfully!");
+            if (onSubmitted) onSubmitted();
 
-  return (
-    <form className="feedback-form" onSubmit={handleSubmit}>
-      <h3>Write Feedback</h3>
+            setTimeout(() => {
+                navigate("/feedback");
+            }, 2000);
+        } catch (err) {
+            console.error(err);
+            setError("❌ Failed to submit feedback");
+        } finally {
+            setLoading(false);
+        }
+    };
 
-      {error && <p className="error">{error}</p>}
-      {success && <p className="success-toast">{success}</p>}
+    return (
+        <form className="feedback-form" onSubmit={handleSubmit}>
+            <h3>Write Feedback</h3>
 
-      <label>Rating:</label>
-      <select
-        value={rating}
-        onChange={(e) => setRating(Number(e.target.value))}
-      >
-        <option value={5}>⭐⭐⭐⭐⭐</option>
-        <option value={4}>⭐⭐⭐⭐</option>
-        <option value={3}>⭐⭐⭐</option>
-        <option value={2}>⭐⭐</option>
-        <option value={1}>⭐</option>
-      </select>
+            {error && <p className="error">{error}</p>}
+            {success && <p className="success-toast">{success}</p>}
 
-      <label>Message:</label>
-      <textarea
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
-        required
-      />
+            <label>Rating:</label>
+            {/* Replaced select with custom StarRatingInput component */}
+            <StarRatingInput rating={rating} setRating={setRating} />
 
-      <label>Upload Photos:</label>
-      <input type="file" multiple onChange={handleFileChange} />
+            <label>Message:</label>
+            <textarea
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                required
+            />
 
-      <button type="submit" disabled={loading}>
-        {loading ? "Submitting..." : "Submit Feedback"}
-      </button>
-    </form>
-  );
+            <label>Upload Photos (Optional):</label>
+            <input type="file" multiple accept="image/*" onChange={handleFileChange} />
+            
+            {/* Photo Preview Section */}
+            {photoPreviews.length > 0 && (
+                <div className="photo-preview">
+                    {photoPreviews.map((src, index) => (
+                        <img 
+                            key={index} 
+                            src={src} 
+                            alt={`Preview ${index + 1}`} 
+                            // Revoke URL when component is unmounted or previews change to prevent memory leaks
+                            onLoad={() => URL.revokeObjectURL(src)} 
+                        />
+                    ))}
+                </div>
+            )}
+
+            <button type="submit" disabled={loading || !message}>
+                {loading ? "Submitting..." : "Submit Feedback"}
+            </button>
+        </form>
+    );
 }
