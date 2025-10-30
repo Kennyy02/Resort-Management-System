@@ -2,257 +2,327 @@
 
 /* Page container */
 body {
-  font-family: 'Poppins', sans-serif;
-  background-color: #fdfdfb;
-  color: #4a4a4a;
-  margin: 0;
-  padding: 0;
+    font-family: 'Poppins', sans-serif;
+    background-color: #fdfdfb;
+    color: #4a4a4a;
+    margin: 0;
+    padding: 0;
 }
 
-/* Main wrapper */
+/* New wrapper for the entire page (allows hero to be full width) */
+.user-services-page {
+    width: 100%;
+    min-height: 100vh;
+    padding: 0; /* Important: Remove default padding */
+}
+
+/* --- SERVICES HERO SECTION STYLES (NEW) --- */
+.services-hero-section {
+    position: relative;
+    width: 100%;
+    height: 350px; /* Adjusted height */
+    overflow: hidden;
+    margin-bottom: 30px; 
+}
+
+.services-hero-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.services-hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Darker overlay for contrast */
+    z-index: 5;
+}
+
+.services-hero-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 10;
+}
+
+.hero-title {
+    color: #fff;
+    font-family: 'Playfair Display', serif;
+    font-size: 3.5rem; 
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin: 0;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+
+/* Main wrapper (now only for content) */
 .user-services-container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 40px 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+    /* Added back horizontal padding */
+    padding: 0 20px 40px 20px; 
 }
 
-/* Main heading */
-.user-services-container h2 {
-  font-family: 'Playfair Display', serif;
-  font-size: 2.8rem;
-  color: #2c2c2c;
-  text-align: center;
-  margin-bottom: 15px;
-  font-weight: 700;
-  letter-spacing: 1px;
-}
+/* Removed the original .user-services-container h2 styling as it's replaced by .hero-title */
+
 
 /* Sub section title */
 .section-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 2rem;
-  color: #a58a5f; /* gold accent */
-  text-align: center;
-  margin: 40px 0 25px;
-  font-weight: 600;
-  position: relative;
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: #a58a5f; /* gold accent */
+    text-align: center;
+    margin: 40px 0 25px;
+    font-weight: 600;
+    position: relative;
 }
 
 .section-title::after {
-  content: "";
-  display: block;
-  width: 60px;
-  height: 3px;
-  background-color: #a58a5f;
-  margin: 10px auto 0;
-  border-radius: 2px;
+    content: "";
+    display: block;
+    width: 60px;
+    height: 3px;
+    background-color: #a58a5f;
+    margin: 10px auto 0;
+    border-radius: 2px;
 }
 
 /* Tabs + sort controls container */
 .controls-container {
-  background: #fff;
-  border-radius: 12px;
-  padding: 15px 25px;
-  margin: 30px auto;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
+    max-width: 1000px; /* Constrain controls slightly */
+    margin: 0 auto 30px auto; /* Centering the controls container */
+    background: #fff;
+    border-radius: 12px;
+    padding: 15px 25px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
 }
 
 .tabs {
-  display: flex;
-  gap: 12px;
+    display: flex;
+    gap: 12px;
 }
 
 .tab-button {
-  padding: 10px 20px;
-  border: 1px solid #ddd;
-  background: #fafafa;
-  border-radius: 30px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #555;
-  cursor: pointer;
-  transition: all 0.3s ease;
+    padding: 10px 20px;
+    border: 1px solid #ddd;
+    background: #fafafa;
+    border-radius: 30px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 .tab-button:hover {
-  background: #f0f0f0;
+    background: #f0f0f0;
 }
 
 .tab-button.active {
-  background: #a58a5f;
-  color: #fff;
-  border-color: #a58a5f;
+    background: #a58a5f;
+    color: #fff;
+    border-color: #a58a5f;
 }
 
 /* Sort controls */
 .sort-controls {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .sort-controls label {
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #444;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #444;
 }
 
 .sort-controls select {
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  background: #fff;
-  cursor: pointer;
-  transition: 0.3s;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #fff;
+    cursor: pointer;
+    transition: 0.3s;
 }
 
 .sort-controls select:focus {
-  border-color: #a58a5f;
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(165, 138, 95, 0.2);
+    border-color: #a58a5f;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(165, 138, 95, 0.2);
 }
 
 /* Grid layout */
 .services-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 30px;
-  margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 30px;
+    margin-top: 20px;
 }
 
 /* Service Card */
 .service-card {
-  background: #fff;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .service-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+    transform: translateY(-8px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
 }
 
 .service-image-wrapper {
-  width: 100%;
-  height: 220px;
-  overflow: hidden;
-  position: relative;
+    width: 100%;
+    height: 220px;
+    overflow: hidden;
+    position: relative;
 }
 
 .service-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.4s ease;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
 }
 
 .service-card:hover .service-image {
-  transform: scale(1.08);
+    transform: scale(1.08);
 }
 
 .no-image {
-  background: #eaeaea;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 220px;
-  font-size: 1rem;
-  color: #888;
+    background: #eaeaea;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 220px;
+    font-size: 1rem;
+    color: #888;
 }
 
 /* Card details */
 .service-details {
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
 }
 
 .service-details h3 {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.4rem;
-  color: #2c2c2c;
-  margin: 0 0 10px;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    color: #2c2c2c;
+    margin: 0 0 10px;
 }
 
 .service-details p {
-  font-size: 0.95rem;
-  color: #555;
-  margin: 0 0 10px;
+    font-size: 0.95rem;
+    color: #555;
+    margin: 0 0 10px;
 }
 
 /* Price + Status */
 .price-status-wrapper {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 12px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 12px 0;
 }
 
 .price-status-wrapper .price {
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: #a58a5f;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #a58a5f;
 }
 
 .status-available {
-  background: #f0f7f0;
-  color: #2e7d32;
-  font-size: 0.8rem;
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-weight: 600;
+    background: #f0f7f0;
+    color: #2e7d32;
+    font-size: 0.8rem;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 600;
 }
 
 .status-unavailable {
-  background: #fff1f1;
-  color: #c62828;
-  font-size: 0.8rem;
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-weight: 600;
+    background: #fff1f1;
+    color: #c62828;
+    font-size: 0.8rem;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 600;
 }
 
 /* Book Now button */
 .book-now-button {
-  background: #a58a5f;
-  color: #fff;
-  padding: 12px 18px;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  margin-top: auto;
-  transition: background 0.3s ease;
+    background: #a58a5f;
+    color: #fff;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: auto;
+    transition: background 0.3s ease;
 }
 
 .book-now-button:hover {
-  background: #8a734e;
+    background: #8a734e;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .controls-container {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 15px;
-  }
+    /* Hero adjustments */
+    .services-hero-section {
+        height: 250px;
+    }
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    /* End hero adjustments */
 
-  .tabs {
-    width: 100%;
-    justify-content: space-around;
-  }
+    .controls-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+        padding: 15px;
+    }
+    
+    .sort-controls {
+        width: 100%;
+        justify-content: space-between;
+    }
 
-  .services-grid {
-    grid-template-columns: 1fr;
-  }
+    .tabs {
+        width: 100%;
+        justify-content: space-between;
+    }
+    .tab-button {
+        padding: 8px 15px;
+        font-size: 0.9rem;
+    }
+
+    .user-services-container {
+        padding: 0 10px 30px;
+    }
+
+    .services-grid {
+        grid-template-columns: 1fr;
+    }
 }
