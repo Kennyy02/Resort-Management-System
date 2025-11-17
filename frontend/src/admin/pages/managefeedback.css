@@ -1,6 +1,6 @@
 body {
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    background: #f4f7f6;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7f6;
     color: #333;
     margin: 0;
     padding: 0;
@@ -9,18 +9,18 @@ body {
 .managefeedback-container {
     width: 100%;
     padding: 2rem;
-    background: transparent;
+    background-color: transparent;
 }
 
 h2 {
     text-align: center;
     color: #4C5A48;
     margin-bottom: 1rem;
-    font-size: 2rem;
+    font-size: 2em;
     font-weight: 600;
 }
 
-/* Toggle Buttons */
+/* Toggle buttons */
 .feedback-toggle {
     display: flex;
     justify-content: center;
@@ -30,49 +30,51 @@ h2 {
 
 .feedback-toggle button {
     padding: 0.6rem 1.2rem;
+    border: none;
     border-radius: 5px;
-    border: 1px solid #dee2e6;
-    background: #fff;
     cursor: pointer;
-    font-size: 0.9rem;
     font-weight: 500;
+    font-size: 0.9rem;
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
     color: #6c757d;
     transition: 0.2s ease;
 }
 
 .feedback-toggle button:hover:not(:disabled) {
-    background: #e9ecef;
+    background-color: #e9ecef;
 }
 
 .feedback-toggle button.active {
-    background: #5E6D58;
-    color: #fff;
+    background-color: #5E6D58;
+    color: white;
+    font-weight: 600;
 }
 
-/* Status Messages */
+/* Status messages */
 .status-message {
     text-align: center;
-    font-size: 1.1rem;
+    font-size: 1.1em;
     padding: 1rem;
     border-radius: 5px;
     margin-top: 1rem;
 }
 
 .status-message.loading {
-    background: #DCE4D8;
     color: #5E6D58;
+    background-color: #DCE4D8;
     border: 1px solid #5E6D58;
 }
 
 .status-message.error {
-    background: #ffebee;
     color: #d32f2f;
+    background-color: #ffebee;
     border: 1px solid #d32f2f;
 }
 
 .status-message.no-feedback {
-    background: #f0f0f0;
     color: #555;
+    background-color: #f0f0f0;
     border: 1px solid #ccc;
 }
 
@@ -85,99 +87,117 @@ h2 {
 .feedback-table {
     width: 100%;
     border-collapse: collapse;
-    background: #fff;
-    margin-top: 1rem;
+    background-color: #ffffff;
     border-radius: 8px;
     overflow: hidden;
+    margin-top: 1rem;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .feedback-table th,
 .feedback-table td {
     padding: 12px 15px;
-    border-bottom: 1px solid #e0e0e0;
     text-align: left;
+    border-bottom: 1px solid #e0e0e0;
 }
 
 .feedback-table th {
-    background: #5E6D58;
-    color: #fff;
+    background-color: #5E6D58;
+    color: #ffffff;
     font-weight: 600;
     text-transform: uppercase;
-    font-size: 0.9rem;
+    font-size: 0.9em;
 }
 
 .feedback-table tbody tr:nth-child(even) {
-    background: #f9f9f9;
+    background-color: #f9f9f9;
 }
 
 .feedback-table tbody tr:hover {
-    background: #E6EAE4;
+    background-color: #E6EAE4;
 }
 
 .deleted-row {
-    background: #ffebee !important;
+    background-color: #ffebee !important;
     color: #888;
-    opacity: 0.7;
     text-decoration: line-through;
+    opacity: 0.7;
 }
 
 /* Buttons */
 .feedback-table td button {
     padding: 6px 10px;
-    border-radius: 5px;
     border: none;
+    border-radius: 5px;
     cursor: pointer;
     font-weight: 500;
-    font-size: 0.85rem;
-    min-width: 70px;
     transition: 0.3s ease;
+    font-size: 0.85em;
+    min-width: 70px;
 }
 
 .hide-btn {
-    background: #d32f2f;
-    color: #fff;
+    background-color: #d32f2f;
+    color: white;
 }
 
 .hide-btn:hover {
-    background: #c62828;
+    background-color: #c62828;
     transform: translateY(-1px);
 }
 
 .restore-btn {
-    background: #7C9271;
-    color: #fff;
+    background-color: #7C9271;
+    color: white;
 }
 
 .restore-btn:hover {
-    background: #6A7C5F;
+    background-color: #6A7C5F;
     transform: translateY(-1px);
 }
 
-/* Images */
-.photo-preview {
+/* ------- FIXED IMAGE COLUMN -------- */
+
+.images-cell {
     display: flex;
-    gap: 8px;
+    align-items: center;
+}
+
+.photo-preview-admin {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 6px;
 }
 
 .admin-feedback-image {
-    width: 60px;
-    height: 60px;
+    width: 55px;
+    height: 55px;
     border-radius: 5px;
     object-fit: cover;
+}
+
+.photo-count-indicator {
+    background: #5E6D58;
+    color: #fff;
+    padding: 4px 6px;
+    font-size: 0.75rem;
+    border-radius: 4px;
+    height: fit-content;
 }
 
 /* Pagination */
 .pagination {
     display: flex;
     justify-content: center;
+    align-items: center;
     margin-top: 1.5rem;
     gap: 0.5rem;
     flex-wrap: wrap;
 }
 
 .pagination-button {
-    background: #fff;
+    background-color: #ffffff;
     border: 1px solid #dee2e6;
     color: #6c757d;
     padding: 0.5rem 1rem;
@@ -189,30 +209,28 @@ h2 {
 }
 
 .pagination-button:hover:not(:disabled) {
-    background: #e9ecef;
+    background-color: #e9ecef;
     border-color: #ced4da;
+    color: #343a40;
 }
 
 .pagination-button.active {
-    background: #5E6D58;
+    background-color: #5E6D58;
     border-color: #5E6D58;
-    color: #fff;
+    color: white;
+    font-weight: 600;
 }
 
 .pagination-button:disabled {
-    background: #f8f9fa;
-    border-color: #e9ecef;
-    color: #adb5bd;
     cursor: not-allowed;
+    background-color: #f8f9fa;
+    color: #adb5bd;
+    border-color: #e9ecef;
 }
 
-/* Mobile View */
+/* Mobile Responsive */
 @media (max-width: 768px) {
-    .feedback-table,
-    .feedback-table tbody,
-    .feedback-table tr,
-    .feedback-table td,
-    .feedback-table th {
+    .feedback-table, .feedback-table tbody, .feedback-table tr, .feedback-table td, .feedback-table th {
         display: block;
     }
 
@@ -222,15 +240,16 @@ h2 {
 
     .feedback-table tr {
         margin-bottom: 1rem;
-        padding: 0.5rem;
         border: 1px solid #e0e0e0;
         border-radius: 8px;
+        padding: 0.5rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
 
     .feedback-table td {
-        padding-left: 50%;
-        text-align: right;
         border-bottom: 1px dashed #eee;
+        text-align: right;
+        padding-left: 50%;
         position: relative;
     }
 
@@ -238,11 +257,12 @@ h2 {
         content: attr(data-label);
         position: absolute;
         left: 10px;
-        width: 45%;
+        width: calc(50% - 20px);
+        padding-right: 10px;
+        white-space: nowrap;
+        text-align: left;
         font-weight: 600;
         color: #4C5A48;
-        text-align: left;
-        white-space: nowrap;
     }
 
     .feedback-table td button {
