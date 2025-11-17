@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom'; 
-import './facilities.css'; // Make sure this path is correct
+import './styles/aboutus.css'; 
 
 // Assuming this is your base API URL for the aboutus service
 const FACILITIES_API_URL = `${process.env.REACT_APP_ABOUTUS_API}/pre/api/facilities`;
