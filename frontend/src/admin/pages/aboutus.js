@@ -10,16 +10,18 @@ const POLICIES_API_URL = `${BASE_URL}/pre/api/policies`;
 
 const AdminAboutUs = () => {
     const [generalContent, setGeneralContent] = useState('');
+    const [generalId, setGeneralId] = useState(null); // Added state for general ID
 
     const [facilitiesList, setFacilitiesList] = useState([]);
     const [newFacilityName, setNewFacilityName] = useState('');
     const [newFacilityDescription, setNewFacilityDescription] = useState('');
-    // ADDED STATE: For Facility Image URL
-    const [newFacilityImageUrl, setNewFacilityImageUrl] = useState('');
+    const [newFacilityImageUrl, setNewFacilityImageUrl] = useState(''); 
     const [editingFacility, setEditingFacility] = useState(null);
 
     const [policiesList, setPoliciesList] = useState([]);
-// ... (rest of policy states)
+    const [newPolicyText, setNewPolicyText] = useState(''); // Added state for new policy text
+    const [newPolicyCategory, setNewPolicyCategory] = useState(''); // Added state for new policy category
+    const [editingPolicy, setEditingPolicy] = useState(null); // Added state for editing policy
 
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
@@ -32,7 +34,10 @@ const AdminAboutUs = () => {
 
     const policyCategories = useMemo(() => ([
         { value: 'terms_booking', label: 'Terms of Payment & Booking Policies' },
-// ... (rest of policy categories)
+        { value: 'check_in_out', label: 'Check-in & Check-out Policies' },
+        { value: 'occupancy_room_service', label: 'Occupancy & Room Service' },
+        { value: 'safety_conduct', label: 'Safety Precautions, Risk Control & Proper Conduct' },
+        { value: 'swimming_pool_rules', label: 'Swimming Pool Rules' },
         { value: 'other_policies', label: 'Other Resort Policies' },
     ]), []);
 
@@ -46,7 +51,13 @@ const AdminAboutUs = () => {
         setError('');
         try {
             const generalResponse = await axios.get(GENERAL_API_URL);
-            setGeneralContent(generalResponse.data.length ? generalResponse.data[0].content : '');
+            if(generalResponse.data.length) {
+                setGeneralContent(generalResponse.data[0].content);
+                setGeneralId(generalResponse.data[0].id);
+            } else {
+                setGeneralContent('');
+                setGeneralId(null);
+            }
 
             const facilitiesResponse = await axios.get(FACILITIES_API_URL);
             setFacilitiesList(facilitiesResponse.data);
@@ -61,9 +72,32 @@ const AdminAboutUs = () => {
         }
     };
 
-    // ... (handleGeneralSubmit and handleGeneralDelete functions)
+    // General Info Functions
+    const handleGeneralSubmit = async () => {
+        if (!generalContent.trim()) { setError('General content cannot be empty'); return; }
+        setLoading(true); setMessage(''); setError('');
+        try {
+            const data = { type: 'general', content: generalContent };
+            await axios.post(GENERAL_API_URL, data);
+            setMessage('General content saved successfully!');
+            fetchAllContent();
+        } catch (err) { setError('Failed to save general content'); }
+        finally { setLoading(false); }
+    };
 
-    // Facilities
+    const handleGeneralDelete = async () => {
+        if (!window.confirm('Are you sure you want to delete the General Content?')) return;
+        setLoading(true); setMessage(''); setError('');
+        try {
+            await axios.delete(`${GENERAL_API_URL}/general`);
+            setMessage('General content deleted!');
+            setGeneralContent('');
+            setGeneralId(null);
+        } catch (err) { setError('Failed to delete general content'); }
+        finally { setLoading(false); }
+    };
+
+    // Facilities Functions
     const handleAddUpdateFacility = async () => {
         if (!newFacilityName.trim()) { setError('Facility name cannot be empty'); return; }
         setLoading(true); setMessage(''); setError('');
@@ -71,19 +105,21 @@ const AdminAboutUs = () => {
             const data = { 
                 name: newFacilityName, 
                 description: newFacilityDescription, 
-                image_url: newFacilityImageUrl // ADDED: Image URL in payload
+                image_url: newFacilityImageUrl
             };
 
             if (editingFacility) {
                 await axios.put(`${FACILITIES_API_URL}/${editingFacility.id}`, data);
+                setMessage('Facility updated successfully!');
                 setEditingFacility(null);
             } else {
                 await axios.post(FACILITIES_API_URL, data);
+                setMessage('Facility added successfully!');
             }
             // Reset fields
             setNewFacilityName(''); 
             setNewFacilityDescription('');
-            setNewFacilityImageUrl(''); // ADDED: Reset Image URL field
+            setNewFacilityImageUrl(''); 
             fetchAllContent();
         } catch (err) { setError('Failed to save facility'); }
         finally { setLoading(false); }
@@ -91,26 +127,86 @@ const AdminAboutUs = () => {
 
     const handleDeleteFacility = async (id, name) => {
         if (!window.confirm(`Delete "${name}"?`)) return;
-// ... (rest of delete logic)
+        setLoading(true); setMessage(''); setError('');
+        try {
+            await axios.delete(`${FACILITIES_API_URL}/${id}`);
+            setMessage(`Facility "${name}" deleted!`);
+            fetchAllContent();
+        } catch (err) { setError('Failed to delete facility'); }
+        finally { setLoading(false); }
     };
 
-    const startEditFacility = (f) => { 
-        setEditingFacility(f); 
-        setNewFacilityName(f.name); 
-        setNewFacilityDescription(f.description || ''); 
-        setNewFacilityImageUrl(f.image_url || ''); // ADDED: Set existing image URL
-    };
-    const cancelEditFacility = () => { 
-        setEditingFacility(null); 
-        setNewFacilityName(''); 
-        setNewFacilityDescription(''); 
-        setNewFacilityImageUrl(''); // ADDED: Clear image URL field
+    const startEditFacility = (f) => { 
+        setEditingFacility(f); 
+        setNewFacilityName(f.name); 
+        setNewFacilityDescription(f.description || ''); 
+        setNewFacilityImageUrl(f.image_url || '');
+        // Reset policy edit state when starting facility edit
+        setEditingPolicy(null);
+        setNewPolicyText('');
     };
 
-    // ... (Policies functions)
+    const cancelEditFacility = () => { 
+        setEditingFacility(null); 
+        setNewFacilityName(''); 
+        setNewFacilityDescription(''); 
+        setNewFacilityImageUrl('');
+    };
+
+    // Policies Functions
+    const handleAddUpdatePolicy = async () => {
+        if (!newPolicyText.trim() || !newPolicyCategory) { setError('Policy text and category are required'); return; }
+        setLoading(true); setMessage(''); setError('');
+        try {
+            const data = { policy_text: newPolicyText, category: newPolicyCategory };
+
+            if (editingPolicy) {
+                await axios.put(`${POLICIES_API_URL}/${editingPolicy.id}`, data);
+                setMessage('Policy updated successfully!');
+                setEditingPolicy(null);
+            } else {
+                await axios.post(POLICIES_API_URL, data);
+                setMessage('Policy added successfully!');
+            }
+            setNewPolicyText('');
+            fetchAllContent();
+        } catch (err) { setError('Failed to save policy'); }
+        finally { setLoading(false); }
+    };
+
+    const handleDeletePolicy = async (id) => {
+        if (!window.confirm('Delete this policy?')) return;
+        setLoading(true); setMessage(''); setError('');
+        try {
+            await axios.delete(`${POLICIES_API_URL}/${id}`);
+            setMessage('Policy deleted!');
+            fetchAllContent();
+        } catch (err) { setError('Failed to delete policy'); }
+        finally { setLoading(false); }
+    };
+
+    const startEditPolicy = (p) => {
+        setEditingPolicy(p);
+        setNewPolicyText(p.policy_text);
+        setNewPolicyCategory(p.category);
+        // Reset facility edit state when starting policy edit
+        cancelEditFacility();
+    };
+
+    const cancelEditPolicy = () => {
+        setEditingPolicy(null);
+        setNewPolicyText('');
+        setNewPolicyCategory(policyCategories[0].value);
+    };
+
+    const getCategoryLabel = (value) => {
+        const category = policyCategories.find(c => c.value === value);
+        return category ? category.label : 'N/A';
+    };
 
     // Pagination helpers
     const paginate = (items, page) => items.slice((page-1)*pageSize, page*pageSize);
+    const totalPolicyPages = Math.ceil(policiesList.length / pageSize);
 
     return (
         <div className="aboutus-container full-page">
@@ -122,8 +218,18 @@ const AdminAboutUs = () => {
 
             <div className="main-content-wrapper">
 
-                {/* General Info */}
-// ... (General Info section)
+                {/* General Info (COMPLETED SECTION) */}
+                <div className="admin-section general-section">
+                    <h2>General Information</h2>
+                    <div className="form-group">
+                        <label>Content</label>
+                        <textarea value={generalContent} onChange={e => setGeneralContent(e.target.value)} rows="8" placeholder="Enter general resort information..."/>
+                    </div>
+                    <div className="admin-actions">
+                        <button onClick={handleGeneralSubmit}>{generalId ? 'Update Content' : 'Save Content'}</button>
+                        {generalId && <button onClick={handleGeneralDelete} className="delete-btn">Delete Content</button>}
+                    </div>
+                </div>
 
                 {/* Facilities */}
                 <div className="admin-section facilities-section">
@@ -174,11 +280,51 @@ const AdminAboutUs = () => {
                     )}
                 </div>
 
-                {/* Policies */}
-// ... (Policies section)
+                {/* Policies (COMPLETED SECTION) */}
+                <div className="admin-section policies-section">
+                    <h2>Manage Policies</h2>
+                    <div className="form-group">
+                        <label>Policy Text</label>
+                        <textarea value={newPolicyText} onChange={e => setNewPolicyText(e.target.value)} rows="3" placeholder="Enter policy text (e.g., Check-out is strictly 12:00 PM)"/>
+                    </div>
+                    <div className="form-group">
+                        <label>Category</label>
+                        <select value={newPolicyCategory} onChange={e => setNewPolicyCategory(e.target.value)}>
+                            {policyCategories.map(cat => (
+                                <option key={cat.value} value={cat.value}>{cat.label}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="admin-actions">
+                        {editingPolicy && <button onClick={cancelEditPolicy} className="cancel-btn">Cancel Edit</button>}
+                        <button onClick={handleAddUpdatePolicy}>{editingPolicy ? 'Update' : 'Add'} Policy</button>
+                    </div>
 
+                    {policiesList.length > 0 && (
+                        <>
+                            <h3>Existing Policies</h3>
+                            <div className="item-list">
+                                {paginate(policiesList, policyPage).map(p => (
+                                    <div key={p.id} className="item-card policy-card">
+                                        <div className="item-details">
+                                            <p className="policy-text-display"><strong>{p.policy_text}</strong></p>
+                                            <small className="policy-category-display">Category: {getCategoryLabel(p.category)}</small>
+                                        </div>
+                                        <div className="item-actions">
+                                            <button onClick={() => startEditPolicy(p)} className="edit-btn">Edit</button>
+                                            <button onClick={() => handleDeletePolicy(p.id)} className="delete-btn">Delete</button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="pagination">
+                                {Array.from({length: totalPolicyPages}, (_, i) => (
+                                    <button key={i} className={policyPage === i + 1 ? 'active' : 'inactive'} onClick={() => setPolicyPage(i + 1)}>{i + 1}</button>
+                                ))}
+                            </div>
+                        </>
+                    )}
                 </div>
-
             </div>
         </div>
     );
