@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
+import { useNavigate } from 'react-router-dom'; // NEW IMPORT
 import "./styles/aboutus.css";
 import aboutusbg from "../components/pictures/aboutusbg.jpg"; 
 
@@ -10,8 +11,8 @@ const FACILITIES_API_URL = `${BASE_URL}/pre/api/facilities`;
 const POLICIES_API_URL = `${BASE_URL}/pre/api/policies`;
 
 const AboutUs = () => {
-  // ADDED STATE: For Photo Modal
-  const [selectedFacilityImage, setSelectedFacilityImage] = useState(null); 
+  // REMOVED: const [selectedFacilityImage, setSelectedFacilityImage] = useState(null); 
+  const navigate = useNavigate(); // NEW: Initialize navigation
   const [activeTab, setActiveTab] = useState("general");
   const [aboutUsData, setAboutUsData] = useState({
     general: "",
@@ -59,7 +60,8 @@ const AboutUs = () => {
 
         setAboutUsData({
           general: generalContent,
-          facilities: facilitiesData,
+          // Facilities data no longer contains image_url from the clean backend
+          facilities: facilitiesData, 
           policies: policiesData,
         });
       } catch (err) {
@@ -71,6 +73,15 @@ const AboutUs = () => {
     };
     fetchData();
   }, []);
+  
+  // NEW: Handler for clicking a facility, which navigates
+  const handleFacilityClick = (facilityName) => {
+        // Use encodeURIComponent to safely pass the name in the URL
+        const encodedName = encodeURIComponent(facilityName);
+        // Navigate to the dedicated details page 
+        navigate(`/facility-details/${encodedName}`); 
+  };
+
 
   const groupedPolicies = useMemo(() => {
     return aboutUsData.policies.reduce((acc, policy) => {
@@ -104,24 +115,23 @@ const AboutUs = () => {
         return (
           <div className="plain-section">
             <h2 className="section-title">Facilities</h2>
-            {/* Applied a new class for styling the facilities list as buttons/cards */}
-            <div className="plain-text facilities-grid"> 
+            <div className="plain-text facilities-grid"> 
               {aboutUsData.facilities.length > 0 ? (
                 aboutUsData.facilities.map((facility) => (
-                  // Facility item is now a clickable button
-                  <button 
-                    key={facility.id} 
-                    className="facility-button" 
-                    // Open modal only if image_url exists
-                    onClick={() => facility.image_url && setSelectedFacilityImage({name: facility.name, url: facility.image_url})}
-                    disabled={!facility.image_url} 
+                  // Facility item is now a clickable button/div that calls the handler
+                  <div
+                    key={facility.id} 
+                    className="facility-card-button" // Renamed class for clarity
+                    onClick={() => handleFacilityClick(facility.name)} // Calls new navigation handler
+                    role="button"
+                    tabIndex={0}
                   >
                     <span className="facility-name">
                       <strong>{facility.name}</strong>
                     </span>
                     {facility.description && <p className="facility-desc">{facility.description}</p>}
-                    {facility.image_url && <span className="view-photo-label"> (View Photo)</span>}
-                  </button>
+                    <span className="view-photo-label">Click to View Photos ➡️</span>
+                  </div>
                 ))
               ) : (
                 <p>No facilities information available.</p>
@@ -202,17 +212,7 @@ const AboutUs = () => {
         <div className="content">{renderContent()}</div>
       </div>
 
-      {/* NEW: Photo Modal Component */}
-      {selectedFacilityImage && (
-        <div className="photo-modal-overlay" onClick={() => setSelectedFacilityImage(null)}>
-          {/* Stop propagation on content to prevent closing when clicking inside the image area */}
-          <div className="photo-modal-content" onClick={e => e.stopPropagation()}>
-            <button className="modal-close-btn" onClick={() => setSelectedFacilityImage(null)}>&times;</button>
-            <h2>{selectedFacilityImage.name}</h2>
-            <img src={selectedFacilityImage.url} alt={selectedFacilityImage.name} className="modal-image" />
-          </div>
-        </div>
-      )}
+      {/* REMOVED: Photo Modal Component JSX */}
     </div>
   );
 };
