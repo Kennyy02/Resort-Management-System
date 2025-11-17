@@ -19,7 +19,6 @@ const corsOptions = {
         }
         return callback(null, true);
     },
-    // *** FIX: Explicitly include OPTIONS for the CORS preflight check ***
     methods: "GET,HEAD,PUT,PATCH,POST,OPTIONS", 
     credentials: true,
 };
@@ -33,7 +32,9 @@ const db = mysql.createConnection({
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    port: process.env.DB_PORT || 3306
+    port: process.env.DB_PORT || 3306,
+    // FIX 2: Ensures dates are returned as ISO strings for reliable parsing in React
+    dateStrings: true 
 });
 
 db.connect((err) => {
@@ -44,8 +45,9 @@ db.connect((err) => {
     console.log('Connected to MySQL database');
 });
 
+// FIX 1: Changed table name to 'contact_messages'
 const createTableSQL = `
-    CREATE TABLE IF NOT EXISTS messages (
+    CREATE TABLE IF NOT EXISTS contact_messages ( 
         id INT AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
         email VARCHAR(255) NOT NULL,
@@ -59,14 +61,15 @@ db.query(createTableSQL, (err) => {
     if (err) {
         console.error('Error creating table:', err);
     } else {
-        console.log('Messages table ensured.');
+        console.log('Contact Messages table ensured.');
     }
 });
 
 app.post('/api/contact', (req, res) => {
     const { name, email, message } = req.body;
     
-    const sql = 'INSERT INTO messages (name, email, message, status) VALUES (?, ?, ?, ?)';
+    // FIX 1: Changed table name
+    const sql = 'INSERT INTO contact_messages (name, email, message, status) VALUES (?, ?, ?, ?)';
     db.query(sql, [name, email, message, 'pending'], (err, result) => {
         if (err) {
             console.error('Error saving message:', err);
@@ -77,7 +80,8 @@ app.post('/api/contact', (req, res) => {
 });
 
 app.get('/api/messages', (req, res) => {
-    const sql = 'SELECT * FROM messages ORDER BY created_at DESC'; 
+    // FIX 1: Changed table name
+    const sql = 'SELECT * FROM contact_messages ORDER BY created_at DESC'; 
     db.query(sql, (err, results) => {
         if (err) {
             console.error('Error fetching messages:', err);
@@ -95,7 +99,8 @@ app.put('/api/messages/:id/status', (req, res) => {
         return res.status(400).json({ error: 'Invalid status value' });
     }
     
-    const sql = 'UPDATE messages SET status = ? WHERE id = ?';
+    // FIX 1: Changed table name
+    const sql = 'UPDATE contact_messages SET status = ? WHERE id = ?';
     db.query(sql, [status, id], (err, result) => {
         if (err) {
             console.error('Error updating status:', err);
