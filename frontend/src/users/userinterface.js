@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Feedbacks from './feedbacks'; 
-import './styles/homepage.css'; 
+import './styles/userinterface.css'; 
 
 // Placeholder image (create this file in your project)
 import homepageHero from '../components/pictures/homepageHero.jpg'; 
