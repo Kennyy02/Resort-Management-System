@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import Feedbacks from './Feedbacks'; 
+import Feedbacks from './feedbacks'; 
 import './styles/homepage.css'; 
 
 // Placeholder image (create this file in your project)
