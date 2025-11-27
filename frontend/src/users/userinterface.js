@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./styles/userinterface.css";
 
@@ -30,12 +30,8 @@ export default function Homepage() {
     feedbacks: false,
   });
 
-  // =======================
-  // FETCHING DATA
-  // =======================
   useEffect(() => {
     const fetchAll = async () => {
-      // ABOUT US
       const aboutCandidates = [
         `${ABOUT_BASE}/pre/api/aboutus`,
         `${ABOUT_BASE}/api/aboutus`,
@@ -67,7 +63,6 @@ export default function Homepage() {
         setAbout({ content: "About information currently unavailable.", videoUrl: null });
       }
 
-      // SERVICES
       const servicesCandidates = [
         `${SERVICES_BASE}/services`,
         `${SERVICES_BASE}/api/services`,
@@ -100,7 +95,6 @@ export default function Homepage() {
         setIslandHops([]);
       }
 
-      // FEEDBACKS
       const feedbackCandidates = [
         `${FEEDBACKS_BASE}/api/feedback`,
         `${FEEDBACKS_BASE}/api/feedbacks`,
@@ -122,9 +116,6 @@ export default function Homepage() {
     fetchAll();
   }, []);
 
-  // =======================
-  // FIXED INTERSECTION OBSERVER
-  // =======================
   useEffect(() => {
     const callback = (entries) => {
       entries.forEach((e) => {
@@ -150,9 +141,6 @@ export default function Homepage() {
   const getImage = (item) =>
     item?.image || item?.imageUrl || item?.photo || item?.thumbnail || null;
 
-  // =======================
-  // RENDER UI
-  // =======================
   return (
     <div className="homepage-root">
       <header className="hero large-hero">
@@ -207,16 +195,26 @@ export default function Homepage() {
             </div>
 
             <div className="about-media">
-              {about.videoUrl ? (
-                <video controls playsInline className="resort-video" src={about.videoUrl} />
-              ) : (
-                <div className="video-placeholder">
-                  <img
-                    src={getImage(rooms[0]) || "/placeholder-resort.jpg"}
-                    alt="resort preview"
-                  />
-                </div>
-              )}
+              {/* Embed YouTube Video */}
+              <div className="youtube-wrapper">
+                <iframe
+                  width="100%"
+                  height="315"
+                  src="https://www.youtube.com/embed/f4eLvLbREEI"
+                  title="Resort Preview Video"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
+                <a
+                  href="https://youtu.be/f4eLvLbREEI?si=Fs1JufiGEBUgXWtx"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="video-link"
+                >
+                  Watch on YouTube
+                </a>
+              </div>
             </div>
           </div>
         </section>
