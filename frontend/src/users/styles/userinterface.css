@@ -2,15 +2,15 @@
 .homepage-root {
   font-family: "Poppins", sans-serif;
   color: #222;
-  background: #f9f9f9;
+  background: #f0f5ef; /* Sage-green light background */
 }
 
 /* HERO */
 .hero {
   width: 100%;
   padding: 80px 5%;
-  background: linear-gradient(to right, #1a1a1a, #3a3a3a);
-  color: white;
+  background: linear-gradient(to right, #a3b18a, #6b8e23); /* sage green gradient */
+  color: #fff;
 }
 
 .large-hero {
@@ -33,15 +33,15 @@
 }
 
 .hero-title {
-  font-size: 42px;
+  font-size: 48px;
   line-height: 1.1;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   font-weight: 700;
 }
 
 .hero-sub {
-  font-size: 18px;
-  margin-bottom: 25px;
+  font-size: 20px;
+  margin-bottom: 30px;
   opacity: 0.9;
 }
 
@@ -52,14 +52,19 @@
   border: none;
   cursor: pointer;
   margin-right: 10px;
-  background: #ffc14d;
+  background: #c7d3b3; /* lighter sage */
   font-weight: 600;
+  transition: 0.3s;
+}
+
+.hero-cta button:hover {
+  background: #9bb77a;
 }
 
 .hero-cta .ghost {
   background: transparent;
-  border: 2px solid white;
-  color: white;
+  border: 2px solid #fff;
+  color: #fff;
 }
 
 .hero-image-wrapper {
@@ -108,22 +113,30 @@ section {
   gap: 40px;
 }
 
+.about-text h2 {
+  font-size: 36px;
+  margin-bottom: 15px;
+  font-weight: 700;
+  color: #52734d; /* darker sage */
+}
+
 .about-content p {
   line-height: 1.6;
   margin-bottom: 10px;
+  color: #333;
 }
 
 .about-actions .btn {
   display: inline-block;
   padding: 10px 18px;
-  background: #3268ff;
+  background: #52734d;
   color: white;
   border-radius: 8px;
   margin-top: 15px;
   font-weight: 600;
+  text-decoration: none;
 }
 
-/* ABOUT MEDIA (IMAGE OR VIDEO) */
 .about-media img,
 .resort-video {
   width: 100%;
@@ -137,19 +150,30 @@ section {
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
+  margin-top: 20px;
 }
 
 .youtube-wrapper iframe {
   width: 100%;
+  max-width: 560px;
   height: 315px;
   border-radius: 12px;
 }
 
 .video-link {
   font-size: 0.9rem;
-  color: #007bff;
+  color: #52734d;
   text-decoration: underline;
   text-align: center;
+}
+
+/* BIG ABOUT TITLE ABOVE VIDEO */
+.about-video-title {
+  font-size: 36px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 20px;
+  color: #52734d;
 }
 
 /* CARDS GRID */
@@ -160,7 +184,7 @@ section {
 }
 
 .card {
-  background: white;
+  background: #f9f9f9;
   border-radius: 12px;
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
   overflow: hidden;
@@ -205,9 +229,10 @@ section {
 
 .card-footer .btn.small {
   padding: 8px 16px;
-  background: #2e65ff;
+  background: #52734d;
   color: white;
   border-radius: 8px;
+  text-decoration: none;
 }
 
 .card.wide img {
@@ -267,6 +292,10 @@ section {
   .youtube-wrapper iframe {
     height: 200px;
   }
+
+  .about-video-title {
+    font-size: 28px;
+  }
 }
 
 @media (max-width: 600px) {
@@ -280,5 +309,9 @@ section {
 
   .feedback-carousel {
     grid-template-columns: 1fr;
+  }
+
+  .about-video-title {
+    font-size: 24px;
   }
 }
