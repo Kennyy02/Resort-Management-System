@@ -1,564 +1,254 @@
-/* userinterface.css */
-
-/*
-  Global Styles
-  - Establishes a common padding and font style for the entire page.
-*/
-.home-page-content {
-    background-color: #fff;
+/* ROOT */
+.homepage-root {
+  font-family: "Poppins", sans-serif;
+  color: #222;
+  background: #f9f9f9;
 }
 
-/*
-  Hero Section
-  - Full-screen section with a fading background image slider.
-  - The hero-content is centered and uses fluid font sizes.
-*/
-.hero-section {
-    position: relative;
-    width: 100%;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
+/* HERO */
+.hero {
+  width: 100%;
+  padding: 80px 5%;
+  background: linear-gradient(to right, #1a1a1a, #3a3a3a);
+  color: white;
 }
 
-.app-image-section {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
+.large-hero {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
 }
 
-.resort-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-    transition: opacity 0.5s ease-in-out;
-    cursor: default;
+.hero-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+  flex-wrap: wrap;
 }
 
-.resort-image.fade-in {
-    opacity: 1;
+.hero-left {
+  flex: 1;
+  min-width: 300px;
 }
 
-.resort-image.fade-out {
-    opacity: 0;
+.hero-title {
+  font-size: 42px;
+  line-height: 1.1;
+  margin-bottom: 15px;
+  font-weight: 700;
 }
 
-.hero-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.3);
-    z-index: 1;
+.hero-sub {
+  font-size: 18px;
+  margin-bottom: 25px;
+  opacity: 0.9;
 }
 
-.hero-content {
-    position: relative;
-    z-index: 2;
-    color: #fff;
-    text-align: center;
-    padding: 20px;
-    max-width: 800px;
-    width: 100%;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+.hero-cta button {
+  padding: 12px 22px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  margin-right: 10px;
+  background: #ffc14d;
+  font-weight: 600;
 }
 
-.hero-content h1 {
-    font-size: clamp(2.5em, 8vw, 3.5em);
-    margin-bottom: 30px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-    line-height: 1.2;
-    text-transform: uppercase;
-    white-space: pre-line;
-    font-weight: 700;
+.hero-cta .ghost {
+  background: transparent;
+  border: 2px solid white;
+  color: white;
 }
 
-.explore-more-button {
-    background-color: transparent;
-    color: #fff;
-    border: 1px solid #fff;
-    padding: 12px 30px;
-    font-size: 1em;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-    border-radius: 3px;
+.hero-image-wrapper {
+  flex: 1;
+  display: flex;
+  justify-content: center;
 }
 
-.explore-more-button:hover {
-    background-color: #fff;
-    color: #333;
-    border-color: #fff;
+.hero-image-wrapper img {
+  width: 100%;
+  max-width: 500px;
+  border-radius: 16px;
+  object-fit: cover;
+  height: 380px;
+  background: #ddd;
 }
 
-.slider-dots {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 3;
-    display: flex;
-    gap: 10px;
+/* MAIN */
+.main-content {
+  padding: 60px 5%;
 }
 
-.slider-dot {
-    width: 12px;
-    height: 12px;
-    background-color: rgba(255, 255, 255, 0.5);
-    border-radius: 50%;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.3s ease;
+/* SECTIONS */
+section {
+  margin-bottom: 90px;
 }
 
-.slider-dot.active {
-    background-color: #fff;
-    transform: scale(1.2);
+.section-header {
+  text-align: center;
+  margin-bottom: 40px;
 }
 
-/*
-  Animation for sections
-  - Uses `IntersectionObserver` to animate sections into view.
-*/
+.section-header h3 {
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.section-header p {
+  opacity: 0.7;
+}
+
+/* ABOUT GRID */
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+
+.about-content p {
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+
+.about-actions .btn {
+  display: inline-block;
+  padding: 10px 18px;
+  background: #3268ff;
+  color: white;
+  border-radius: 8px;
+  margin-top: 15px;
+  font-weight: 600;
+}
+
+.about-media img,
+.resort-video {
+  width: 100%;
+  border-radius: 12px;
+  height: auto;
+}
+
+/* CARDS GRID */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 30px;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  transition: 0.25s ease;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+}
+
+.card-media img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+.card-body {
+  padding: 18px;
+}
+
+.card-body h4 {
+  margin-bottom: 10px;
+  font-size: 20px;
+}
+
+.card-body .muted {
+  opacity: 0.7;
+  font-size: 14px;
+  margin-bottom: 18px;
+}
+
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-footer .price {
+  font-weight: 700;
+  font-size: 17px;
+}
+
+.card-footer .btn.small {
+  padding: 8px 16px;
+  background: #2e65ff;
+  color: white;
+  border-radius: 8px;
+}
+
+.card.wide img {
+  height: 220px;
+}
+
+/* FEEDBACK */
+.feedback-carousel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 25px;
+}
+
+.feedback-card {
+  background: white;
+  padding: 22px;
+  border-radius: 12px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+  font-style: italic;
+  line-height: 1.6;
+}
+
+.feedback-card .meta {
+  margin-top: 14px;
+  font-style: normal;
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+/* SCROLL ANIMATION */
 .scroll-animate {
-    opacity: 0;
-    transform: translateY(50px);
-    transition: opacity 2.0s ease-out, transform 2.0s ease-out;
+  opacity: 0;
+  transform: translateY(40px);
+  transition: 0.7s ease;
 }
 
 .scroll-animate.is-visible {
-    opacity: 1;
-    transform: translateY(0);
+  opacity: 1;
+  transform: translateY(0);
 }
 
-/*
-  "Why Work With Us" Section
-  - Features grid that wraps on smaller screens.
-*/
-.why-work-with-us-section {
-    padding: 80px 5%;
-    text-align: center;
-    background-color: #fff;
-    overflow: hidden;
-}
-
-.why-work-with-us-title {
-    font-size: clamp(2em, 5vw, 2.8em);
-    color: #333;
-    margin-bottom: 60px;
-    line-height: 1.2;
-    text-align: center;
-}
-
-.why-work-with-us-features-grid {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 30px;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.feature-item {
-    flex: 0 0 auto;
-    width: clamp(250px, 30vw, 350px);
-    padding: 25px 20px;
-    background-color: #fff;
-    border: 1px solid #eee;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    border-radius: 5px;
-    display: flex;
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .hero-inner {
     flex-direction: column;
-    align-items: center;
     text-align: center;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .hero-image-wrapper img {
+    height: 300px;
+  }
+
+  .about-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
-.feature-item:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
+@media (max-width: 600px) {
+  .hero-title {
+    font-size: 32px;
+  }
 
-.feature-icon-wrapper {
-    width: 80px;
-    height: 80px;
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.feature-icon {
-    font-size: 3.5em;
-    line-height: 1;
-    display: block;
-    color: #92754d;
-}
-
-.feature-title {
-    font-size: 1.3em;
-    color: #333;
-    margin-bottom: 10px;
-    font-weight: 700;
-    text-transform: capitalize;
-}
-
-.feature-description {
-    font-size: 0.95em;
-    color: #666;
-    line-height: 1.6;
-}
-
-/*
-  "What We Offer" Section
-  - Columns stack vertically on mobile.
-*/
-.how-it-works-section {
-    padding: 80px 5%;
-    text-align: center;
-    background-color: #fff;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: relative;
-    overflow: hidden;
-}
-
-.how-it-works-title {
-    font-size: clamp(2em, 5vw, 2.8em);
-    color: #333;
-    margin-bottom: 60px;
-    line-height: 1.2;
-    max-width: 600px;
-}
-
-.how-it-works-content-grid {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    gap: 40px;
-    max-width: 1200px;
-    width: 100%;
-}
-
-.how-it-works-column {
-    display: flex;
-    flex-direction: column;
-    gap: 40px;
-    flex: 1;
-    max-width: 350px;
-}
-
-.how-it-works-column.right-column {
-    padding-top: 80px;
-}
-
-.how-it-works-step {
-    display: flex;
-    text-align: left;
-    gap: 15px;
-}
-
-.step-number {
-    font-size: 2em;
-    font-weight: bold;
-    color: #007bff;
-    flex-shrink: 0;
-    width: 40px;
-    height: 40px;
-    line-height: 40px;
-    text-align: center;
-    border: 2px solid #007bff;
-    border-radius: 50%;
-}
-
-.step-text h3 {
-    font-size: 1.3em;
-    color: #333;
-    margin-bottom: 5px;
-    line-height: 1.3;
-}
-
-.step-text p {
-    font-size: 0.95em;
-    color: #666;
-    line-height: 1.5;
-}
-
-.how-it-works-central-image-container {
-    position: relative;
-    flex-shrink: 0;
-    width: 100%;
-    max-width: 350px;
-    aspect-ratio: 10 / 13;
-    background-color: #f0f8ff;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    cursor: default;
-}
-
-.how-it-works-central-image-container .central-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-    border-radius: 20px;
-}
-
-/*
-  Popular Destination Section
-  - The header uses flexbox to stack on mobile.
-  - The card container uses horizontal scrolling.
-*/
-.popular-destination-section {
-    padding: 80px 5%;
-    background-color: #fff;
-    overflow: hidden;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.popular-destination-header {
-    width: 100%;
-    max-width: 1200px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: flex-end;
-    margin-bottom: 40px;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-.popular-destination-header .subtitle {
-    color: #007bff;
-    font-size: 1.1em;
-    margin-bottom: 5px;
-    text-transform: capitalize;
-    font-weight: 600;
-}
-
-.popular-destination-header .section-title {
-    font-size: clamp(2em, 5vw, 2.8em);
-    color: #333;
-    margin-bottom: 0;
-    font-weight: 700;
-    text-align: left;
-}
-
-.popular-destination-header .destination-info {
-    text-align: right;
-    max-width: 300px;
-    margin-top: 20px;
-}
-
-.popular-destination-header .destination-count {
-    color: #007bff;
-    font-size: 1.2em;
-    font-weight: 600;
-    margin-bottom: 5px;
-}
-
-.popular-destination-header .destination-description {
-    font-size: 0.9em;
-    color: #777;
-    line-height: 1.4;
-}
-
-.popular-destination-cards-container {
-    display: flex;
-    gap: 20px;
-    padding-bottom: 20px;
-    overflow-x: scroll;
-    -webkit-overflow-scrolling: touch;
-    scroll-snap-type: x mandatory;
-    width: 100%;
-    padding-left: 5%;
-    padding-right: 5%;
-    box-sizing: border-box;
-    white-space: nowrap;
-}
-
-.destination-card {
-    flex: 0 0 auto;
-    width: calc(100vw - 10%);
-    max-width: 320px;
-    scroll-snap-align: center;
-    background-color: #fff;
-    border-radius: 0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    cursor: default;
-    margin-right: 15px;
-}
-
-.destination-card-image-wrapper {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 3 / 4;
-    overflow: hidden;
-    border-radius: 0;
-    cursor: default;
-}
-
-.destination-card-image-wrapper img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    transition: transform 0.3s ease;
-    filter: brightness(0.9);
-}
-
-.destination-card-content {
-    padding: 15px 15px 20px;
-    text-align: left;
-    flex-grow: 1;
-}
-
-.destination-card-content h3 {
-    font-size: 1.4em;
-    color: #333;
-    margin-bottom: 5px;
-    font-weight: 600;
-    line-height: 1.2;
-}
-
-.destination-card-content p {
-    font-size: 0.9em;
-    color: #777;
-    margin-bottom: 0;
-    line-height: 1.4;
-}
-
-.destination-slider-dots {
-    display: flex;
-    gap: 8px;
-    margin-top: 30px;
-    justify-content: center;
-    width: 100%;
-}
-
-.destination-slider-dot {
-    width: 8px;
-    height: 8px;
-    background-color: #e0e0e0;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: background-color 0.3s ease, width 0.3s ease;
-}
-
-.destination-slider-dot.active {
-    background-color: #007bff;
-    width: 25px;
-    border-radius: 5px;
-}
-
-/*
-  Media Queries
-  - Fixed and enhanced mobile-specific styles.
-*/
-@media (max-width: 992px) {
-    .how-it-works-content-grid {
-        flex-direction: column;
-        align-items: center;
-        gap: 40px;
-    }
-    .how-it-works-column {
-        max-width: 100%;
-        align-items: center;
-    }
-    .how-it-works-column.right-column {
-        padding-top: 0;
-    }
-    .how-it-works-step {
-        text-align: center;
-        flex-direction: column;
-        align-items: center;
-    }
-    .step-text {
-        width: 100%;
-    }
-    .why-work-with-us-features-grid {
-        gap: 20px;
-    }
-    .feature-item {
-        width: 48%;
-    }
-}
-
-@media (max-width: 768px) {
-    section {
-        padding: 60px 5%;
-    }
-    .hero-content h1 {
-        font-size: 2.5em;
-    }
-    .popular-destination-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    .popular-destination-header .destination-info {
-        text-align: left;
-        margin-top: 10px;
-    }
-    .popular-destination-cards-container {
-        /* Ensure the cards are a single column and scrollable */
-        display: flex;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        padding-left: 5%;
-        padding-right: 5%;
-        -webkit-overflow-scrolling: touch;
-    }
-    .destination-card {
-        width: calc(90vw - 15px); /* A more robust width for mobile, leaving space for margin */
-        scroll-snap-align: center;
-        margin-right: 15px;
-    }
-}
-
-@media (max-width: 480px) {
-    section {
-        padding: 40px 5%;
-    }
-    .hero-content h1 {
-        font-size: 2em;
-    }
-    .why-work-with-us-features-grid {
-        flex-direction: column;
-        align-items: center;
-        gap: 25px;
-    }
-    .feature-item {
-        width: 100%;
-        max-width: 300px;
-    }
-    .how-it-works-central-image-container {
-        max-width: 250px;
-    }
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
 }
