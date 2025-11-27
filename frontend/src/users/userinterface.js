@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import mountainView from "../components/pictures/mountainView.jpg";
 import "./styles/userinterface.css";
 
 const ABOUT_BASE = "https://about-us-production.up.railway.app";
@@ -17,12 +19,12 @@ const tryFetch = async (candidates, config = {}) => {
 };
 
 export default function Homepage() {
+  const navigate = useNavigate();
   const [about, setAbout] = useState({ content: "Loading about info...", videoUrl: null });
   const [rooms, setRooms] = useState([]);
   const [islandHops, setIslandHops] = useState([]);
   const [feedbacks, setFeedbacks] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const [visible, setVisible] = useState({
     about: false,
     rooms: false,
@@ -32,87 +34,65 @@ export default function Homepage() {
 
   useEffect(() => {
     const fetchAll = async () => {
-      const aboutCandidates = [
+      const aboutResp = await tryFetch([
         `${ABOUT_BASE}/pre/api/aboutus`,
         `${ABOUT_BASE}/api/aboutus`,
         `${ABOUT_BASE}/aboutus`,
         `${ABOUT_BASE}/api/v1/about`,
-      ];
+      ]);
 
-      const aboutResp = await tryFetch(aboutCandidates);
       if (aboutResp.data) {
         let content = "";
         let videoUrl = null;
-
         if (Array.isArray(aboutResp.data) && aboutResp.data.length > 0) {
-          content =
-            aboutResp.data[0].content ||
-            aboutResp.data[0].description ||
-            JSON.stringify(aboutResp.data[0]);
+          content = aboutResp.data[0].content || aboutResp.data[0].description || "";
           videoUrl = aboutResp.data[0].videoUrl || aboutResp.data[0].video || null;
         } else if (typeof aboutResp.data === "object") {
-          content =
-            aboutResp.data.content ||
-            aboutResp.data.description ||
-            JSON.stringify(aboutResp.data);
+          content = aboutResp.data.content || aboutResp.data.description || "";
           videoUrl = aboutResp.data.videoUrl || aboutResp.data.video || null;
         }
-
         setAbout({ content, videoUrl });
       } else {
         setAbout({ content: "About information currently unavailable.", videoUrl: null });
       }
 
-      const servicesCandidates = [
+      const servicesResp = await tryFetch([
         `${SERVICES_BASE}/services`,
         `${SERVICES_BASE}/api/services`,
         `${SERVICES_BASE}/api/v1/services`,
         `${SERVICES_BASE}/service`,
         `${SERVICES_BASE}/api/service`,
-      ];
-
-      const servicesResp = await tryFetch(servicesCandidates);
+      ]);
 
       if (servicesResp.data && Array.isArray(servicesResp.data)) {
         const items = servicesResp.data;
-
         const roomsList = items.filter((i) =>
           (i.type && i.type.toLowerCase().includes("room")) ||
           (i.category && i.category.toLowerCase().includes("room")) ||
           (i.title && /room|suite|cottage/i.test(i.title))
         );
-
         const islandList = items.filter((i) =>
           (i.type && i.type.toLowerCase().includes("island")) ||
           (i.category && i.category.toLowerCase().includes("island")) ||
           (i.title && /island|hop|boat|tour|package/i.test(i.title))
         );
-
         setRooms(roomsList.length ? roomsList : items.slice(0, 6));
         setIslandHops(islandList.length ? islandList : items.slice(6));
-      } else {
-        setRooms([]);
-        setIslandHops([]);
       }
 
-      const feedbackCandidates = [
+      const feedbackResp = await tryFetch([
         `${FEEDBACKS_BASE}/api/feedback`,
         `${FEEDBACKS_BASE}/api/feedbacks`,
         `${FEEDBACKS_BASE}/feedback`,
         `${FEEDBACKS_BASE}/ratings`,
         `${FEEDBACKS_BASE}/api/ratings`,
-      ];
-
-      const feedbackResp = await tryFetch(feedbackCandidates);
+      ]);
       if (feedbackResp.data && Array.isArray(feedbackResp.data)) {
         setFeedbacks(feedbackResp.data.slice(0, 12));
-      } else {
-        setFeedbacks([]);
       }
 
       setLoading(false);
     };
-
     fetchAll();
   }, []);
 
@@ -131,10 +111,8 @@ export default function Homepage() {
         }
       });
     };
-
     const observer = new IntersectionObserver(callback, { threshold: 0.15 });
     document.querySelectorAll(".scroll-animate").forEach((el) => observer.observe(el));
-
     return () => observer.disconnect();
   }, []);
 
@@ -151,25 +129,15 @@ export default function Homepage() {
               A peaceful escape — book rooms, join island hopping, and make memories.
             </p>
             <div className="hero-cta">
-              <button
-                onClick={() => window.scrollTo({ top: 700, behavior: "smooth" })}
-              >
-                Explore Rooms
-              </button>
-              <button
-                className="ghost"
-                onClick={() => window.scrollTo({ top: 1500, behavior: "smooth" })}
-              >
+              <button onClick={() => navigate("/services")}>Explore Rooms</button>
+              <button className="ghost" onClick={() => navigate("/services")}>
                 Island Hopping
               </button>
             </div>
           </div>
 
           <div className="hero-image-wrapper">
-            <img
-              src={getImage(rooms[0]) || "/placeholder-resort.jpg"}
-              alt="resort hero"
-            />
+            <img src={mountainView} alt="Mountain view resort" />
           </div>
         </div>
       </header>
@@ -177,37 +145,34 @@ export default function Homepage() {
       <main className="main-content">
         {/* ABOUT */}
         <section
-          className={`about-section scroll-animate ${
-            visible.about ? "is-visible" : ""
-          }`}
+          className={`about-section scroll-animate ${visible.about ? "is-visible" : ""}`}
         >
           <div className="about-grid">
             <div className="about-text">
-              <h2>About the Resort</h2>
+              <div className="about-video-title">Swim, Chill, Chillax</div>
               <div className="about-content">
                 {loading
                   ? <p>Loading information...</p>
                   : about.content.split("\n").map((l, i) => <p key={i}>{l}</p>)}
               </div>
               <div className="about-actions">
-                <a className="btn" href="/aboutus">Read Full Story</a>
+                <a className="btn" onClick={() => navigate("/aboutus")}>
+                  Read Full Story
+                </a>
               </div>
             </div>
 
             <div className="about-media">
-              {/* Embed YouTube Video */}
               <div className="youtube-wrapper">
                 <iframe
-                  width="100%"
-                  height="315"
-                  src="https://www.youtube.com/embed/f4eLvLbREEI"
+                  src={about.videoUrl || "https://www.youtube.com/embed/f4eLvLbREEI"}
                   title="Resort Preview Video"
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                 ></iframe>
                 <a
-                  href="https://youtu.be/f4eLvLbREEI?si=Fs1JufiGEBUgXWtx"
+                  href={about.videoUrl || "https://youtu.be/f4eLvLbREEI"}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="video-link"
@@ -220,44 +185,26 @@ export default function Homepage() {
         </section>
 
         {/* ROOMS */}
-        <section
-          className={`rooms-section scroll-animate ${
-            visible.rooms ? "is-visible" : ""
-          }`}
-        >
+        <section className={`rooms-section scroll-animate ${visible.rooms ? "is-visible" : ""}`}>
           <div className="section-header">
             <h3>Rooms & Accommodations</h3>
             <p>Comfortable rooms curated for a relaxing stay.</p>
           </div>
 
           <div className="cards-grid">
-            {rooms.length === 0 && !loading ? (
-              <p className="muted">No rooms found.</p>
-            ) : null}
-
             {rooms.map((r, idx) => (
               <article className="card" key={r.id || idx}>
                 <div className="card-media">
-                  <img
-                    src={getImage(r) || "/placeholder-room.jpg"}
-                    alt={r.title || "room"}
-                  />
+                  <img src={getImage(r) || "/placeholder-room.jpg"} alt={r.title || "room"} />
                 </div>
                 <div className="card-body">
                   <h4>{r.title || r.name || `Room ${idx + 1}`}</h4>
                   <p className="muted">
-                    {r.description
-                      ? r.description.slice(0, 120) +
-                        (r.description.length > 120 ? "..." : "")
-                      : "No description."}
+                    {r.description ? r.description.slice(0, 120) + (r.description.length > 120 ? "..." : "") : "No description."}
                   </p>
                   <div className="card-footer">
-                    <span className="price">
-                      {r.price ? `₱${r.price}` : "Contact"}
-                    </span>
-                    <a className="btn small" href={`/services/${r.id || idx}`}>
-                      Book
-                    </a>
+                    <span className="price">{r.price ? `₱${r.price}` : "Contact"}</span>
+                    <a className="btn small" onClick={() => navigate("/services")}>Book</a>
                   </div>
                 </div>
               </article>
@@ -266,44 +213,24 @@ export default function Homepage() {
         </section>
 
         {/* ISLAND HOPPING */}
-        <section
-          className={`island-section scroll-animate ${
-            visible.island ? "is-visible" : ""
-          }`}
-        >
+        <section className={`island-section scroll-animate ${visible.island ? "is-visible" : ""}`}>
           <div className="section-header">
             <h3>Island Hopping & Tours</h3>
             <p>Explore nearby islands with guided tours and boat trips.</p>
           </div>
 
           <div className="cards-grid">
-            {islandHops.length === 0 && !loading ? (
-              <p className="muted">No packages found.</p>
-            ) : null}
-
             {islandHops.map((p, idx) => (
               <article className="card wide" key={p.id || idx}>
                 <div className="card-media">
-                  <img
-                    src={getImage(p) || "/placeholder-island.jpg"}
-                    alt={p.title || "package"}
-                  />
+                  <img src={getImage(p) || "/placeholder-island.jpg"} alt={p.title || "package"} />
                 </div>
                 <div className="card-body">
                   <h4>{p.title || p.name || `Package ${idx + 1}`}</h4>
-                  <p className="muted">
-                    {p.description
-                      ? p.description.slice(0, 140) +
-                        (p.description.length > 140 ? "..." : "")
-                      : "No description."}
-                  </p>
+                  <p className="muted">{p.description?.slice(0, 140) + (p.description?.length > 140 ? "..." : "") || "No description."}</p>
                   <div className="card-footer">
-                    <span className="price">
-                      {p.price ? `₱${p.price}` : "Contact"}
-                    </span>
-                    <a className="btn small" href={`/packages/${p.id || idx}`}>
-                      View
-                    </a>
+                    <span className="price">{p.price ? `₱${p.price}` : "Contact"}</span>
+                    <a className="btn small" onClick={() => navigate("/services")}>View</a>
                   </div>
                 </div>
               </article>
@@ -312,36 +239,23 @@ export default function Homepage() {
         </section>
 
         {/* FEEDBACK */}
-        <section
-          className={`feedbacks-section scroll-animate ${
-            visible.feedbacks ? "is-visible" : ""
-          }`}
-        >
+        <section className={`feedbacks-section scroll-animate ${visible.feedbacks ? "is-visible" : ""}`}>
           <div className="section-header">
             <h3>Guest Feedback</h3>
             <p>What our guests say about their stay.</p>
           </div>
 
           <div className="feedback-carousel">
-            {feedbacks.length === 0 ? (
-              <p className="muted">No feedbacks yet.</p>
-            ) : (
-              feedbacks.slice(0, 6).map((f, i) => (
-                <blockquote className="feedback-card" key={f.id || i}>
-                  <p className="msg">
-                    “{f.message || f.content || f.feedback || "No message."}”
-                  </p>
-                  <footer className="meta">
-                    <strong>{f.name || f.user || "Guest"}</strong>
-                    <span className="date">
-                      {f.created_at
-                        ? new Date(f.created_at).toLocaleDateString()
-                        : ""}
-                    </span>
-                  </footer>
-                </blockquote>
-              ))
-            )}
+            {feedbacks.slice(0, 6).map((f, i) => (
+              <blockquote className="feedback-card" key={f.id || i}>
+                <p className="msg">“{f.message || f.content || f.feedback || "No message."}”</p>
+                <footer className="meta">
+                  <strong>{f.name || f.user || "Guest"}</strong>
+                  <span className="date">{f.created_at ? new Date(f.created_at).toLocaleDateString() : ""}</span>
+                </footer>
+              </blockquote>
+            ))}
+            {feedbacks.length === 0 && <p className="muted">No feedbacks yet.</p>}
           </div>
         </section>
       </main>
