@@ -32,7 +32,7 @@ html, body {
     height: 100%;
     margin: 0;
     padding: 0;
-    overflow-x: hidden; /* Prevent horizontal scroll from overflowing content */
+    overflow-x: hidden;
 }
 
 #root, .app-container {
@@ -67,7 +67,7 @@ button {
 }
 
 /* ------------------------------------------- */
-/* EXISTING HEADER STYLES (Solid White, Fixed) */
+/* 1. HEADER STYLES (Solid White, Fixed)       */
 /* ------------------------------------------- */
 .app-header {
     background-color: var(--text-light);
@@ -85,11 +85,26 @@ button {
     box-sizing: border-box;
 }
 
+/* FIX 1: Make logo image and name side-by-side */
+.logo-link {
+    display: flex; 
+    align-items: center; 
+}
+
 .app-logo {
     height: 50px;
     width: auto;
     max-width: 200px;
     display: block;
+    margin-right: 10px; 
+}
+
+/* FIX 2: Force resort name text color to dark */
+.resort-name {
+    color: var(--text-dark); 
+    font-weight: 600;
+    font-size: 1.1em;
+    white-space: nowrap; 
 }
 
 /* Existing Navigation */
@@ -135,12 +150,14 @@ button {
     display: none;
     background: none;
     font-size: 1.8em;
-    color: black; 
+    color: var(--text-dark) !important; /* <-- FIXED: Forces the color to be black */
     border: none;
     cursor: pointer;
 }
 
-/* Existing MAIN CONTENT FIX */
+/* ------------------------------------------- */
+/* 2. MAIN CONTENT FIX                         */
+/* ------------------------------------------- */
 .app-main {
     flex-grow: 1;
     width: 100%;
@@ -150,21 +167,19 @@ button {
 }
 
 /* ------------------------------------------- */
-/* NEW FOOTER STYLES (Multi-Column Layout)     */
+/* 3. NEW FOOTER STYLES (Multi-Column Layout)  */
 /* ------------------------------------------- */
 
 .app-footer {
     background-color: var(--footer-bg); 
     color: var(--footer-text-light); 
-    padding: 60px 5% 0; /* Adjusted padding to match header's side spacing */
+    padding: 60px 5% 0;
     width: 100%;
     font-size: 0.9em;
 }
 
-/* Footer Grid */
 .app-footer .footer-content-wrapper {
     display: grid;
-    /* Defines 4 columns with varying widths: Branding/Contact, Newsletter, Links, Social */
     grid-template-columns: 1.5fr 1.5fr 1fr 1fr; 
     gap: 40px;
     padding-bottom: 40px;
@@ -179,7 +194,6 @@ button {
     color: var(--footer-heading-color); 
 }
 
-/* Footer Branding */
 .app-footer .footer-logo-link {
     display: flex;
     align-items: center;
@@ -189,14 +203,14 @@ button {
 
 .app-footer .footer-logo {
     height: 40px; 
-    filter: brightness(0) invert(1); /* Makes the logo white/light against the dark footer */
+    filter: brightness(0) invert(1);
     margin-right: 10px;
 }
 
 .app-footer .footer-resort-name {
     font-size: 1.2rem;
     font-weight: bold;
-    color: var(--text-light); 
+    color: var(--text-light);
 }
 
 /* Contact Info Styling */
@@ -306,7 +320,7 @@ button {
 }
 
 /* ------------------------------------------- */
-/* EXISTING MEDIA QUERIES + FOOTER RESPONSIVE  */
+/* MEDIA QUERIES                               */
 /* ------------------------------------------- */
 @media (max-width: 768px) {
     .app-header {
@@ -331,7 +345,7 @@ button {
     }
     .hamburger-menu {
         display: block; 
-        color: black; 
+        color: var(--text-dark) !important; /* Ensures black on mobile too */
     }
     .app-main {
         padding-top: var(--header-height);
@@ -339,14 +353,14 @@ button {
     
     /* FOOTER TABLET */
     .app-footer .footer-content-wrapper {
-        grid-template-columns: 1fr 1fr; /* Two columns on tablets */
+        grid-template-columns: 1fr 1fr;
     }
 }
 
 @media (max-width: 600px) {
     /* FOOTER MOBILE */
     .app-footer .footer-content-wrapper {
-        grid-template-columns: 1fr; /* Single column on mobile */
+        grid-template-columns: 1fr; 
     }
     .app-footer .footer-bottom-bar {
         flex-direction: column;
