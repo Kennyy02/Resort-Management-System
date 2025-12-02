@@ -1,23 +1,27 @@
+/* ======================================= */
+/* 1. HEADER STYLING (SOLID WHITE FIX)     */
+/* ======================================= */
+
 .app-header {
-  /* Crucial for the fixed/sticky effect */
+  /* Position: Fixed to keep it visible while scrolling */
   position: fixed; 
   top: 0;
   left: 0;
   width: 100%;
   z-index: 1000; 
-  padding: 20px 40px; 
+  padding: 15px 40px; /* Reduced padding for a tighter look */
   display: flex;
   justify-content: space-between;
   align-items: center;
   
-  /* Initial state: Transparent background */
-  background-color: transparent;
+  /* Solid White Background */
+  background-color: #ffffff; 
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
   
-  /* Smooth transitions for the effect */
-  transition: background-color 0.4s ease, box-shadow 0.4s ease, padding 0.4s ease;
+  /* Removed all transparency transitions */
 }
 
-/* Logo and Text Styling (Initial State: White) */
+/* Logo and Text Styling (Dark/Black) */
 .app-header .logo-link {
     display: flex;
     align-items: center;
@@ -27,84 +31,70 @@
 .app-header .app-logo {
     height: 50px; 
     margin-right: 15px;
-    /* Optional: Helps a dark logo stand out against a dark hero image */
-    filter: drop-shadow(0 0 5px rgba(0,0,0,0.5)); 
+    /* Ensure no filters are applied, shows the logo in its original colors */
+    filter: none; 
 }
 
 .app-header .resort-name {
     font-size: 1.4rem;
     font-weight: 500;
-    color: white; 
-    transition: color 0.4s ease;
+    color: #333333; /* Dark text */
 }
 
-/* Navigation links Initial color (White) */
+/* Navigation links (Dark/Black) */
 .app-header .app-nav .nav-link,
 .app-header .app-nav .logout-btn {
-    color: white; 
-    transition: color 0.4s ease;
+    color: #333333; /* Dark text */
     margin-left: 25px; 
+    text-decoration: none;
+    padding: 5px 10px;
 }
 
-/* --- HEADER: Scrolled State (Solid White Background) --- */
-
-.app-header.scrolled {
-  background-color: #ffffff; /* Solid white background */
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); 
-  padding: 15px 40px; /* Reduced height when scrolled */
+/* Hover effect */
+.app-header .app-nav .nav-link:hover,
+.app-header .app-nav .logout-btn:hover {
+    color: #555e51; /* Darker green hover color */
 }
 
-/* Text color change when scrolled (Dark/Black) */
-.app-header.scrolled .resort-name,
-.app-header.scrolled .app-nav .nav-link,
-.app-header.scrolled .app-nav .logout-btn {
-    color: #333333; 
-}
+/* --- No .scrolled styles needed anymore --- */
 
-.app-header.scrolled .app-logo {
-    filter: none; /* Remove shadow/filter when background is light */
-}
 
 /* ======================================= */
 /* 2. MAIN CONTENT FIX (The Solution)      */
 /* ======================================= */
 
-/* Pushes the main content down by 100px, which is slightly more than the header's maximum height, to prevent overlap. */
+/* Pushes the main content down by 80px, ensuring content starts below the solid header. */
+/* (The header is now consistently about 80px tall) */
 .app-main {
-    padding-top: 100px; 
+    padding-top: 80px; 
 }
 
 /* ======================================= */
 /* 3. FOOTER STYLING                       */
+/* (The multi-column layout remains the same) */
 /* ======================================= */
-
-/* --- FOOTER: Base Styling & Color Scheme --- */
 
 .app-footer {
     /* Base Color: Dark gray-green */
     background-color: #555e51; 
-    color: #f0f0f0; /* Light text color */
+    color: #f0f0f0; 
     padding: 60px 40px 0; 
 }
 
-/* Use CSS Grid for the four columns */
 .app-footer .footer-content-wrapper {
     display: grid;
-    /* Defines 4 columns with varying widths */
     grid-template-columns: 1.5fr 1.5fr 1fr 1fr; 
     gap: 40px;
     padding-bottom: 40px;
-    /* Separator line above the copyright bar */
     border-bottom: 1px solid rgba(255, 255, 255, 0.2); 
 }
 
 .app-footer h4 {
     font-size: 1.2rem;
     margin-bottom: 20px;
-    color: #c4d7b2; /* Lighter shade for headings */
+    color: #c4d7b2; 
 }
 
-/* Footer Branding */
 .app-footer .footer-logo-link {
     display: flex;
     align-items: center;
@@ -114,7 +104,7 @@
 
 .app-footer .footer-logo {
     height: 40px; 
-    filter: brightness(0) invert(1); /* Makes a dark logo appear white/light */
+    filter: brightness(0) invert(1); 
     margin-right: 10px;
 }
 
@@ -124,7 +114,6 @@
     color: white; 
 }
 
-/* Contact Info Styling */
 .app-footer .contact-info p,
 .app-footer .contact-info address {
     font-size: 0.9rem;
@@ -133,7 +122,6 @@
     font-style: normal;
 }
 
-/* Newsletter Form Layout */
 .app-footer .newsletter-form {
     display: flex;
     margin-top: 15px;
@@ -149,7 +137,7 @@
 }
 
 .app-footer .subscribe-btn {
-    background-color: #3b533b; /* Button color */
+    background-color: #3b533b; 
     color: white;
     border: none;
     padding: 10px 20px;
@@ -169,8 +157,6 @@
     color: rgba(255, 255, 255, 0.7);
 }
 
-
-/* Quick Links and Social Links (Vertical Stack) */
 .app-footer .site-links,
 .app-footer .follow-us {
     display: flex;
@@ -235,13 +221,13 @@
 /* --- Responsive Adjustments --- */
 @media (max-width: 900px) {
     .app-footer .footer-content-wrapper {
-        grid-template-columns: 1fr 1fr; /* Two columns on tablets */
+        grid-template-columns: 1fr 1fr;
     }
 }
 
 @media (max-width: 600px) {
     .app-footer .footer-content-wrapper {
-        grid-template-columns: 1fr; /* Single column on mobile */
+        grid-template-columns: 1fr;
     }
     .app-footer .footer-bottom-bar {
         flex-direction: column;
