@@ -1,4 +1,5 @@
 .app-header {
+  /* Crucial for the fixed/sticky effect */
   position: fixed; 
   top: 0;
   left: 0;
@@ -8,10 +9,15 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  
+  /* Initial state: Transparent background */
   background-color: transparent;
+  
+  /* Smooth transitions for the effect */
   transition: background-color 0.4s ease, box-shadow 0.4s ease, padding 0.4s ease;
 }
 
+/* Logo and Text Styling (Initial State: White) */
 .app-header .logo-link {
     display: flex;
     align-items: center;
@@ -21,6 +27,7 @@
 .app-header .app-logo {
     height: 50px; 
     margin-right: 15px;
+    /* Optional: Helps a dark logo stand out against a dark hero image */
     filter: drop-shadow(0 0 5px rgba(0,0,0,0.5)); 
 }
 
@@ -31,6 +38,7 @@
     transition: color 0.4s ease;
 }
 
+/* Navigation links Initial color (White) */
 .app-header .app-nav .nav-link,
 .app-header .app-nav .logout-btn {
     color: white; 
@@ -38,12 +46,15 @@
     margin-left: 25px; 
 }
 
+/* --- HEADER: Scrolled State (Solid White Background) --- */
+
 .app-header.scrolled {
-  background-color: #ffffff;
+  background-color: #ffffff; /* Solid white background */
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); 
-  padding: 15px 40px;
+  padding: 15px 40px; /* Reduced height when scrolled */
 }
 
+/* Text color change when scrolled (Dark/Black) */
 .app-header.scrolled .resort-name,
 .app-header.scrolled .app-nav .nav-link,
 .app-header.scrolled .app-nav .logout-btn {
@@ -51,29 +62,49 @@
 }
 
 .app-header.scrolled .app-logo {
-    filter: none;
+    filter: none; /* Remove shadow/filter when background is light */
 }
 
+/* ======================================= */
+/* 2. MAIN CONTENT FIX (The Solution)      */
+/* ======================================= */
+
+/* Pushes the main content down by 100px, which is slightly more than the header's maximum height, to prevent overlap. */
+.app-main {
+    padding-top: 100px; 
+}
+
+/* ======================================= */
+/* 3. FOOTER STYLING                       */
+/* ======================================= */
+
+/* --- FOOTER: Base Styling & Color Scheme --- */
+
 .app-footer {
+    /* Base Color: Dark gray-green */
     background-color: #555e51; 
-    color: #f0f0f0;
+    color: #f0f0f0; /* Light text color */
     padding: 60px 40px 0; 
 }
 
+/* Use CSS Grid for the four columns */
 .app-footer .footer-content-wrapper {
     display: grid;
+    /* Defines 4 columns with varying widths */
     grid-template-columns: 1.5fr 1.5fr 1fr 1fr; 
     gap: 40px;
     padding-bottom: 40px;
+    /* Separator line above the copyright bar */
     border-bottom: 1px solid rgba(255, 255, 255, 0.2); 
 }
 
 .app-footer h4 {
     font-size: 1.2rem;
     margin-bottom: 20px;
-    color: #c4d7b2;
+    color: #c4d7b2; /* Lighter shade for headings */
 }
 
+/* Footer Branding */
 .app-footer .footer-logo-link {
     display: flex;
     align-items: center;
@@ -83,7 +114,7 @@
 
 .app-footer .footer-logo {
     height: 40px; 
-    filter: brightness(0) invert(1);
+    filter: brightness(0) invert(1); /* Makes a dark logo appear white/light */
     margin-right: 10px;
 }
 
@@ -93,6 +124,7 @@
     color: white; 
 }
 
+/* Contact Info Styling */
 .app-footer .contact-info p,
 .app-footer .contact-info address {
     font-size: 0.9rem;
@@ -101,6 +133,7 @@
     font-style: normal;
 }
 
+/* Newsletter Form Layout */
 .app-footer .newsletter-form {
     display: flex;
     margin-top: 15px;
@@ -116,7 +149,7 @@
 }
 
 .app-footer .subscribe-btn {
-    background-color: #3b533b;
+    background-color: #3b533b; /* Button color */
     color: white;
     border: none;
     padding: 10px 20px;
@@ -136,6 +169,8 @@
     color: rgba(255, 255, 255, 0.7);
 }
 
+
+/* Quick Links and Social Links (Vertical Stack) */
 .app-footer .site-links,
 .app-footer .follow-us {
     display: flex;
@@ -162,6 +197,8 @@
     color: #c4d7b2;
     text-decoration: underline;
 }
+
+/* --- Bottom Bar --- */
 
 .app-footer .footer-bottom-bar {
     display: flex;
@@ -195,15 +232,16 @@
     text-decoration: underline;
 }
 
+/* --- Responsive Adjustments --- */
 @media (max-width: 900px) {
     .app-footer .footer-content-wrapper {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr 1fr; /* Two columns on tablets */
     }
 }
 
 @media (max-width: 600px) {
     .app-footer .footer-content-wrapper {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr; /* Single column on mobile */
     }
     .app-footer .footer-bottom-bar {
         flex-direction: column;
