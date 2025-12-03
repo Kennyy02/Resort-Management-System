@@ -13,7 +13,9 @@ const tryFetch = async (candidates, config = {}) => {
     try {
       const res = await axios.get(url, config);
       if (res && res.data !== undefined) return { data: res.data, url };
-    } catch (err) {}
+    } catch (err) {
+      continue;
+    }
   }
   return { data: null, url: null };
 };
@@ -57,11 +59,10 @@ export default function Homepage() {
       }
 
       const servicesResp = await tryFetch([
-        `${SERVICES_BASE}/services`,
         `${SERVICES_BASE}/api/services`,
-        `${SERVICES_BASE}/api/v1/services`,
+        `${SERVICES_BASE}/services`,
         `${SERVICES_BASE}/service`,
-        `${SERVICES_BASE}/api/service`,
+        `${SERVICES_BASE}/api/v1/services`,
       ]);
 
       if (servicesResp.data && Array.isArray(servicesResp.data)) {
@@ -78,21 +79,29 @@ export default function Homepage() {
         );
         setRooms(roomsList.length ? roomsList : items.slice(0, 6));
         setIslandHops(islandList.length ? islandList : items.slice(6));
+      } else {
+        setRooms([]);
+        setIslandHops([]);
       }
 
       const feedbackResp = await tryFetch([
-        `${FEEDBACKS_BASE}/api/feedback`,
         `${FEEDBACKS_BASE}/api/feedbacks`,
+        `${FEEDBACKS_BASE}/api/feedback`,
+        `${FEEDBACKS_BASE}/feedbacks`,
         `${FEEDBACKS_BASE}/feedback`,
         `${FEEDBACKS_BASE}/ratings`,
         `${FEEDBACKS_BASE}/api/ratings`,
       ]);
+
       if (feedbackResp.data && Array.isArray(feedbackResp.data)) {
         setFeedbacks(feedbackResp.data.slice(0, 12));
+      } else {
+        setFeedbacks([]);
       }
 
       setLoading(false);
     };
+
     fetchAll();
   }, []);
 
@@ -100,14 +109,11 @@ export default function Homepage() {
     const callback = (entries) => {
       entries.forEach((e) => {
         if (e.isIntersecting) {
-          if (e.target.classList.contains("about-section"))
-            setVisible((v) => ({ ...v, about: true }));
-          if (e.target.classList.contains("rooms-section"))
-            setVisible((v) => ({ ...v, rooms: true }));
-          if (e.target.classList.contains("island-section"))
-            setVisible((v) => ({ ...v, island: true }));
-          if (e.target.classList.contains("feedbacks-section"))
-            setVisible((v) => ({ ...v, feedbacks: true }));
+          const cls = e.target.classList;
+          if (cls.contains("about-section")) setVisible((v) => ({ ...v, about: true }));
+          if (cls.contains("rooms-section")) setVisible((v) => ({ ...v, rooms: true }));
+          if (cls.contains("island-section")) setVisible((v) => ({ ...v, island: true }));
+          if (cls.contains("feedbacks-section")) setVisible((v) => ({ ...v, feedbacks: true }));
         }
       });
     };
@@ -143,7 +149,6 @@ export default function Homepage() {
       </header>
 
       <main className="main-content">
-        {/* ABOUT */}
         <section
           className={`about-section scroll-animate ${visible.about ? "is-visible" : ""}`}
         >
@@ -184,7 +189,6 @@ export default function Homepage() {
           </div>
         </section>
 
-        {/* ROOMS */}
         <section className={`rooms-section scroll-animate ${visible.rooms ? "is-visible" : ""}`}>
           <div className="section-header">
             <h3>Rooms & Accommodations</h3>
@@ -200,11 +204,15 @@ export default function Homepage() {
                 <div className="card-body">
                   <h4>{r.title || r.name || `Room ${idx + 1}`}</h4>
                   <p className="muted">
-                    {r.description ? r.description.slice(0, 120) + (r.description.length > 120 ? "..." : "") : "No description."}
+                    {r.description
+                      ? r.description.slice(0, 120) + (r.description.length > 120 ? "..." : "")
+                      : "No description."}
                   </p>
                   <div className="card-footer">
                     <span className="price">{r.price ? `₱${r.price}` : "Contact"}</span>
-                    <a className="btn small" onClick={() => navigate("/services")}>Book</a>
+                    <a className="btn small" onClick={() => navigate("/services")}>
+                      Book
+                    </a>
                   </div>
                 </div>
               </article>
@@ -212,7 +220,6 @@ export default function Homepage() {
           </div>
         </section>
 
-        {/* ISLAND HOPPING */}
         <section className={`island-section scroll-animate ${visible.island ? "is-visible" : ""}`}>
           <div className="section-header">
             <h3>Island Hopping & Tours</h3>
@@ -223,14 +230,23 @@ export default function Homepage() {
             {islandHops.map((p, idx) => (
               <article className="card wide" key={p.id || idx}>
                 <div className="card-media">
-                  <img src={getImage(p) || "/placeholder-island.jpg"} alt={p.title || "package"} />
+                  <img
+                    src={getImage(p) || "/placeholder-island.jpg"}
+                    alt={p.title || "package"}
+                  />
                 </div>
                 <div className="card-body">
                   <h4>{p.title || p.name || `Package ${idx + 1}`}</h4>
-                  <p className="muted">{p.description?.slice(0, 140) + (p.description?.length > 140 ? "..." : "") || "No description."}</p>
+                  <p className="muted">
+                    {p.description
+                      ? p.description.slice(0, 140) + (p.description.length > 140 ? "..." : "")
+                      : "No description."}
+                  </p>
                   <div className="card-footer">
                     <span className="price">{p.price ? `₱${p.price}` : "Contact"}</span>
-                    <a className="btn small" onClick={() => navigate("/services")}>View</a>
+                    <a className="btn small" onClick={() => navigate("/services")}>
+                      View
+                    </a>
                   </div>
                 </div>
               </article>
@@ -238,7 +254,6 @@ export default function Homepage() {
           </div>
         </section>
 
-        {/* FEEDBACK */}
         <section className={`feedbacks-section scroll-animate ${visible.feedbacks ? "is-visible" : ""}`}>
           <div className="section-header">
             <h3>Guest Feedback</h3>
@@ -251,7 +266,9 @@ export default function Homepage() {
                 <p className="msg">“{f.message || f.content || f.feedback || "No message."}”</p>
                 <footer className="meta">
                   <strong>{f.name || f.user || "Guest"}</strong>
-                  <span className="date">{f.created_at ? new Date(f.created_at).toLocaleDateString() : ""}</span>
+                  <span className="date">
+                    {f.created_at ? new Date(f.created_at).toLocaleDateString() : ""}
+                  </span>
                 </footer>
               </blockquote>
             ))}
