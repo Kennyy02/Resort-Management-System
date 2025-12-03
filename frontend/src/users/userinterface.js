@@ -14,7 +14,7 @@ const tryFetch = async (candidates, config = {}) => {
       const res = await axios.get(url, config);
       if (res && res.data !== undefined) return { data: res.data, url };
     } catch (err) {
-      // ignore errors
+      continue;
     }
   }
   return { data: null, url: null };
@@ -36,7 +36,6 @@ export default function Homepage() {
 
   useEffect(() => {
     const fetchAll = async () => {
-      // About section
       const aboutResp = await tryFetch([
         `${ABOUT_BASE}/pre/api/aboutus`,
         `${ABOUT_BASE}/api/aboutus`,
@@ -47,7 +46,6 @@ export default function Homepage() {
       if (aboutResp.data) {
         let content = "";
         let videoUrl = null;
-
         if (Array.isArray(aboutResp.data) && aboutResp.data.length > 0) {
           content = aboutResp.data[0].content || aboutResp.data[0].description || "";
           videoUrl = aboutResp.data[0].videoUrl || aboutResp.data[0].video || null;
@@ -55,62 +53,50 @@ export default function Homepage() {
           content = aboutResp.data.content || aboutResp.data.description || "";
           videoUrl = aboutResp.data.videoUrl || aboutResp.data.video || null;
         }
-
         setAbout({ content, videoUrl });
       } else {
         setAbout({ content: "About information currently unavailable.", videoUrl: null });
       }
 
-      // Services section
       const servicesResp = await tryFetch([
         `${SERVICES_BASE}/api/services`,
         `${SERVICES_BASE}/services`,
-        `${SERVICES_BASE}/api/v1/services`,
         `${SERVICES_BASE}/service`,
-        `${SERVICES_BASE}/api/service`,
+        `${SERVICES_BASE}/api/v1/services`,
       ]);
 
       if (servicesResp.data && Array.isArray(servicesResp.data)) {
         const items = servicesResp.data;
-
-        const roomsList = items
-          .filter(
-            (i) =>
-              (i.type && i.type.toLowerCase().includes("room")) ||
-              (i.category && i.category.toLowerCase().includes("room")) ||
-              (i.title && /room|suite|cottage/i.test(i.title))
-          )
-          .slice(0, 4);
-
-        const islandList = items
-          .filter(
-            (i) =>
-              (i.type && i.type.toLowerCase().includes("island")) ||
-              (i.category && i.category.toLowerCase().includes("island")) ||
-              (i.title && /island|hop|boat|tour|package/i.test(i.title))
-          )
-          .slice(0, 4);
-
-        setRooms(roomsList.length ? roomsList : items.slice(0, 4));
-        setIslandHops(islandList.length ? islandList : items.slice(0, 4));
+        const roomsList = items.filter((i) =>
+          (i.type && i.type.toLowerCase().includes("room")) ||
+          (i.category && i.category.toLowerCase().includes("room")) ||
+          (i.title && /room|suite|cottage/i.test(i.title))
+        ).slice(0, 4); // first 4 rooms
+        const islandList = items.filter((i) =>
+          (i.type && i.type.toLowerCase().includes("island")) ||
+          (i.category && i.category.toLowerCase().includes("island")) ||
+          (i.title && /island|hop|boat|tour|package/i.test(i.title))
+        ).slice(0, 4); // first 4 island hops
+        setRooms(roomsList);
+        setIslandHops(islandList);
+      } else {
+        setRooms([]);
+        setIslandHops([]);
       }
 
-      // Feedbacks
       const feedbackResp = await tryFetch([
-        `${FEEDBACKS_BASE}/api/feedback`,
         `${FEEDBACKS_BASE}/api/feedbacks`,
+        `${FEEDBACKS_BASE}/api/feedback`,
+        `${FEEDBACKS_BASE}/feedbacks`,
         `${FEEDBACKS_BASE}/feedback`,
         `${FEEDBACKS_BASE}/ratings`,
         `${FEEDBACKS_BASE}/api/ratings`,
       ]);
 
       if (feedbackResp.data && Array.isArray(feedbackResp.data)) {
-        const sortedFeedbacks = feedbackResp.data.sort((a, b) => {
-          const dateA = new Date(a.created_at || a.date || 0);
-          const dateB = new Date(b.created_at || b.date || 0);
-          return dateB - dateA;
-        });
-        setFeedbacks(sortedFeedbacks.slice(0, 4));
+        setFeedbacks(feedbackResp.data.slice(0, 4)); // first 4 feedbacks
+      } else {
+        setFeedbacks([]);
       }
 
       setLoading(false);
@@ -123,29 +109,24 @@ export default function Homepage() {
     const callback = (entries) => {
       entries.forEach((e) => {
         if (e.isIntersecting) {
-          if (e.target.classList.contains("about-section"))
-            setVisible((v) => ({ ...v, about: true }));
-          if (e.target.classList.contains("rooms-section"))
-            setVisible((v) => ({ ...v, rooms: true }));
-          if (e.target.classList.contains("island-section"))
-            setVisible((v) => ({ ...v, island: true }));
-          if (e.target.classList.contains("feedbacks-section"))
-            setVisible((v) => ({ ...v, feedbacks: true }));
+          const cls = e.target.classList;
+          if (cls.contains("about-section")) setVisible((v) => ({ ...v, about: true }));
+          if (cls.contains("rooms-section")) setVisible((v) => ({ ...v, rooms: true }));
+          if (cls.contains("island-section")) setVisible((v) => ({ ...v, island: true }));
+          if (cls.contains("feedbacks-section")) setVisible((v) => ({ ...v, feedbacks: true }));
         }
       });
     };
-
     const observer = new IntersectionObserver(callback, { threshold: 0.15 });
     document.querySelectorAll(".scroll-animate").forEach((el) => observer.observe(el));
-
     return () => observer.disconnect();
   }, []);
 
-  const getImage = (item) => item?.image || item?.imageUrl || item?.photo || item?.thumbnail || null;
+  const getImage = (item) =>
+    item?.image || item?.imageUrl || item?.photo || item?.thumbnail || null;
 
   return (
     <div className="homepage-root">
-      {/* HERO */}
       <header className="hero large-hero">
         <div className="hero-inner">
           <div className="hero-left">
@@ -160,6 +141,7 @@ export default function Homepage() {
               </button>
             </div>
           </div>
+
           <div className="hero-image-wrapper">
             <img src={mountainView} alt="Mountain view resort" />
           </div>
@@ -168,7 +150,9 @@ export default function Homepage() {
 
       <main className="main-content">
         {/* ABOUT */}
-        <section className={`about-section scroll-animate ${visible.about ? "is-visible" : ""}`}>
+        <section
+          className={`about-section scroll-animate ${visible.about ? "is-visible" : ""}`}
+        >
           <div className="about-grid">
             <div className="about-text">
               <div className="about-video-title">Swim, Chill, Chillax</div>
@@ -178,9 +162,12 @@ export default function Homepage() {
                   : about.content.split("\n").map((l, i) => <p key={i}>{l}</p>)}
               </div>
               <div className="about-actions">
-                <a className="btn" onClick={() => navigate("/aboutus")}>Read Full Story</a>
+                <a className="btn" onClick={() => navigate("/aboutus")}>
+                  Read Full Story
+                </a>
               </div>
             </div>
+
             <div className="about-media">
               <div className="youtube-wrapper">
                 <iframe
@@ -209,7 +196,8 @@ export default function Homepage() {
             <h3>Rooms & Accommodations</h3>
             <p>Comfortable rooms curated for a relaxing stay.</p>
           </div>
-          <div className="cards-grid scrollable">
+
+          <div className="cards-grid horizontal-scroll">
             {rooms.map((r, idx) => (
               <article className="card" key={r.id || idx}>
                 <div className="card-media">
@@ -224,7 +212,9 @@ export default function Homepage() {
                   </p>
                   <div className="card-footer">
                     <span className="price">{r.price ? `₱${r.price}` : "Contact"}</span>
-                    <a className="btn small" onClick={() => navigate("/services")}>Book</a>
+                    <a className="btn small" onClick={() => navigate("/services")}>
+                      Book
+                    </a>
                   </div>
                 </div>
               </article>
@@ -238,20 +228,28 @@ export default function Homepage() {
             <h3>Island Hopping & Tours</h3>
             <p>Explore nearby islands with guided tours and boat trips.</p>
           </div>
-          <div className="cards-grid scrollable">
+
+          <div className="cards-grid horizontal-scroll">
             {islandHops.map((p, idx) => (
               <article className="card wide" key={p.id || idx}>
                 <div className="card-media">
-                  <img src={getImage(p) || "/placeholder-island.jpg"} alt={p.title || "package"} />
+                  <img
+                    src={getImage(p) || "/placeholder-island.jpg"}
+                    alt={p.title || "package"}
+                  />
                 </div>
                 <div className="card-body">
                   <h4>{p.title || p.name || `Package ${idx + 1}`}</h4>
                   <p className="muted">
-                    {p.description?.slice(0, 140) + (p.description?.length > 140 ? "..." : "") || "No description."}
+                    {p.description
+                      ? p.description.slice(0, 140) + (p.description.length > 140 ? "..." : "")
+                      : "No description."}
                   </p>
                   <div className="card-footer">
                     <span className="price">{p.price ? `₱${p.price}` : "Contact"}</span>
-                    <a className="btn small" onClick={() => navigate("/services")}>View</a>
+                    <a className="btn small" onClick={() => navigate("/services")}>
+                      View
+                    </a>
                   </div>
                 </div>
               </article>
@@ -265,13 +263,16 @@ export default function Homepage() {
             <h3>Guest Feedback</h3>
             <p>What our guests say about their stay.</p>
           </div>
-          <div className="feedback-carousel scrollable">
+
+          <div className="feedback-carousel horizontal-scroll">
             {feedbacks.map((f, i) => (
               <blockquote className="feedback-card" key={f.id || i}>
                 <p className="msg">“{f.message || f.content || f.feedback || "No message."}”</p>
                 <footer className="meta">
                   <strong>{f.name || f.user || "Guest"}</strong>
-                  <span className="date">{f.created_at ? new Date(f.created_at).toLocaleDateString() : ""}</span>
+                  <span className="date">
+                    {f.created_at ? new Date(f.created_at).toLocaleDateString() : ""}
+                  </span>
                 </footer>
               </blockquote>
             ))}
