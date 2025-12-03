@@ -20,10 +20,7 @@ function UserServices() {
         try {
             const url = `${process.env.REACT_APP_BOOKINGS_API}/api/bookings/check-prerequisite/${email}`;
             const res = await fetch(url);
-            if (!res.ok) {
-                console.error("Failed to fetch booking prerequisite status.");
-                return false;
-            }
+            if (!res.ok) return false;
             const data = await res.json();
             return data.hasRoomOrCottageBooking;
         } catch (err) {
@@ -113,7 +110,6 @@ function UserServices() {
                         </div>
                         <div className="service-details">
                             <h3>{service.name}</h3>
-                            <p><strong>Description:</strong> {service.description}</p>
                             <p><strong>Price:</strong> ₱{parseFloat(service.price).toFixed(2)}</p>
                             <p>
                                 <strong>Status:</strong>{' '}
@@ -121,6 +117,7 @@ function UserServices() {
                                     {service.status}
                                 </span>
                             </p>
+                            <p className="service-description">{service.description}</p>
                             {isAvailable && (
                                 <button
                                     className="book-now-button"
@@ -156,21 +153,15 @@ function UserServices() {
                                 <button
                                     className={activeTab === 'rooms' ? 'tab-button active' : 'tab-button'}
                                     onClick={() => setActiveTab('rooms')}
-                                >
-                                    Rooms
-                                </button>
+                                >Rooms</button>
                                 <button
                                     className={activeTab === 'cottages' ? 'tab-button active' : 'tab-button'}
                                     onClick={() => setActiveTab('cottages')}
-                                >
-                                    Cottages
-                                </button>
+                                >Cottages</button>
                                 <button
                                     className={activeTab === 'island_hopping' ? 'tab-button active' : 'tab-button'}
                                     onClick={() => setActiveTab('island_hopping')}
-                                >
-                                    Island Hopping
-                                </button>
+                                >Island Hopping</button>
                             </div>
 
                             <div className="sort-controls">
@@ -209,9 +200,9 @@ function UserServices() {
                             )}
                             {((activeTab === 'rooms' && rooms.length === 0) ||
                               (activeTab === 'cottages' && cottages.length === 0) ||
-                              (activeTab === 'island_hopping' && islandHopping.length === 0)) ? (
+                              (activeTab === 'island_hopping' && islandHopping.length === 0)) && (
                                 <p className="no-services-message">No {activeTab.replace('_', ' ')} available at the moment.</p>
-                            ) : null}
+                            )}
                         </div>
                     </>
                 )}
