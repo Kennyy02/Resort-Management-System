@@ -1,7 +1,0 @@
-# railway.yaml
-services:
-  # You need to match the root directory structure for your manage service
-  - name: manage-service
-    root: services/manageservice/src
-    volumes:
-      - /app/uploads
