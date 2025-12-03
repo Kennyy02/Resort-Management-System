@@ -1,15 +1,13 @@
-/* --- SAGE GREEN THEME VARIABLES --- */
 :root {
-    --primary-color: #A0C49D; /* Light Sage Green */
-    --secondary-color: #C4D7B2; /* Lighter Accent */
-    --text-color: #4A574A; /* Darker Green/Gray for text */
+    --primary-color: #A0C49D;
+    --secondary-color: #C4D7B2;
+    --text-color: #4A574A;
     --background-color: #F8F8F8;
     --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    --status-available: #4CAF50; /* Green */
-    --status-unavailable: #F44336; /* Red */
+    --status-available: #4CAF50;
+    --status-unavailable: #F44336;
 }
 
-/* --- 1. General Page Layout (Fixed Width) --- */
 .user-services-page {
     width: 100%;
     min-height: 100vh;
@@ -17,23 +15,20 @@
     padding-bottom: 50px;
 }
 
-/* Main content container is now fixed width and not 'boxed' */
 .user-services-container {
     padding: 20px 40px;
-    /* Fixed maximum width for the grid */
-    max-width: 1400px; 
+    max-width: 1400px;
     margin: 0 auto;
-    background-color: transparent; /* Remove the white box */
-    box-shadow: none; /* Remove shadow */
+    background-color: transparent;
+    box-shadow: none;
     margin-top: -80px;
     position: relative;
     z-index: 10;
 }
 
-/* --- 2. Hero Section (Banner Image) --- */
 .services-hero-section {
     position: relative;
-    height: 300px;
+    height: 350px;
     overflow: hidden;
     margin-bottom: 100px;
 }
@@ -47,8 +42,7 @@
 }
 
 .services-hero-overlay {
-    /* Optional: Use a dark sage tint for the overlay */
-    background: rgba(74, 87, 74, 0.3); 
+    background: rgba(74, 87, 74, 0.3);
     position: absolute;
     top: 0;
     left: 0;
@@ -67,13 +61,12 @@
 }
 
 .hero-title {
-    font-size: 3rem;
+    font-size: 3.5rem;
     font-weight: 700;
     margin: 0;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
 }
 
-/* --- 3. Controls (Tabs and Sort) --- */
 .controls-container {
     display: flex;
     justify-content: space-between;
@@ -81,6 +74,7 @@
     margin-bottom: 25px;
     padding: 10px 0;
     border-bottom: 1px solid var(--secondary-color);
+    flex-wrap: wrap;
 }
 
 .tabs {
@@ -98,6 +92,7 @@
     font-weight: 600;
     color: var(--text-color);
     transition: all 0.3s ease;
+    white-space: nowrap;
 }
 
 .tab-button:hover {
@@ -133,11 +128,9 @@
     padding-left: 20px;
 }
 
-/* --- 4. Service Card Grid (Fixed 4 Columns) --- */
 .services-grid {
     display: grid;
-    /* Fixed 4 columns */
-    grid-template-columns: repeat(4, 1fr); 
+    grid-template-columns: repeat(4, 1fr);
     gap: 25px;
     padding-top: 10px;
 }
@@ -233,6 +226,90 @@
     background-color: var(--text-color);
 }
 
-/* --- 5. Removed Mobile Responsiveness --- */
-/* Media queries have been intentionally removed to ensure a fixed layout. */
-/* On smaller screens, the 4-column grid will likely cause horizontal scrolling. */
+.book-now-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    color: #666;
+}
+
+.booking-requirement-note {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+    border-radius: 5px;
+    font-weight: 500;
+    text-align: center;
+}
+
+@media (max-width: 1199px) {
+    .services-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 767px) {
+    .services-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .user-services-container {
+        padding: 15px 20px;
+        margin-top: -60px;
+    }
+
+    .hero-title {
+        font-size: 2.5rem;
+    }
+
+    .section-title {
+        font-size: 1.7rem;
+        padding-left: 15px;
+    }
+    
+    .controls-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .tabs {
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 5px;
+    }
+}
+
+@media (max-width: 499px) {
+    .services-hero-section {
+        height: 250px;
+        margin-bottom: 80px;
+    }
+
+    .services-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .user-services-container {
+        padding: 10px 15px;
+    }
+    
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .service-image-wrapper {
+        height: 200px;
+    }
+    
+    .service-details h3 {
+        font-size: 1.2rem;
+    }
+    
+    .service-details p {
+        font-size: 0.9rem;
+    }
+}
