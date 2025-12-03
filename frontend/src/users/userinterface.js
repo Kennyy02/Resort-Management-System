@@ -71,14 +71,14 @@ export default function Homepage() {
           (i.type && i.type.toLowerCase().includes("room")) ||
           (i.category && i.category.toLowerCase().includes("room")) ||
           (i.title && /room|suite|cottage/i.test(i.title))
-        );
+        ).slice(0, 4); // first 4 rooms
         const islandList = items.filter((i) =>
           (i.type && i.type.toLowerCase().includes("island")) ||
           (i.category && i.category.toLowerCase().includes("island")) ||
           (i.title && /island|hop|boat|tour|package/i.test(i.title))
-        );
-        setRooms(roomsList.length ? roomsList : items.slice(0, 6));
-        setIslandHops(islandList.length ? islandList : items.slice(6));
+        ).slice(0, 4); // first 4 island hops
+        setRooms(roomsList);
+        setIslandHops(islandList);
       } else {
         setRooms([]);
         setIslandHops([]);
@@ -94,7 +94,7 @@ export default function Homepage() {
       ]);
 
       if (feedbackResp.data && Array.isArray(feedbackResp.data)) {
-        setFeedbacks(feedbackResp.data.slice(0, 12));
+        setFeedbacks(feedbackResp.data.slice(0, 4)); // first 4 feedbacks
       } else {
         setFeedbacks([]);
       }
@@ -149,6 +149,7 @@ export default function Homepage() {
       </header>
 
       <main className="main-content">
+        {/* ABOUT */}
         <section
           className={`about-section scroll-animate ${visible.about ? "is-visible" : ""}`}
         >
@@ -189,13 +190,14 @@ export default function Homepage() {
           </div>
         </section>
 
+        {/* ROOMS */}
         <section className={`rooms-section scroll-animate ${visible.rooms ? "is-visible" : ""}`}>
           <div className="section-header">
             <h3>Rooms & Accommodations</h3>
             <p>Comfortable rooms curated for a relaxing stay.</p>
           </div>
 
-          <div className="cards-grid">
+          <div className="cards-grid horizontal-scroll">
             {rooms.map((r, idx) => (
               <article className="card" key={r.id || idx}>
                 <div className="card-media">
@@ -220,13 +222,14 @@ export default function Homepage() {
           </div>
         </section>
 
+        {/* ISLAND HOPPING */}
         <section className={`island-section scroll-animate ${visible.island ? "is-visible" : ""}`}>
           <div className="section-header">
             <h3>Island Hopping & Tours</h3>
             <p>Explore nearby islands with guided tours and boat trips.</p>
           </div>
 
-          <div className="cards-grid">
+          <div className="cards-grid horizontal-scroll">
             {islandHops.map((p, idx) => (
               <article className="card wide" key={p.id || idx}>
                 <div className="card-media">
@@ -254,14 +257,15 @@ export default function Homepage() {
           </div>
         </section>
 
+        {/* FEEDBACK */}
         <section className={`feedbacks-section scroll-animate ${visible.feedbacks ? "is-visible" : ""}`}>
           <div className="section-header">
             <h3>Guest Feedback</h3>
             <p>What our guests say about their stay.</p>
           </div>
 
-          <div className="feedback-carousel">
-            {feedbacks.slice(0, 6).map((f, i) => (
+          <div className="feedback-carousel horizontal-scroll">
+            {feedbacks.map((f, i) => (
               <blockquote className="feedback-card" key={f.id || i}>
                 <p className="msg">“{f.message || f.content || f.feedback || "No message."}”</p>
                 <footer className="meta">
