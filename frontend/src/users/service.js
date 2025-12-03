@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './styles/services.css';
-import tower from '../components/pictures/tower.jpg';
+import './styles/services.css'; // Ensure this path is correct
+import tower from '../components/pictures/tower.jpg'; // Path to your hero image
 
 function UserServices() {
     // --- State Variables ---
@@ -11,23 +11,22 @@ function UserServices() {
     const [activeTab, setActiveTab] = useState('rooms');
     const [sortOrder, setSortOrder] = useState('none');
     
-    // NEW: State for prerequisite status
+    // State for prerequisite status
     const [hasRoomOrCottageBooking, setHasRoomOrCottageBooking] = useState(false); 
     
-    // NEW: State to simulate login status (crucial for checking if we should ask for prerequisite)
-    const [isLoggedIn] = useState(true); // Set to 'true' for testing the booking prerequisite logic
+    // State to simulate login status (Assume user is logged in for full demo of prerequisite check)
+    const [isLoggedIn] = useState(true); 
     
     // ⚠️ IMPORTANT: REPLACE THIS WITH YOUR ACTUAL LOGGED-IN USER'S EMAIL 
-    // Example: const { user } = useAuth(); const userEmail = user?.email;
     const [userEmail] = useState('user@example.com'); 
     
     const navigate = useNavigate();
 
-    // --- NEW/UPDATED: Function to Fetch Prerequisite Status from Server ---
+    // --- Function to Fetch Prerequisite Status from Server ---
     const checkBookingPrerequisite = useCallback(async (email) => {
         if (!email) return false;
         try {
-            // Assumes process.env.REACT_APP_BOOKINGS_API points to your Express server (e.g., http://localhost:5003)
+            // NOTE: Ensure your environment variable (or hardcoded path) is correct for the server
             const url = `${process.env.REACT_APP_BOOKINGS_API}/api/bookings/check-prerequisite/${email}`;
             const res = await fetch(url);
             
@@ -43,9 +42,8 @@ function UserServices() {
             return false;
         }
     }, []);
-    // ------------------------------------------------
 
-    // --- UPDATED: Handle Book Now Click Logic ---
+    // --- Handle Book Now Click Logic (Includes Prerequisite Check) ---
     const handleBookNowClick = useCallback(async (serviceId, serviceName, servicePrice, serviceType) => {
         
         // 1. Check for Island Hopping prerequisite only
@@ -53,15 +51,13 @@ function UserServices() {
             
             // a. Check if the user is logged in
             if (!isLoggedIn || !userEmail) {
-                // If not logged in, prompt them to log in first (or book room/cottage)
                 alert("Please log in and book a Room or Cottage first before booking an Island Hopping Tour.");
                 return; 
             }
 
             // b. Check for approved Room/Cottage booking
             if (!hasRoomOrCottageBooking) {
-                // If logged in but no approved booking, prompt them to book the prerequisite
-                alert("You must have an APPROVED Room or Cottage booking before booking an Island Hopping Tour.");
+                alert("You must have an APPROVED Room or Cottage booking first.");
                 return; 
             }
         }
@@ -70,7 +66,7 @@ function UserServices() {
         navigate('/booknow', { state: { serviceId, serviceName, servicePrice } });
         console.log(`Navigating to Book Now for service ID: ${serviceId}, Name: ${serviceName}, Price: ${servicePrice}`);
     }, [navigate, isLoggedIn, userEmail, hasRoomOrCottageBooking]); 
-    // ---------------------------------------------
+    
 
     // Fetch all services
     const fetchServices = async () => {
@@ -109,7 +105,7 @@ function UserServices() {
                 setHasRoomOrCottageBooking(hasPrerequisite);
             }
             
-            setLoading(false); // Set loading to false only after all async operations are done
+            setLoading(false); 
         };
 
         loadData();
@@ -126,13 +122,11 @@ function UserServices() {
     }, [services, sortOrder]);
 
 
-    // Filtering must happen BEFORE the return
     const rooms = sortedServices.filter(service => service.type === 'room');
     const cottages = sortedServices.filter(service => service.type === 'cottage');
     const islandHopping = sortedServices.filter(service => service.type === 'island_hopping');
 
 
-    // Note: The loading/error return must remain at the top level of the component
     if (loading) {
         return <div className="user-services-page loading">Loading services...</div>;
     }
@@ -141,17 +135,16 @@ function UserServices() {
         return <div className="user-services-page error-message">{error}</div>;
     }
 
-    // --- UPDATED: renderServiceCards function ---
-    // The button is now always available if service status is 'available'
     const renderServiceCards = (serviceList, serviceType) => (
-        <div className="services-grid">
+        // The services-grid class is what the CSS targets for the swipable effect
+        <div className="services-grid"> 
             {serviceList.map((service) => {
                 
-                // Determine if the button should be shown (based on availability)
                 const isAvailable = service.status === 'available';
 
                 return (
-                    <div className="service-card" key={service.id}>
+                    // The service-card class is what the CSS targets for card sizing
+                    <div className="service-card" key={service.id}> 
                         <div className="service-image-wrapper">
                             {service.image_url ? (
                                 <img
@@ -176,7 +169,6 @@ function UserServices() {
                             {isAvailable && (
                                 <button
                                     className="book-now-button"
-                                    // Pass the serviceType so the handler can check the prerequisite
                                     onClick={() => handleBookNowClick(service.id, service.name, service.price, serviceType)}
                                 >
                                     Book Now
@@ -213,6 +205,7 @@ function UserServices() {
                     <>
                         <div className="controls-container">
                             <div className="tabs">
+                                {/* Tabs use the 'tab-button' class which is styled for the new look */}
                                 <button
                                     className={activeTab === 'rooms' ? 'tab-button active' : 'tab-button'}
                                     onClick={() => setActiveTab('rooms')}
@@ -225,7 +218,6 @@ function UserServices() {
                                 >
                                     Cottages
                                 </button>
-                                {/* NEW Island Hopping Tab */}
                                 <button
                                     className={activeTab === 'island_hopping' ? 'tab-button active' : 'tab-button'}
                                     onClick={() => setActiveTab('island_hopping')}
@@ -262,7 +254,6 @@ function UserServices() {
                                     {renderServiceCards(islandHopping, 'island_hopping')}
                                 </div>
                             )}
-                            {/* Update No Services Message to check all filtered arrays */}
                             {((activeTab === 'rooms' && rooms.length === 0) || 
                               (activeTab === 'cottages' && cottages.length === 0) ||
                               (activeTab === 'island_hopping' && islandHopping.length === 0)) ? (
