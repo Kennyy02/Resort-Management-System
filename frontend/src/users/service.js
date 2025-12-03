@@ -4,24 +4,30 @@ import './styles/services.css';
 import tower from '../components/pictures/tower.jpg';
 
 function UserServices() {
+    // --- State Variables ---
     const [services, setServices] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [activeTab, setActiveTab] = useState('rooms');
     const [sortOrder, setSortOrder] = useState('none');
-    const [hasRoomOrCottageBooking, setHasRoomOrCottageBooking] = useState(false);
-    const [userEmail] = useState('user@example.com');
+    
+    // NEW: State for prerequisite status
+    const [hasRoomOrCottageBooking, setHasRoomOrCottageBooking] = useState(false); 
+    
+    // NEW: State to simulate login status (crucial for checking if we should ask for prerequisite)
+    const [isLoggedIn] = useState(true); // Set to 'true' for testing the booking prerequisite logic
+    
+    // ⚠️ IMPORTANT: REPLACE THIS WITH YOUR ACTUAL LOGGED-IN USER'S EMAIL 
+    // Example: const { user } = useAuth(); const userEmail = user?.email;
+    const [userEmail] = useState('user@example.com'); 
     
     const navigate = useNavigate();
 
-    const handleBookNowClick = useCallback((serviceId, serviceName, servicePrice) => {
-        navigate('/booknow', { state: { serviceId, serviceName, servicePrice }});
-        console.log(`Navigating to Book Now for service ID: ${serviceId}, Name: ${serviceName}, Price: ${servicePrice}`);
-    }, [navigate]);
-
+    // --- NEW/UPDATED: Function to Fetch Prerequisite Status from Server ---
     const checkBookingPrerequisite = useCallback(async (email) => {
         if (!email) return false;
         try {
+            // Assumes process.env.REACT_APP_BOOKINGS_API points to your Express server (e.g., http://localhost:5003)
             const url = `${process.env.REACT_APP_BOOKINGS_API}/api/bookings/check-prerequisite/${email}`;
             const res = await fetch(url);
             
@@ -37,7 +43,36 @@ function UserServices() {
             return false;
         }
     }, []);
+    // ------------------------------------------------
 
+    // --- UPDATED: Handle Book Now Click Logic ---
+    const handleBookNowClick = useCallback(async (serviceId, serviceName, servicePrice, serviceType) => {
+        
+        // 1. Check for Island Hopping prerequisite only
+        if (serviceType === 'island_hopping') {
+            
+            // a. Check if the user is logged in
+            if (!isLoggedIn || !userEmail) {
+                // If not logged in, prompt them to log in first (or book room/cottage)
+                alert("Please log in and book a Room or Cottage first before booking an Island Hopping Tour.");
+                return; 
+            }
+
+            // b. Check for approved Room/Cottage booking
+            if (!hasRoomOrCottageBooking) {
+                // If logged in but no approved booking, prompt them to book the prerequisite
+                alert("You must have an APPROVED Room or Cottage booking before booking an Island Hopping Tour.");
+                return; 
+            }
+        }
+
+        // If not Island Hopping, or if the prerequisite check passed, proceed to navigation
+        navigate('/booknow', { state: { serviceId, serviceName, servicePrice } });
+        console.log(`Navigating to Book Now for service ID: ${serviceId}, Name: ${serviceName}, Price: ${servicePrice}`);
+    }, [navigate, isLoggedIn, userEmail, hasRoomOrCottageBooking]); 
+    // ---------------------------------------------
+
+    // Fetch all services
     const fetchServices = async () => {
         setError(null);
         try {
@@ -55,11 +90,11 @@ function UserServices() {
 
             const data = await res.json();
             setServices(data);
-            return true;
+            return true; // Indicate success
 
         } catch (err) {
             setError(`Failed to load services: ${err.message}`);
-            return false;
+            return false; // Indicate failure
         }
     };
 
@@ -68,16 +103,17 @@ function UserServices() {
             setLoading(true);
             const servicesFetched = await fetchServices();
             
-            if (servicesFetched && userEmail) {
+            // Check prerequisite only if services fetch was successful and user is logged in
+            if (servicesFetched && isLoggedIn && userEmail) {
                 const hasPrerequisite = await checkBookingPrerequisite(userEmail);
                 setHasRoomOrCottageBooking(hasPrerequisite);
             }
             
-            setLoading(false);
+            setLoading(false); // Set loading to false only after all async operations are done
         };
 
         loadData();
-    }, [userEmail, checkBookingPrerequisite]);
+    }, [userEmail, isLoggedIn, checkBookingPrerequisite]); 
 
     const sortedServices = useMemo(() => {
         if (sortOrder === 'none') return services;
@@ -89,10 +125,14 @@ function UserServices() {
         });
     }, [services, sortOrder]);
 
+
+    // Filtering must happen BEFORE the return
     const rooms = sortedServices.filter(service => service.type === 'room');
     const cottages = sortedServices.filter(service => service.type === 'cottage');
     const islandHopping = sortedServices.filter(service => service.type === 'island_hopping');
 
+
+    // Note: The loading/error return must remain at the top level of the component
     if (loading) {
         return <div className="user-services-page loading">Loading services...</div>;
     }
@@ -101,12 +141,14 @@ function UserServices() {
         return <div className="user-services-page error-message">{error}</div>;
     }
 
+    // --- UPDATED: renderServiceCards function ---
+    // The button is now always available if service status is 'available'
     const renderServiceCards = (serviceList, serviceType) => (
         <div className="services-grid">
             {serviceList.map((service) => {
-                const isIslandHopping = serviceType === 'island_hopping';
-                const canBook = service.status === 'available' && 
-                                (!isIslandHopping || hasRoomOrCottageBooking);
+                
+                // Determine if the button should be shown (based on availability)
+                const isAvailable = service.status === 'available';
 
                 return (
                     <div className="service-card" key={service.id}>
@@ -127,26 +169,17 @@ function UserServices() {
                             <p><strong>Price:</strong> ₱{parseFloat(service.price).toFixed(2)}</p>
                             <p>
                                 <strong>Status:</strong>{' '}
-                                <span className={service.status === 'available' ? 'status-available' : 'status-unavailable'}>
+                                <span className={isAvailable ? 'status-available' : 'status-unavailable'}>
                                     {service.status}
                                 </span>
                             </p>
-                            {canBook ? (
+                            {isAvailable && (
                                 <button
                                     className="book-now-button"
-                                    onClick={() => handleBookNowClick(service.id, service.name, service.price)}
+                                    // Pass the serviceType so the handler can check the prerequisite
+                                    onClick={() => handleBookNowClick(service.id, service.name, service.price, serviceType)}
                                 >
                                     Book Now
-                                </button>
-                            ) : (
-                                <button
-                                    className="book-now-button disabled"
-                                    disabled={true}
-                                    title={isIslandHopping 
-                                        ? "Requires an APPROVED Room or Cottage booking first" 
-                                        : "Service Unavailable"}
-                                >
-                                    {isIslandHopping ? 'Book Room/Cottage First' : 'Unavailable'}
                                 </button>
                             )}
                         </div>
@@ -158,6 +191,8 @@ function UserServices() {
 
     return (
         <div className="user-services-page">
+            
+            {/* Hero Image Section */}
             <div className="services-hero-section">
                 <img
                     src={tower}
@@ -170,6 +205,7 @@ function UserServices() {
                 </div>
             </div>
 
+            {/* Main Content Container */}
             <div className="user-services-container">
                 {services.length === 0 ? (
                     <p>No services available at the moment.</p>
@@ -189,6 +225,7 @@ function UserServices() {
                                 >
                                     Cottages
                                 </button>
+                                {/* NEW Island Hopping Tab */}
                                 <button
                                     className={activeTab === 'island_hopping' ? 'tab-button active' : 'tab-button'}
                                     onClick={() => setActiveTab('island_hopping')}
@@ -223,17 +260,13 @@ function UserServices() {
                                 <div className="service-section">
                                     <h3 className="section-title">Island Hopping Tours</h3>
                                     {renderServiceCards(islandHopping, 'island_hopping')}
-                                    {!hasRoomOrCottageBooking && (
-                                        <p className="booking-requirement-note">
-                                            ⚠️ **Island Hopping Tours require an **APPROVED** Room or Cottage booking.**
-                                        </p>
-                                    )}
                                 </div>
                             )}
+                            {/* Update No Services Message to check all filtered arrays */}
                             {((activeTab === 'rooms' && rooms.length === 0) || 
                               (activeTab === 'cottages' && cottages.length === 0) ||
                               (activeTab === 'island_hopping' && islandHopping.length === 0)) ? (
-                                <p className="no-services-message">No {activeTab.replace('_', ' ')} available at the moment.</p>
+                                    <p className="no-services-message">No {activeTab.replace('_', ' ')} available at the moment.</p>
                             ) : null}
                         </div>
                     </>
