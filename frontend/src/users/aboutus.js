@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
-import { useNavigate } from 'react-router-dom'; // NEW IMPORT
+import { useNavigate } from 'react-router-dom';
 import "./styles/aboutus.css";
 import aboutusbg from "../components/pictures/aboutusbg.jpg"; 
 
