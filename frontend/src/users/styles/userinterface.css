@@ -68,7 +68,7 @@ h3 {
   border-radius: 8px; 
 }
 
-/* 🔴 Hero CTA Button Styling (Solid White with Dark Text) 🔴 */
+/* Hero CTA Button Styling (Solid White with Dark Text) */
 .hero-cta button,
 .hero-cta button.ghost {
   border: none;
@@ -83,7 +83,6 @@ h3 {
   background-color: #e0e0e0; 
   color: var(--text-color);
 }
-/* -------------------------------------------------------- */
 
 /* About Section Button (Primary Outline) */
 .about-actions .btn {
@@ -141,9 +140,9 @@ section.is-visible {
 
 /* --- Hero Section --- */
 .hero {
-  min-height: 90vh; 
+  /* 🔴 FIX: Reduced min-height to crop the image and make the hero section shorter */
+  min-height: 75vh; 
   display: flex;
-  /* Align items to the START to leave space for a navigation bar */
   align-items: flex-start; 
   color: white;
   padding: 2rem 0 4rem; 
@@ -178,7 +177,7 @@ section.is-visible {
   z-index: 2; 
 }
 
-/* 🔴 Centering the Hero Text Content (Title/Buttons) 🔴 */
+/* Centering and Positioning the Hero Text Content (Title/Buttons) */
 .hero-left {
     width: 100%;
     display: flex;
@@ -187,8 +186,8 @@ section.is-visible {
     text-align: center;
     /* Pushes content down from the top edge of the hero */
     margin-top: 15vh; 
-    /* Space between the text block and the search box */
-    margin-bottom: 5rem; 
+    /* 🔴 FIX: Increased space below text to push the search bar lower */
+    margin-bottom: 8rem; 
 }
 
 /* --- Availability Search Box Positioning (Desktop) --- */
@@ -200,7 +199,7 @@ section.is-visible {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   padding: 1.5rem;
   
-  /* 🔴 Overlapping Positioning 🔴 */
+  /* Overlapping Positioning */
   position: absolute; 
   left: 50%;
   bottom: 0; /* Aligns with the bottom of the hero section */
@@ -284,8 +283,8 @@ section.is-visible {
 
 /* --- About Section --- */
 .about-section {
-    /* 🔴 Increased margin-top to clear the overlapping search box */
-    margin-top: 10rem; 
+    /* 🔴 FIX: Increased margin-top to clear the search bar that was pushed lower */
+    margin-top: 12rem; 
 }
 
 /* --- About Section (Content below the Hero) --- */
