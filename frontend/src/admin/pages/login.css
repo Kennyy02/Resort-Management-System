@@ -1,41 +1,66 @@
 /* login.css */
 
-/* --- 1. Main Layout and Container --- */
-
+/* --- 1. Main Layout and Glass Background --- */
 .login-container {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background: linear-gradient(135deg, #f0f4f8, #c1d1e6); /* Light gradient background */
-    font-family: 'Arial', sans-serif;
+    /* Simulate the dark, out-of-focus background */
+    background: #4a5c60; 
+    font-family: Arial, sans-serif;
+    position: relative;
+    /* Optional: Add a simple noise or texture effect if desired */
+    /* overflow: hidden; */
 }
 
 .login-box {
-    background-color: #ffffff;
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    /* Glassmorphism Effect */
+    background: rgba(255, 255, 255, 0.15); /* White with 15% opacity */
+    backdrop-filter: blur(10px); /* The key to the effect */
+    -webkit-backdrop-filter: blur(10px); /* For Safari support */
+    
+    padding: 20px 30px 40px 30px; /* Adjusted padding to match compact look */
+    border-radius: 18px; /* Rounded corners */
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Light border */
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2); /* Soft, prominent shadow */
     width: 100%;
-    max-width: 400px;
-}
-
-.login-title {
-    font-size: 24px;
-    font-weight: 600;
-    color: #333333;
-    margin-bottom: 30px;
+    max-width: 350px; /* Small, compact size */
     text-align: center;
-    border-bottom: 2px solid #007bff;
-    padding-bottom: 10px;
+    position: relative;
 }
 
-/* --- 2. Form Styling --- */
+/* Hide the default title in favor of the icon */
+.login-title {
+    display: none; 
+}
+
+/* --- 2. Icon Placeholder (for the round icon on top) --- */
+/* Your HTML doesn't include the icon, so we use CSS to create its space */
+.login-box::before {
+    content: ''; 
+    display: block;
+    width: 60px;
+    height: 60px;
+    background: rgba(0, 0, 0, 0.6); /* Darker, semi-transparent background */
+    border-radius: 50%;
+    position: absolute;
+    top: -30px; /* Pull it up above the box */
+    left: 50%;
+    transform: translateX(-50%);
+    /* Use a tool like Font Awesome or a background image for the person icon */
+    /* For simplicity, we just create the circle here */
+    border: 2px solid rgba(255, 255, 255, 0.7);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+/* --- 3. Form Styling (Inputs are styled to match the translucent look) --- */
 
 .login-form {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 15px; /* Compact spacing */
+    margin-top: 40px; /* Space below the icon */
 }
 
 .form-group {
@@ -43,28 +68,33 @@
     flex-direction: column;
 }
 
+/* Hide the default labels, as the design uses placeholders/icons */
 .form-group label {
-    font-size: 14px;
-    color: #555555;
-    margin-bottom: 8px;
-    font-weight: 500;
+    display: none;
 }
 
 .form-input {
+    background: rgba(255, 255, 255, 0.1); /* Very slight background */
+    color: #ffffff; /* White text for contrast */
     padding: 12px 15px;
-    border: 1px solid #cccccc;
-    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
     font-size: 16px;
-    transition: border-color 0.3s, box-shadow 0.3s;
+    font-weight: 300;
+}
+
+/* Change placeholder color to match the subtle gray text */
+.form-input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
 }
 
 .form-input:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
     outline: none;
 }
 
-/* --- 3. Password Visibility Toggle --- */
+/* --- 4. Password Toggle Styling (Adjusted for glass look) --- */
 
 .password-wrapper {
     position: relative;
@@ -74,90 +104,62 @@
 
 .password-wrapper .form-input {
     width: 100%;
-    padding-right: 80px; /* Make space for the button */
+    padding-right: 80px; 
 }
 
 .show-password-btn {
     position: absolute;
-    right: 1px;
-    top: 1px;
-    height: calc(100% - 2px);
-    padding: 0 15px;
+    right: 5px;
+    padding: 5px 10px;
     background: none;
     border: none;
     cursor: pointer;
     font-size: 14px;
-    color: #007bff;
-    border-radius: 0 8px 8px 0;
-    transition: background-color 0.2s;
+    color: rgba(255, 255, 255, 0.8); 
+    transition: color 0.2s;
 }
 
 .show-password-btn:hover {
-    background-color: #f0f0f0;
+    color: #ffffff;
 }
 
-/* --- 4. Login Button --- */
+/* --- 5. Login Button (Solid, flat design) --- */
 
 .login-button {
-    padding: 14px;
-    background-color: #007bff;
+    padding: 12px;
+    background-color: rgba(0, 0, 0, 0.5); /* Dark, semi-transparent background */
     color: white;
-    font-size: 18px;
-    font-weight: bold;
-    border: none;
-    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Subtle white border */
+    border-radius: 6px;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    margin-top: 10px;
+    text-transform: uppercase;
+    margin-top: 15px;
 }
 
 .login-button:hover {
-    background-color: #0056b3;
+    background-color: rgba(0, 0, 0, 0.7);
 }
 
-.login-button:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-}
-
-/* --- 5. Message/Alerts --- */
+/* --- 6. Messages (Keeping it subtle and clean) --- */
 
 .login-message {
-    padding: 10px;
-    border-radius: 6px;
-    margin-bottom: 20px;
+    padding: 8px;
+    border-radius: 4px;
+    margin-bottom: 15px;
     text-align: center;
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 13px;
+    font-weight: 500;
+    color: #ffffff;
+    background: rgba(0, 0, 0, 0.3);
 }
 
 .login-message.error {
-    background-color: #fddddd;
-    color: #d9534f;
-    border: 1px solid #d9534f;
+    background-color: rgba(220, 53, 69, 0.7);
 }
 
 .login-message.success {
-    background-color: #d4edda;
-    color: #28a745;
-    border: 1px solid #28a745;
-}
-
-/* --- 6. Mobile Responsiveness --- */
-
-@media (max-width: 500px) {
-    .login-box {
-        margin: 20px;
-        padding: 30px 20px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    }
-
-    .login-title {
-        font-size: 22px;
-    }
-
-    .login-button {
-        font-size: 16px;
-        padding: 12px;
-    }
+    background-color: rgba(40, 167, 69, 0.7);
 }
