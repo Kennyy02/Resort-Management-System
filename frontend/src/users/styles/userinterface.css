@@ -141,7 +141,7 @@ section.is-visible {
 
 /* --- Hero Section --- */
 .hero {
-  /* Reduced min-height for further cropping */
+  /* Retained from previous versions (70vh) */
   min-height: 70vh; 
   display: flex;
   align-items: flex-start; 
@@ -185,8 +185,8 @@ section.is-visible {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    /* 🔴 FIX 1: Reduced margin-top (from 7vh) to move the text/buttons lower */
-    margin-top: 5vh; 
+    /* 🔴 FIX 1: Reduced margin-top (from 3vh) to move the text/buttons even lower */
+    margin-top: 1vh; 
     /* Space between text block and search bar */
     margin-bottom: 9rem; 
 }
@@ -204,8 +204,8 @@ section.is-visible {
   position: absolute; 
   left: 50%;
   bottom: 0; /* Aligns with the bottom of the hero section */
-  /* 🔴 FIX 2: Increased translation to 100% to push the box down even further (a full box height overlap) */
-  transform: translate(-50%, 100%); 
+  /* Reverted to 75% overlap, as 100% was too low for the user's preference */
+  transform: translate(-50%, 75%); 
   z-index: 3; 
 }
 
@@ -246,8 +246,8 @@ section.is-visible {
 
 .search-button {
   width: 100%;
-  /* 🔴 FIX 3: Reduced padding (from 0.6rem) to make the button even smaller */
-  padding: 0.5rem 1rem; 
+  /* 🔴 FIX 2: Reduced padding (from 0.5rem) to make the button smaller */
+  padding: 0.35rem 1rem; 
   font-size: 1rem;
   background-color: var(--primary-color);
   color: white;
@@ -285,8 +285,8 @@ section.is-visible {
 
 /* --- About Section --- */
 .about-section {
-    /* 🔴 FIX 4: Increased margin-top (from 14rem) to clear the pushed-down search bar */
-    margin-top: 16rem; 
+    /* Reverted to 14rem to clear the 75% overlap */
+    margin-top: 14rem; 
 }
 
 /* --- About Section (Content below the Hero) --- */
