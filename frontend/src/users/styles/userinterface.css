@@ -1,5 +1,8 @@
 /* --- CSS Reset/Global Styles & Variables --- */
-
+/* Add this ONLY temporarily at the very top of userinterface.css */
+body { 
+    background-color: red !important; 
+  
 :root {
   /* Colors - Defined for consistency */
   --primary-color: #38761D; /* Deep Green for accents and headers */
