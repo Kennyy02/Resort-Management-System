@@ -1,111 +1,195 @@
-/* --- Container --- */
+/* * 1. Global Setup and Centering
+ * Sets up a full-screen, centered background for the login card.
+ */
+:root {
+    /* Define primary colors based on a dark, professional theme 
+       (adjust these if you want different colors later) */
+    --primary-color: #3b82f6; /* Tailwind blue-500 equivalent */
+    --text-color: #f3f4f6;   /* Light gray for text */
+    --card-bg: rgba(255, 255, 255, 0.1); /* Semi-transparent for glass effect */
+    --input-bg: rgba(255, 255, 255, 0.2);
+    --border-color: rgba(255, 255, 255, 0.5);
+    --shadow-color: rgba(0, 0, 0, 0.3);
+}
+
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    /* Use a dark background to make the light card stand out */
+    background: #111827; 
+}
+
 .login-container {
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: #f5f6fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
 }
 
-/* --- Box --- */
+/* * 2. Login Box (The Card)
+ * Creates the centered, rounded, semi-transparent card effect.
+ */
 .login-box {
-  width: 360px;
-  background: #ffffff;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 400px; /* Max width for desktop/tablet view */
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 40px 30px;
+    box-shadow: 0 10px 30px var(--shadow-color);
+    backdrop-filter: blur(10px); /* Key for the glass effect */
+    border: 1px solid var(--border-color);
+    position: relative; /* For the absolute icon above the box */
 }
 
-/* --- Title --- */
 .login-title {
-  text-align: center;
-  margin-bottom: 20px;
-  font-size: 24px;
-  color: #333;
-  letter-spacing: 0.5px;
+    text-align: center;
+    color: var(--text-color);
+    margin-bottom: 30px;
+    font-size: 1.8rem;
 }
 
-/* --- Messages --- */
-.login-message {
-  padding: 10px;
-  border-radius: 6px;
-  font-size: 14px;
-  margin-bottom: 15px;
-  text-align: center;
+/* * 3. Form Group and Inputs (The Compact Design)
+ * Hides the separate labels and integrates the icon look.
+ */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Compact spacing between fields */
 }
 
-.login-message.error {
-  background: #ffe5e5;
-  color: #d90000;
-}
-
-.login-message.success {
-  background: #e5ffe9;
-  color: #0c8b2f;
-}
-
-/* --- Inputs --- */
 .form-group {
-  margin-bottom: 15px;
-  display: flex;
-  flex-direction: column;
+    /* Set up relative positioning for absolute icon placement */
+    position: relative;
+    /* Hide the default label to achieve the compact look */
 }
 
-label {
-  font-size: 14px;
-  color: #444;
-  margin-bottom: 6px;
+.form-group label {
+    display: none; 
 }
 
 .form-input {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 15px;
-  transition: 0.2s;
+    width: 100%;
+    padding: 12px 12px 12px 40px; /* Increased left padding for the icon */
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-color);
+    font-size: 1rem;
+    transition: all 0.2s ease;
 }
 
 .form-input:focus {
-  border-color: #4c8df6;
-  box-shadow: 0 0 0 2px rgba(76,141,246,0.15);
-  outline: none;
+    outline: none;
+    border-color: var(--primary-color);
+    background: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 0 2px var(--primary-color);
 }
 
-/* --- Password Wrapper --- */
+/* Icon Simulation using ::before on the form group */
+.form-group::before {
+    content: ''; 
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.1rem;
+    color: var(--text-color);
+    pointer-events: none; /* Allows clicks to pass through to the input */
+    z-index: 10;
+}
+
+/* Specific Icons based on field type/order */
+/* Staff ID / Email */
+.login-form .form-group:nth-child(1)::before,
+.login-form .form-group:nth-child(2)::before {
+    /* Unicode for a simple person icon (Fallback for Font Awesome) */
+    content: '\1F464'; 
+    font-size: 18px;
+}
+
+/* Password */
+.login-form .form-group:nth-child(3)::before {
+    /* Unicode for a simple lock icon (Fallback for Font Awesome) */
+    content: '\1F512';
+    font-size: 18px;
+}
+
+
+/* * 4. Password Wrapper and Show/Hide Button
+ */
 .password-wrapper {
-  display: flex;
-  align-items: center;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* Adjust input within wrapper to fit button */
+.password-wrapper .form-input {
+    padding-right: 80px; /* Extra space for the Show/Hide button */
 }
 
 .show-password-btn {
-  margin-left: 8px;
-  padding: 9px 12px;
-  font-size: 13px;
-  background: #eee;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.2s;
+    position: absolute;
+    right: 1px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: var(--text-color);
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 0 8px 8px 0;
+    transition: background-color 0.2s;
 }
 
 .show-password-btn:hover {
-  background: #ddd;
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* --- Login Button --- */
+/* * 5. Login Button
+ */
 .login-button {
-  width: 100%;
-  padding: 12px;
-  font-size: 16px;
-  margin-top: 5px;
-  background: #4c8df6;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.25s;
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    background: var(--primary-color);
+    color: white;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
 }
 
 .login-button:hover {
-  background: #3a7ce3;
+    background-color: #2563eb; /* Darker blue */
+}
+
+.login-button:active {
+    transform: scale(0.99);
+}
+
+/* * 6. Message (Error/Success)
+ */
+.login-message {
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.login-message.error {
+    background-color: rgba(252, 165, 165, 0.3); /* Red-ish background */
+    color: #f87171; /* Brighter red text */
+    border: 1px solid #f87171;
+}
+
+.login-message.success {
+    background-color: rgba(167, 243, 208, 0.3); /* Green-ish background */
+    color: #34d399; /* Brighter green text */
+    border: 1px solid #34d399;
 }
