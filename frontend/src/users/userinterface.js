@@ -238,6 +238,7 @@ export default function Homepage() {
             <p className="hero-sub">
               A peaceful escape — book rooms, join island hopping, and make memories.
             </p>
+            {/* These buttons are explicitly kept as requested */}
             <div className="hero-cta">
               <button onClick={() => navigate("/services")}>Explore Rooms</button>
               <button className="ghost" onClick={() => navigate("/services")}>
@@ -247,6 +248,7 @@ export default function Homepage() {
           </div>
 
           {/* --- NEW Availability Search Box --- */}
+          {/* This element is absolutely positioned via CSS to float in the lower half */}
           <form className="hero-search-box" onSubmit={handleSearchSubmit}>
             <div className="search-fields">
               <div className="search-field-group">
