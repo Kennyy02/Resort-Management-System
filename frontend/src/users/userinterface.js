@@ -165,7 +165,7 @@ export default function Homepage() {
   const navigate = useNavigate();
   const { about, rooms, islandHops, feedbacks, loading } = useResortData();
   
-  // State for scroll animations, retained from original component
+  // State for scroll animations
   const [visible, setVisible] = useState({
     about: false,
     rooms: false,
@@ -189,14 +189,12 @@ export default function Homepage() {
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    // Logic to handle search/redirect to booking page with query parameters
     const queryString = new URLSearchParams(searchQuery).toString();
-    // Navigate to a dedicated availability page or the services page with the search query
     navigate(`/availability?${queryString}`); 
     console.log("Searching with:", searchQuery);
   };
 
-  // Effect for IntersectionObserver (scroll animation), retained from original
+  // Effect for IntersectionObserver (scroll animation)
   useEffect(() => {
     const callback = (entries) => {
       entries.forEach((e) => {
@@ -211,34 +209,30 @@ export default function Homepage() {
     };
     const observer = new IntersectionObserver(callback, { threshold: 0.15 });
     
-    // Observe all elements with the 'scroll-animate' class
     document.querySelectorAll(".scroll-animate").forEach((el) => observer.observe(el));
     
-    // Cleanup function
     return () => observer.disconnect();
   }, []);
 
-  // Default YouTube URL to display if the API doesn't provide one
   const defaultVideoUrl = "https://www.youtube.com/embed/f4eLvLbREEI";
   const videoToUse = about.videoUrl ? about.videoUrl.replace('watch?v=', 'embed/') : defaultVideoUrl;
   const videoLinkUrl = about.videoUrl || "https://youtu.be/f4eLvLbREEI";
 
   return (
     <div className="homepage-root">
-      {/* Hero Section: UPDATED to use mountainView as full background and added an overlay */}
+      {/* Hero Section: Includes the title, buttons, and search box */}
       <header 
         className="hero large-hero"
         style={{ backgroundImage: `url(${mountainView})` }} 
       >
-        {/* Darkening Overlay (positioning is handled in CSS) */}
         <div className="hero-overlay"></div> 
         <div className="hero-inner">
           <div className="hero-left">
+            {/* --- Hero Text and Buttons (Required for the visual) --- */}
             <h1 className="hero-title">EM'z Bayview Mountain Resort</h1>
             <p className="hero-sub">
               A peaceful escape — book rooms, join island hopping, and make memories.
             </p>
-            {/* These buttons are explicitly kept as requested */}
             <div className="hero-cta">
               <button onClick={() => navigate("/services")}>Explore Rooms</button>
               <button className="ghost" onClick={() => navigate("/services")}>
@@ -247,8 +241,7 @@ export default function Homepage() {
             </div>
           </div>
 
-          {/* --- NEW Availability Search Box --- */}
-          {/* This element is absolutely positioned via CSS to float in the lower half */}
+          {/* --- Availability Search Box (The overlapping element) --- */}
           <form className="hero-search-box" onSubmit={handleSearchSubmit}>
             <div className="search-fields">
               <div className="search-field-group">
@@ -268,7 +261,7 @@ export default function Homepage() {
                   type="date"
                   id="checkInDate"
                   name="checkInDate"
-                  placeholder="dd/mm/yyyy" // ADDED for consistency
+                  placeholder="dd/mm/yyyy" 
                   value={searchQuery.checkInDate}
                   onChange={handleSearchChange}
                   required
@@ -280,7 +273,7 @@ export default function Homepage() {
                   type="date"
                   id="checkOutDate"
                   name="checkOutDate"
-                  placeholder="dd/mm/yyyy" // ADDED for consistency
+                  placeholder="dd/mm/yyyy" 
                   value={searchQuery.checkOutDate}
                   onChange={handleSearchChange}
                   required
@@ -293,14 +286,11 @@ export default function Homepage() {
               </div>
             </div>
           </form>
-          {/* ------------------------------- */}
-
-          {/* The image wrapper and image are REMOVED as the image is now the background of the header */}
         </div>
       </header>
 
       <main className="main-content">
-        {/* ABOUT Section */}
+        {/* ABOUT Section (Pushed down by margin-top in CSS to clear the search bar) */}
         <section
           className={`about-section scroll-animate ${visible.about ? "is-visible" : ""}`}
         >
@@ -321,7 +311,6 @@ export default function Homepage() {
 
             <div className="about-media">
               <div className="youtube-wrapper">
-                {/* Simplified iframe logic: attempts to convert a watch URL to an embed URL */}
                 <iframe
                   src={videoToUse}
                   title="Resort Preview Video"
@@ -348,7 +337,6 @@ export default function Homepage() {
             <h3>Rooms & Accommodations</h3>
             <p>Comfortable rooms curated for a relaxing stay.</p>
           </div>
-
           <div className="cards-grid horizontal-scroll">
             {rooms.map((r, idx) => (
               <article className="card" key={r.id || idx}>
@@ -382,7 +370,6 @@ export default function Homepage() {
             <h3>Island Hopping & Tours</h3>
             <p>Explore nearby islands with guided tours and boat trips.</p>
           </div>
-
           <div className="cards-grid horizontal-scroll">
             {islandHops.map((p, idx) => (
               <article className="card wide" key={p.id || idx}>
@@ -419,7 +406,6 @@ export default function Homepage() {
             <h3>Guest Feedback</h3>
             <p>What our guests say about their stay.</p>
           </div>
-
           <div className="feedback-carousel horizontal-scroll">
             {feedbacks.map((f, i) => (
               <blockquote className="feedback-card" key={f.id || i}>
