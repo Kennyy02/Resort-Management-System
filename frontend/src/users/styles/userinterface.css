@@ -185,8 +185,8 @@ section.is-visible {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    /* 🔴 FIX 1: Reduced margin-top (from 15vh) to move the text/buttons lower */
-    margin-top: 10vh; 
+    /* 🔴 FIX: Reduced margin-top (from 10vh) to move the text/buttons lower */
+    margin-top: 7vh; 
     /* Space between text block and search bar */
     margin-bottom: 9rem; 
 }
@@ -246,7 +246,7 @@ section.is-visible {
 
 .search-button {
   width: 100%;
-  /* 🔴 FIX 2: Reduced padding (from 0.75rem) to make the button smaller */
+  /* Reduced padding to make the button smaller */
   padding: 0.6rem 1rem; 
   font-size: 1rem;
   background-color: var(--primary-color);
