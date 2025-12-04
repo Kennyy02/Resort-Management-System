@@ -1,118 +1,108 @@
-/* admin/pages/login.css */
+/* login.css */
 
-body {
-    font-family: "Inter", sans-serif;
-    background-color: #f0f2f5; 
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    color: #333;
-    box-sizing: border-box;
-}
-
+/* Container styling */
 .login-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    min-height: 100vh;
-    padding: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #f8f9fa;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .login-box {
-    background-color: white;
-    padding: 2.5rem;
-    border-radius: 1rem;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 450px;
-    text-align: center;
-    box-sizing: border-box;
+  background: #ffffff;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
 }
 
 .login-title {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: #8fbc8f;
-    margin-bottom: 2.5rem;
+  text-align: center;
+  margin-bottom: 30px;
+  color: #38761d;
 }
 
+/* Messages */
 .login-message {
-    padding: 0.75rem 1rem;
-    border-radius: 0.5rem;
-    margin-bottom: 1.5rem;
-    font-size: 0.9rem;
-    font-weight: 500;
+  text-align: center;
+  margin-bottom: 20px;
+  font-weight: 500;
 }
 
 .login-message.success {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
+  color: green;
 }
 
 .login-message.error {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
+  color: red;
 }
 
-.login-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-
-.form-group {
-    text-align: left;
+/* Form fields */
+.login-form .form-group {
+  margin-bottom: 20px;
 }
 
 .form-group label {
-    display: block;
-    margin-bottom: 0.6rem;
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: #555;
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #333333;
 }
 
 .form-input {
-    width: 100%;
-    padding: 0.85rem 1.1rem;
-    border: 1px solid #ccc;
-    border-radius: 0.6rem;
-    font-size: 1rem;
-    color: #333; /* The key fix: This ensures text is visible. */
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #cccccc;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.3s;
 }
 
 .form-input:focus {
-    outline: none;
-    border-color: #8fbc8f;
-    box-shadow: 0 0 0 4px rgba(143, 188, 143, 0.25);
+  outline: none;
+  border-color: #38761d;
 }
 
+/* Password wrapper for Show/Hide */
+.password-wrapper {
+  position: relative;
+}
+
+.show-password-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: #38761d;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 4px 8px;
+  font-size: 13px;
+}
+
+.show-password-btn:hover {
+  text-decoration: underline;
+}
+
+/* Login button */
 .login-button {
-    background-color: #8fbc8f;
-    color: white;
-    padding: 1rem 1.8rem;
-    border: none;
-    border-radius: 0.6rem;
-    font-size: 1.2rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background-color 0.2s ease, transform 0.1s ease;
-    width: 100%;
-    margin-top: 2rem;
+  width: 100%;
+  padding: 12px;
+  background-color: #38761d;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 .login-button:hover {
-    background-color: #7a9e7a;
-    transform: translateY(-2px);
-}
-
-.login-button:active {
-    transform: translateY(0);
+  background-color: #2e5a17;
 }
