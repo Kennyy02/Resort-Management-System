@@ -1,145 +1,114 @@
-/* ===========================
-   LOGIN PAGE - CLEAN MODERN UI
-   =========================== */
-
-body {
-  margin: 0;
-  padding: 0;
-  font-family: "Inter", Arial, sans-serif;
-  background: linear-gradient(135deg, #1a1f2b, #2e3752);
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Center Wrapper */
+/* Center the login box */
 .login-container {
   width: 100%;
+  height: 100vh;
   display: flex;
   justify-content: center;
-  padding: 20px;
+  align-items: center;
+  background: #ffffff; /* plain white background only */
+  padding: 0;
+  margin: 0;
 }
 
-/* Login Card */
+/* Small, compact login form */
 .login-box {
+  width: 280px;               /* around 2–3 inches */
+  padding: 20px 18px;
   background: #ffffff;
-  width: 380px;
-  padding: 35px 30px;
-  border-radius: 16px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.18);
-  animation: fadeIn 0.4s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
 /* Title */
 .login-title {
   text-align: center;
-  margin-bottom: 25px;
-  font-size: 24px;
-  font-weight: 700;
-  color: #2d2d2d;
+  margin-bottom: 12px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
 }
 
-/* Message */
+/* Messages */
 .login-message {
-  padding: 10px 12px;
-  border-radius: 8px;
-  margin-bottom: 15px;
-  font-size: 14px;
+  font-size: 13px;
+  padding: 8px;
+  border-radius: 5px;
   text-align: center;
+  margin-bottom: 10px;
 }
 
 .login-message.error {
-  background: #ffe6e6;
-  color: #c62828;
-  border: 1px solid #ffb3b3;
+  background: #ffeaea;
+  color: #cc0000;
 }
 
 .login-message.success {
-  background: #e6ffe6;
-  color: #2e7d32;
-  border: 1px solid #b3ffb3;
+  background: #eaffe6;
+  color: #2a8a2a;
 }
 
-/* Form */
+/* Form layout */
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 12px;
 }
 
 .form-group label {
-  font-size: 14px;
-  color: #333;
-  margin-bottom: 5px;
+  font-size: 13px;
+  margin-bottom: 3px;
   display: block;
+  color: #333;
 }
 
 /* Inputs */
 .form-input {
   width: 100%;
-  padding: 12px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-  outline: none;
-  transition: 0.2s;
+  padding: 8px 10px;
+  font-size: 13px;
+  border-radius: 5px;
+  border: 1px solid #cfcfcf;
 }
 
 .form-input:focus {
-  border-color: #4b70f5;
-  box-shadow: 0 0 4px rgba(75, 112, 245, 0.4);
+  border-color: #6a8bff;
+  outline: none;
 }
 
-/* Password Wrapper */
+/* Password show btn */
 .password-wrapper {
   display: flex;
+  gap: 5px;
   align-items: center;
-  gap: 8px;
 }
 
 .show-password-btn {
-  background: #e3e6f1;
+  padding: 7px 10px;
+  font-size: 12px;
+  background: #ededed;
   border: none;
-  padding: 10px 14px;
-  border-radius: 8px;
+  border-radius: 4px;
   cursor: pointer;
-  transition: 0.2s;
-  font-size: 13px;
 }
 
 .show-password-btn:hover {
-  background: #d0d4e2;
+  background: #dcdcdc;
 }
 
-/* Submit Button */
+/* Login button */
 .login-button {
   width: 100%;
-  padding: 12px;
-  background: #4b70f5;
-  color: #fff;
+  margin-top: 5px;
+  padding: 9px;
+  font-size: 14px;
   border: none;
-  border-radius: 12px;
-  font-size: 16px;
+  border-radius: 6px;
+  background: #6a8bff;
+  color: white;
   cursor: pointer;
-  margin-top: 10px;
-  transition: 0.25s;
-  font-weight: 600;
 }
 
 .login-button:hover {
-  background: #3d5ed8;
-}
-
-/* Mobile */
-@media (max-width: 480px) {
-  .login-box {
-    width: 90%;
-    padding: 28px 20px;
-  }
+  background: #5877e6;
 }
