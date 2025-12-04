@@ -140,8 +140,8 @@ section.is-visible {
 
 /* --- Hero Section --- */
 .hero {
-  /* 🔴 FIX: Reduced min-height to crop the image and make the hero section shorter */
-  min-height: 75vh; 
+  /* 🔴 FIX 1: Slightly reduced min-height for further cropping */
+  min-height: 70vh; 
   display: flex;
   align-items: flex-start; 
   color: white;
@@ -186,8 +186,8 @@ section.is-visible {
     text-align: center;
     /* Pushes content down from the top edge of the hero */
     margin-top: 15vh; 
-    /* 🔴 FIX: Increased space below text to push the search bar lower */
-    margin-bottom: 8rem; 
+    /* 🔴 FIX 2: Increased space below text to push the search bar lower */
+    margin-bottom: 9rem; 
 }
 
 /* --- Availability Search Box Positioning (Desktop) --- */
@@ -203,8 +203,8 @@ section.is-visible {
   position: absolute; 
   left: 50%;
   bottom: 0; /* Aligns with the bottom of the hero section */
-  /* Translates horizontally to center, and 50% down to create the overlap */
-  transform: translate(-50%, 50%); 
+  /* 🔴 FIX 3: Increased translation to 75% to push the box down further (more than half its height) */
+  transform: translate(-50%, 75%); 
   z-index: 3; 
 }
 
@@ -283,8 +283,8 @@ section.is-visible {
 
 /* --- About Section --- */
 .about-section {
-    /* 🔴 FIX: Increased margin-top to clear the search bar that was pushed lower */
-    margin-top: 12rem; 
+    /* 🔴 FIX 4: Increased margin-top to clear the search bar that was pushed lower (now ~14rem) */
+    margin-top: 14rem; 
 }
 
 /* --- About Section (Content below the Hero) --- */
