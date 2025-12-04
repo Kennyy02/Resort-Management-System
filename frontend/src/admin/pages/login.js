@@ -6,6 +6,7 @@ const AdminLogin = () => {
   const [staffId, setStaffId] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // new state
   const [message, setMessage] = useState(null);
 
   const navigate = useNavigate();
@@ -17,14 +18,14 @@ const AdminLogin = () => {
       const res = await fetch(`${process.env.REACT_APP_ADMIN_API}/admin-login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ staffId, email, password }), // <-- FIXED HERE
+        body: JSON.stringify({ staffId, email, password }),
       });
 
       const data = await res.json();
 
       if (res.ok) {
         localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('admin', JSON.stringify(data.admin)); // store admin info
+        localStorage.setItem('admin', JSON.stringify(data.admin));
         console.log('Login successful, navigating...');
         navigate('/admin/analytics'); 
       } else {
@@ -72,13 +73,22 @@ const AdminLogin = () => {
 
           <div className="form-group">
             <label>Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="form-input"
-            />
+            <div className="password-wrapper">
+              <input
+                type={showPassword ? 'text' : 'password'} // toggles password visibility
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="form-input"
+              />
+              <button
+                type="button"
+                className="show-password-btn"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? 'Hide' : 'Show'}
+              </button>
+            </div>
           </div>
 
           <button type="submit" className="login-button">
