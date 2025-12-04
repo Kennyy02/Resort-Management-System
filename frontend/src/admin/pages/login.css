@@ -1,195 +1,145 @@
-/* * 1. Global Setup and Centering
- * Sets up a full-screen, centered background for the login card.
- */
-:root {
-    /* Define primary colors based on a dark, professional theme 
-       (adjust these if you want different colors later) */
-    --primary-color: #3b82f6; /* Tailwind blue-500 equivalent */
-    --text-color: #f3f4f6;   /* Light gray for text */
-    --card-bg: rgba(255, 255, 255, 0.1); /* Semi-transparent for glass effect */
-    --input-bg: rgba(255, 255, 255, 0.2);
-    --border-color: rgba(255, 255, 255, 0.5);
-    --shadow-color: rgba(0, 0, 0, 0.3);
-}
+/* ===========================
+   LOGIN PAGE - CLEAN MODERN UI
+   =========================== */
 
 body {
-    margin: 0;
-    font-family: 'Inter', sans-serif;
-    /* Use a dark background to make the light card stand out */
-    background: #111827; 
+  margin: 0;
+  padding: 0;
+  font-family: "Inter", Arial, sans-serif;
+  background: linear-gradient(135deg, #1a1f2b, #2e3752);
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+/* Center Wrapper */
 .login-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    padding: 20px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
 }
 
-/* * 2. Login Box (The Card)
- * Creates the centered, rounded, semi-transparent card effect.
- */
+/* Login Card */
 .login-box {
-    width: 100%;
-    max-width: 400px; /* Max width for desktop/tablet view */
-    background: var(--card-bg);
-    border-radius: 20px;
-    padding: 40px 30px;
-    box-shadow: 0 10px 30px var(--shadow-color);
-    backdrop-filter: blur(10px); /* Key for the glass effect */
-    border: 1px solid var(--border-color);
-    position: relative; /* For the absolute icon above the box */
+  background: #ffffff;
+  width: 380px;
+  padding: 35px 30px;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.18);
+  animation: fadeIn 0.4s ease;
 }
 
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Title */
 .login-title {
-    text-align: center;
-    color: var(--text-color);
-    margin-bottom: 30px;
-    font-size: 1.8rem;
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 24px;
+  font-weight: 700;
+  color: #2d2d2d;
 }
 
-/* * 3. Form Group and Inputs (The Compact Design)
- * Hides the separate labels and integrates the icon look.
- */
-.login-form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px; /* Compact spacing between fields */
-}
-
-.form-group {
-    /* Set up relative positioning for absolute icon placement */
-    position: relative;
-    /* Hide the default label to achieve the compact look */
-}
-
-.form-group label {
-    display: none; 
-}
-
-.form-input {
-    width: 100%;
-    padding: 12px 12px 12px 40px; /* Increased left padding for the icon */
-    background: var(--input-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    color: var(--text-color);
-    font-size: 1rem;
-    transition: all 0.2s ease;
-}
-
-.form-input:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    background: rgba(255, 255, 255, 0.3);
-    box-shadow: 0 0 0 2px var(--primary-color);
-}
-
-/* Icon Simulation using ::before on the form group */
-.form-group::before {
-    content: ''; 
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 1.1rem;
-    color: var(--text-color);
-    pointer-events: none; /* Allows clicks to pass through to the input */
-    z-index: 10;
-}
-
-/* Specific Icons based on field type/order */
-/* Staff ID / Email */
-.login-form .form-group:nth-child(1)::before,
-.login-form .form-group:nth-child(2)::before {
-    /* Unicode for a simple person icon (Fallback for Font Awesome) */
-    content: '\1F464'; 
-    font-size: 18px;
-}
-
-/* Password */
-.login-form .form-group:nth-child(3)::before {
-    /* Unicode for a simple lock icon (Fallback for Font Awesome) */
-    content: '\1F512';
-    font-size: 18px;
-}
-
-
-/* * 4. Password Wrapper and Show/Hide Button
- */
-.password-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-
-/* Adjust input within wrapper to fit button */
-.password-wrapper .form-input {
-    padding-right: 80px; /* Extra space for the Show/Hide button */
-}
-
-.show-password-btn {
-    position: absolute;
-    right: 1px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: transparent;
-    border: none;
-    color: var(--text-color);
-    padding: 8px 12px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    font-weight: 600;
-    border-radius: 0 8px 8px 0;
-    transition: background-color 0.2s;
-}
-
-.show-password-btn:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-}
-
-/* * 5. Login Button
- */
-.login-button {
-    width: 100%;
-    padding: 12px;
-    margin-top: 10px;
-    background: var(--primary-color);
-    color: white;
-    font-size: 1.1rem;
-    font-weight: bold;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.2s, transform 0.1s;
-}
-
-.login-button:hover {
-    background-color: #2563eb; /* Darker blue */
-}
-
-.login-button:active {
-    transform: scale(0.99);
-}
-
-/* * 6. Message (Error/Success)
- */
+/* Message */
 .login-message {
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    text-align: center;
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  font-size: 14px;
+  text-align: center;
 }
 
 .login-message.error {
-    background-color: rgba(252, 165, 165, 0.3); /* Red-ish background */
-    color: #f87171; /* Brighter red text */
-    border: 1px solid #f87171;
+  background: #ffe6e6;
+  color: #c62828;
+  border: 1px solid #ffb3b3;
 }
 
 .login-message.success {
-    background-color: rgba(167, 243, 208, 0.3); /* Green-ish background */
-    color: #34d399; /* Brighter green text */
-    border: 1px solid #34d399;
+  background: #e6ffe6;
+  color: #2e7d32;
+  border: 1px solid #b3ffb3;
+}
+
+/* Form */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.form-group label {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 5px;
+  display: block;
+}
+
+/* Inputs */
+.form-input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  outline: none;
+  transition: 0.2s;
+}
+
+.form-input:focus {
+  border-color: #4b70f5;
+  box-shadow: 0 0 4px rgba(75, 112, 245, 0.4);
+}
+
+/* Password Wrapper */
+.password-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.show-password-btn {
+  background: #e3e6f1;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+  font-size: 13px;
+}
+
+.show-password-btn:hover {
+  background: #d0d4e2;
+}
+
+/* Submit Button */
+.login-button {
+  width: 100%;
+  padding: 12px;
+  background: #4b70f5;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: 0.25s;
+  font-weight: 600;
+}
+
+.login-button:hover {
+  background: #3d5ed8;
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .login-box {
+    width: 90%;
+    padding: 28px 20px;
+  }
 }
