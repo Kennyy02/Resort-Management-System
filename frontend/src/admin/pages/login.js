@@ -2,23 +2,17 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './login.css';
 
-const AdminLogin = () => {
+const AdminLogin = ({ onLogin }) => { // Note the prop destructuring here
   const [staffId, setStaffId] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState(null);
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate(); // We don't strictly need this now
 
-  // We keep the 'e' argument just in case, but rely on the button click
   const handleSubmit = async (e) => {
-    // Remove e.preventDefault() if you remove the onSubmit handler, 
-    // or keep it if you want to be extra safe:
-    if (e && e.preventDefault) {
-        e.preventDefault();
-    }
-    
+    e.preventDefault(); // Keep this for standard form handling
 
     try {
       const res = await fetch(`${process.env.REACT_APP_ADMIN_API}/admin-login`, {
@@ -30,11 +24,17 @@ const AdminLogin = () => {
       const data = await res.json();
 
       if (res.ok) {
+        // Backend returned 200 OK. Save data and redirect.
         localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('admin', JSON.stringify(data.admin));
-        console.log('Login successful, forcing redirect...');
+        // Ensure the server response includes 'admin' data with a 'role' property!
+        localStorage.setItem('user', JSON.stringify({ ...data.admin, role: data.role }));
+        
+        // Call the parent handler (if needed for App.js state):
+        if (onLogin) onLogin();
+        
+        console.log('Login successful, forcing hard redirect...');
         
-        // Use the reliable hard redirect:
+        // FINAL FIX: FORCING BROWSER NAVIGATION
         window.location.href = '/admin/analytics'; 
         
       } else {
@@ -57,8 +57,8 @@ const AdminLogin = () => {
           </p>
         )}
 
-        {/* REMOVED onSubmit={handleSubmit} */}
-        <form className="login-form"> 
+        {/* NOTE: Reverting form structure to original and using onSubmit */}
+        <form onSubmit={handleSubmit} className="login-form">
           <div className="form-group">
             <label>Staff ID</label>
             <input
@@ -85,7 +85,7 @@ const AdminLogin = () => {
             <label>Password</label>
             <div className="password-wrapper">
               <input
-                type={showPassword ? 'text' : 'password'} // toggles password visibility
+                type={showPassword ? 'text' : 'password'} 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -101,8 +101,8 @@ const AdminLogin = () => {
             </div>
           </div>
 
-          {/* CHANGED TYPE AND ADDED onClick HANDLER */}
-          <button type="button" onClick={handleSubmit} className="login-button">
+          {/* NOTE: Reverting button type to submit */}
+          <button type="submit" className="login-button">
             Log In
           </button>
         </form>
