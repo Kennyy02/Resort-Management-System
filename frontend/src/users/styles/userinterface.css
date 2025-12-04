@@ -68,20 +68,21 @@ h3 {
   border-radius: 8px; 
 }
 
-/* Hero CTA Button Styling (Solid White with Dark Text) */
+/* Hero CTA Button Styling (Transparent Background with White Border) */
 .hero-cta button,
 .hero-cta button.ghost {
-  border: none;
-  background-color: white;
-  color: var(--text-color);
+  background-color: transparent; 
+  border: 2px solid white;
+  color: white;
   margin-right: 1rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); 
+  box-shadow: none; 
 }
 
 .hero-cta button:hover,
 .hero-cta button.ghost:hover {
-  background-color: #e0e0e0; 
+  background-color: white; 
   color: var(--text-color);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); 
 }
 
 /* About Section Button (Primary Outline) */
@@ -140,7 +141,7 @@ section.is-visible {
 
 /* --- Hero Section --- */
 .hero {
-  /* 🔴 FIX 1: Slightly reduced min-height for further cropping */
+  /* Reduced min-height for further cropping */
   min-height: 70vh; 
   display: flex;
   align-items: flex-start; 
@@ -184,9 +185,9 @@ section.is-visible {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    /* Pushes content down from the top edge of the hero */
-    margin-top: 15vh; 
-    /* 🔴 FIX 2: Increased space below text to push the search bar lower */
+    /* 🔴 FIX 1: Reduced margin-top (from 15vh) to move the text/buttons lower */
+    margin-top: 10vh; 
+    /* Space between text block and search bar */
     margin-bottom: 9rem; 
 }
 
@@ -203,7 +204,7 @@ section.is-visible {
   position: absolute; 
   left: 50%;
   bottom: 0; /* Aligns with the bottom of the hero section */
-  /* 🔴 FIX 3: Increased translation to 75% to push the box down further (more than half its height) */
+  /* Increased translation to 75% to push the box down further (more than half its height) */
   transform: translate(-50%, 75%); 
   z-index: 3; 
 }
@@ -245,7 +246,8 @@ section.is-visible {
 
 .search-button {
   width: 100%;
-  padding: 0.75rem 1rem;
+  /* 🔴 FIX 2: Reduced padding (from 0.75rem) to make the button smaller */
+  padding: 0.6rem 1rem; 
   font-size: 1rem;
   background-color: var(--primary-color);
   color: white;
@@ -283,7 +285,7 @@ section.is-visible {
 
 /* --- About Section --- */
 .about-section {
-    /* 🔴 FIX 4: Increased margin-top to clear the search bar that was pushed lower (now ~14rem) */
+    /* Maintained clearance for the pushed-down search bar */
     margin-top: 14rem; 
 }
 
