@@ -1,31 +1,171 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import mountainView from "../components/pictures/mountainView.jpg";
 import "./styles/userinterface.css";
 
-const ABOUT_BASE = "https://about-us-production.up.railway.app";
-const SERVICES_BASE = "https://manage-service-production.up.railway.app";
-const FEEDBACKS_BASE = "https://ratings-and-feedbacks-production.up.railway.app";
+// --- Constants & Utilities ---
 
+const BASE_URLS = {
+  ABOUT: "https://about-us-production.up.railway.app",
+  SERVICES: "https://manage-service-production.up.railway.app",
+  FEEDBACKS: "https://ratings-and-feedbacks-production.up.railway.app",
+};
+
+/**
+ * Tries to fetch data from a list of URLs sequentially until one succeeds.
+ * @param {string[]} candidates - Array of URLs to try.
+ * @param {object} config - Axios request config.
+ * @returns {Promise<{data: any, url: string | null}>}
+ */
 const tryFetch = async (candidates, config = {}) => {
   for (const url of candidates) {
     try {
       const res = await axios.get(url, config);
-      if (res && res.data !== undefined) return { data: res.data, url };
+      // Ensure the response has data and it's not null/undefined/empty string
+      if (res && res.data !== null && res.data !== undefined && res.data !== "") {
+        return { data: res.data, url };
+      }
     } catch (err) {
+      // Continue to the next URL on error
       continue;
     }
   }
   return { data: null, url: null };
 };
 
+const getImage = (item) =>
+  item?.image || item?.imageUrl || item?.photo || item?.thumbnail || null;
+
+
+// --- Custom Hook for Data Fetching ---
+
+const useResortData = () => {
+  const [data, setData] = useState({
+    about: { content: "Loading about info...", videoUrl: null },
+    rooms: [],
+    islandHops: [],
+    feedbacks: [],
+    loading: true,
+  });
+
+  const normalizeAbout = (aboutData) => {
+    let content = "";
+    let videoUrl = null;
+    let dataToProcess = aboutData;
+
+    // Handle array response (if the API returns an array of one item)
+    if (Array.isArray(aboutData) && aboutData.length > 0) {
+      dataToProcess = aboutData[0];
+    }
+
+    if (typeof dataToProcess === "object" && dataToProcess !== null) {
+      content = dataToProcess.content || dataToProcess.description || "";
+      videoUrl = dataToProcess.videoUrl || dataToProcess.video || null;
+    }
+    
+    return { 
+        content: content || "About information currently unavailable.", 
+        videoUrl 
+    };
+  };
+
+  const filterServices = (servicesData) => {
+    if (!Array.isArray(servicesData)) {
+      return { rooms: [], islandHops: [] };
+    }
+
+    const items = servicesData;
+    
+    // Logic to filter rooms (first 4)
+    const roomsList = items.filter((i) =>
+      (i.type && i.type.toLowerCase().includes("room")) ||
+      (i.category && i.category.toLowerCase().includes("room")) ||
+      (i.title && /room|suite|cottage/i.test(i.title))
+    ).slice(0, 4);
+
+    // Logic to filter island hops/tours (first 4)
+    const islandList = items.filter((i) =>
+      (i.type && i.type.toLowerCase().includes("island")) ||
+      (i.category && i.category.toLowerCase().includes("island")) ||
+      (i.title && /island|hop|boat|tour|package/i.test(i.title))
+    ).slice(0, 4);
+
+    return { rooms: roomsList, islandHops: islandList };
+  };
+
+  useEffect(() => {
+    const fetchAll = async () => {
+      // 1. Define all fetch promises using Promise.all for parallel execution
+      const aboutPromise = tryFetch([
+        `${BASE_URLS.ABOUT}/pre/api/aboutus`,
+        `${BASE_URLS.ABOUT}/api/aboutus`,
+        `${BASE_URLS.ABOUT}/aboutus`,
+        `${BASE_URLS.ABOUT}/api/v1/about`,
+      ]);
+
+      const servicesPromise = tryFetch([
+        `${BASE_URLS.SERVICES}/api/services`,
+        `${BASE_URLS.SERVICES}/services`,
+        `${BASE_URLS.SERVICES}/service`,
+        `${BASE_URLS.SERVICES}/api/v1/services`,
+      ]);
+
+      const feedbackPromise = tryFetch([
+        `${BASE_URLS.FEEDBACKS}/api/feedbacks`,
+        `${BASE_URLS.FEEDBACKS}/api/feedback`,
+        `${BASE_URLS.FEEDBACKS}/feedbacks`,
+        `${BASE_URLS.FEEDBACKS}/feedback`,
+        `${BASE_URLS.FEEDBACKS}/ratings`,
+        `${BASE_URLS.FEEDBACKS}/api/ratings`,
+      ]);
+      
+      try {
+        // 2. Execute promises in parallel
+        const [aboutResp, servicesResp, feedbackResp] = await Promise.all([
+          aboutPromise,
+          servicesPromise,
+          feedbackPromise,
+        ]);
+
+        // 3. Process and normalize data
+        const aboutData = normalizeAbout(aboutResp.data);
+        const { rooms, islandHops } = filterServices(servicesResp.data);
+        
+        const feedbacks = Array.isArray(feedbackResp.data) 
+            ? feedbackResp.data.slice(0, 4) // first 4 feedbacks
+            : [];
+
+        // 4. Update state
+        setData({
+          about: aboutData,
+          rooms,
+          islandHops,
+          feedbacks,
+          loading: false,
+        });
+
+      } catch (error) {
+        // Log the error but stop the loading state
+        console.error("Error fetching homepage data:", error);
+        setData(prev => ({ ...prev, loading: false }));
+      }
+    };
+
+    fetchAll();
+  }, []);
+
+  return data;
+};
+
+
+// --- Component ---
+
 export default function Homepage() {
   const navigate = useNavigate();
-  const [about, setAbout] = useState({ content: "Loading about info...", videoUrl: null });
-  const [rooms, setRooms] = useState([]);
-  const [islandHops, setIslandHops] = useState([]);
-  const [feedbacks, setFeedbacks] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { about, rooms, islandHops, feedbacks, loading } = useResortData();
+  
+  // State for scroll animations, retained from original component
   const [visible, setVisible] = useState({
     about: false,
     rooms: false,
@@ -33,77 +173,7 @@ export default function Homepage() {
     feedbacks: false,
   });
 
-  useEffect(() => {
-    const fetchAll = async () => {
-      const aboutResp = await tryFetch([
-        `${ABOUT_BASE}/pre/api/aboutus`,
-        `${ABOUT_BASE}/api/aboutus`,
-        `${ABOUT_BASE}/aboutus`,
-        `${ABOUT_BASE}/api/v1/about`,
-      ]);
-
-      if (aboutResp.data) {
-        let content = "";
-        let videoUrl = null;
-        if (Array.isArray(aboutResp.data) && aboutResp.data.length > 0) {
-          content = aboutResp.data[0].content || aboutResp.data[0].description || "";
-          videoUrl = aboutResp.data[0].videoUrl || aboutResp.data[0].video || null;
-        } else if (typeof aboutResp.data === "object") {
-          content = aboutResp.data.content || aboutResp.data.description || "";
-          videoUrl = aboutResp.data.videoUrl || aboutResp.data.video || null;
-        }
-        setAbout({ content, videoUrl });
-      } else {
-        setAbout({ content: "About information currently unavailable.", videoUrl: null });
-      }
-
-      const servicesResp = await tryFetch([
-        `${SERVICES_BASE}/api/services`,
-        `${SERVICES_BASE}/services`,
-        `${SERVICES_BASE}/service`,
-        `${SERVICES_BASE}/api/v1/services`,
-      ]);
-
-      if (servicesResp.data && Array.isArray(servicesResp.data)) {
-        const items = servicesResp.data;
-        const roomsList = items.filter((i) =>
-          (i.type && i.type.toLowerCase().includes("room")) ||
-          (i.category && i.category.toLowerCase().includes("room")) ||
-          (i.title && /room|suite|cottage/i.test(i.title))
-        ).slice(0, 4); // first 4 rooms
-        const islandList = items.filter((i) =>
-          (i.type && i.type.toLowerCase().includes("island")) ||
-          (i.category && i.category.toLowerCase().includes("island")) ||
-          (i.title && /island|hop|boat|tour|package/i.test(i.title))
-        ).slice(0, 4); // first 4 island hops
-        setRooms(roomsList);
-        setIslandHops(islandList);
-      } else {
-        setRooms([]);
-        setIslandHops([]);
-      }
-
-      const feedbackResp = await tryFetch([
-        `${FEEDBACKS_BASE}/api/feedbacks`,
-        `${FEEDBACKS_BASE}/api/feedback`,
-        `${FEEDBACKS_BASE}/feedbacks`,
-        `${FEEDBACKS_BASE}/feedback`,
-        `${FEEDBACKS_BASE}/ratings`,
-        `${FEEDBACKS_BASE}/api/ratings`,
-      ]);
-
-      if (feedbackResp.data && Array.isArray(feedbackResp.data)) {
-        setFeedbacks(feedbackResp.data.slice(0, 4)); // first 4 feedbacks
-      } else {
-        setFeedbacks([]);
-      }
-
-      setLoading(false);
-    };
-
-    fetchAll();
-  }, []);
-
+  // Effect for IntersectionObserver (scroll animation), retained from original
   useEffect(() => {
     const callback = (entries) => {
       entries.forEach((e) => {
@@ -117,59 +187,45 @@ export default function Homepage() {
       });
     };
     const observer = new IntersectionObserver(callback, { threshold: 0.15 });
+    
+    // Observe all elements with the 'scroll-animate' class
     document.querySelectorAll(".scroll-animate").forEach((el) => observer.observe(el));
+    
+    // Cleanup function
     return () => observer.disconnect();
   }, []);
 
-  const getImage = (item) =>
-    item?.image || item?.imageUrl || item?.photo || item?.thumbnail || null;
+  // Default YouTube URL to display if the API doesn't provide one
+  const defaultVideoUrl = "https://www.youtube.com/embed/f4eLvLbREEI";
+  const videoToUse = about.videoUrl ? about.videoUrl.replace('watch?v=', 'embed/') : defaultVideoUrl;
+  const videoLinkUrl = about.videoUrl || "https://youtu.be/f4eLvLbREEI";
 
   return (
     <div className="homepage-root">
+      {/* Hero Section */}
       <header className="hero large-hero">
         <div className="hero-inner">
           <div className="hero-left">
-            {/* NEW: Pre-title matching the sample image */}
-            <p className="hero-pre-title">GET LUXURY & COMFORT</p> 
-            {/* NEW: Headline matching the sample image */}
-            <h1 className="hero-title">The Best Coolest Place Where Luxury Meets Affordability</h1>
+            <h1 className="hero-title">EM'z Bayview Mountain Resort</h1>
             <p className="hero-sub">
-                Natoque elementum sed pretium, orci officia penatibus eu venenatis imperdiet, donec sociis rhoncus diserant proin. Mius, blandias magnis do provident quoisque natnum sunt quia fuga.
+              A peaceful escape — book rooms, join island hopping, and make memories.
             </p>
             <div className="hero-cta">
-              <button onClick={() => navigate("/services")}>BOOK NOW</button>
+              <button onClick={() => navigate("/services")}>Explore Rooms</button>
               <button className="ghost" onClick={() => navigate("/services")}>
-                EXPLORE NOW
+                Island Hopping
               </button>
             </div>
           </div>
-          
-          {/* NEW: Price and Rating Floating Box */}
-          <div className="price-rating-box">
-            <div className="price-info">
-                <span className="price-label">PRICE STARTS FROM</span>
-                <div className="price-value">
-                    <span className="currency-amount">₱2,000</span>
-                    <span className="per-night">/NIGHT</span>
-                </div>
-            </div>
-            <div className="rating-info">
-                <div className="rating-score">4.7</div>
-                <div className="rating-details">
-                    <p>800 Reviews</p>
-                    <p>From Google Business</p>
-                </div>
-            </div>
-          </div>
-          {/* REMOVED: hero-image-wrapper */}
 
+          <div className="hero-image-wrapper">
+            <img src={mountainView} alt="Mountain view resort" />
+          </div>
         </div>
       </header>
-      
-      {/* ... The rest of your main content remains the same ... */}
 
       <main className="main-content">
-        {/* ABOUT */}
+        {/* ABOUT Section */}
         <section
           className={`about-section scroll-animate ${visible.about ? "is-visible" : ""}`}
         >
@@ -190,15 +246,16 @@ export default function Homepage() {
 
             <div className="about-media">
               <div className="youtube-wrapper">
+                {/* Simplified iframe logic: attempts to convert a watch URL to an embed URL */}
                 <iframe
-                  src={about.videoUrl || "https://www.youtube.com/embed/f4eLvLbREEI"}
+                  src={videoToUse}
                   title="Resort Preview Video"
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                 ></iframe>
                 <a
-                  href={about.videoUrl || "https://youtu.be/f4eLvLbREEI"}
+                  href={videoLinkUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="video-link"
@@ -210,7 +267,7 @@ export default function Homepage() {
           </div>
         </section>
 
-        {/* ROOMS */}
+        {/* ROOMS Section */}
         <section className={`rooms-section scroll-animate ${visible.rooms ? "is-visible" : ""}`}>
           <div className="section-header">
             <h3>Rooms & Accommodations</h3>
@@ -239,10 +296,12 @@ export default function Homepage() {
                 </div>
               </article>
             ))}
+            {loading && rooms.length === 0 && <p className="muted">Loading rooms...</p>}
+            {!loading && rooms.length === 0 && <p className="muted">No rooms found.</p>}
           </div>
         </section>
 
-        {/* ISLAND HOPPING */}
+        {/* ISLAND HOPPING Section */}
         <section className={`island-section scroll-animate ${visible.island ? "is-visible" : ""}`}>
           <div className="section-header">
             <h3>Island Hopping & Tours</h3>
@@ -274,10 +333,12 @@ export default function Homepage() {
                 </div>
               </article>
             ))}
+            {loading && islandHops.length === 0 && <p className="muted">Loading island tours...</p>}
+            {!loading && islandHops.length === 0 && <p className="muted">No tours found.</p>}
           </div>
         </section>
 
-        {/* FEEDBACK */}
+        {/* FEEDBACK Section */}
         <section className={`feedbacks-section scroll-animate ${visible.feedbacks ? "is-visible" : ""}`}>
           <div className="section-header">
             <h3>Guest Feedback</h3>
@@ -296,7 +357,8 @@ export default function Homepage() {
                 </footer>
               </blockquote>
             ))}
-            {feedbacks.length === 0 && <p className="muted">No feedbacks yet.</p>}
+            {loading && feedbacks.length === 0 && <p className="muted">Loading feedbacks...</p>}
+            {!loading && feedbacks.length === 0 && <p className="muted">No feedbacks yet.</p>}
           </div>
         </section>
       </main>
