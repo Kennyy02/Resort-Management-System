@@ -6,13 +6,19 @@ const AdminLogin = () => {
   const [staffId, setStaffId] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false); // new state
+  const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState(null);
 
-  const navigate = useNavigate(); // Still imported, but we will bypass it on success
+  const navigate = useNavigate();
 
+  // We keep the 'e' argument just in case, but rely on the button click
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    // Remove e.preventDefault() if you remove the onSubmit handler, 
+    // or keep it if you want to be extra safe:
+    if (e && e.preventDefault) {
+        e.preventDefault();
+    }
+    
 
     try {
       const res = await fetch(`${process.env.REACT_APP_ADMIN_API}/admin-login`, {
@@ -28,10 +34,7 @@ const AdminLogin = () => {
         localStorage.setItem('admin', JSON.stringify(data.admin));
         console.log('Login successful, forcing redirect...');
         
-        // -----------------------------------------------------------------
-        // THE FIX: Use window.location.href to force the browser to navigate
-        // to the dashboard, bypassing potential React Router issues.
-        // -----------------------------------------------------------------
+        // Use the reliable hard redirect:
         window.location.href = '/admin/analytics'; 
         
       } else {
@@ -54,7 +57,8 @@ const AdminLogin = () => {
           </p>
         )}
 
-        <form onSubmit={handleSubmit} className="login-form">
+        {/* REMOVED onSubmit={handleSubmit} */}
+        <form className="login-form"> 
           <div className="form-group">
             <label>Staff ID</label>
             <input
@@ -97,7 +101,8 @@ const AdminLogin = () => {
             </div>
           </div>
 
-          <button type="submit" className="login-button">
+          {/* CHANGED TYPE AND ADDED onClick HANDLER */}
+          <button type="button" onClick={handleSubmit} className="login-button">
             Log In
           </button>
         </form>
@@ -105,4 +110,5 @@ const AdminLogin = () => {
     </div>
   );
 };
+
 export default AdminLogin;
