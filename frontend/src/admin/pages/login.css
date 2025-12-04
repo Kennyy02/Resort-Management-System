@@ -1,146 +1,111 @@
-/* login.css - Minimal, Compact, White Card Design */
-
-/* --- 1. Main Layout and Container --- */
-
+/* --- Container --- */
 .login-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background-color: #f0f0f0; /* Light gray background */
-    font-family: Arial, sans-serif;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f5f6fa;
 }
 
+/* --- Box --- */
 .login-box {
-    background-color: #ffffff;
-    /* Tighter padding for a compact look */
-    padding: 30px;
-    border-radius: 15px; /* Nice rounded corners */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Soft shadow */
-    width: 100%;
-    max-width: 350px; /* Compact width */
-    text-align: center;
+  width: 360px;
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
 }
 
+/* --- Title --- */
 .login-title {
-    font-size: 24px;
-    font-weight: 600;
-    color: #333333;
-    margin-bottom: 25px; /* Reduced space below title */
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #333;
+  letter-spacing: 0.5px;
 }
 
-/* --- 2. Form Styling (Focus on minimal vertical gap) --- */
-
-.login-form {
-    display: flex;
-    flex-direction: column;
-    /* Tighter vertical space between groups */
-    gap: 12px; 
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-    /* Ensure no external margin/padding is inherited */
-    margin: 0;
-    padding: 0;
-}
-
-.form-group label {
-    font-size: 13px;
-    color: #555555;
-    /* Reduced margin below label */
-    margin-bottom: 5px; 
-    text-align: left;
-    font-weight: 500;
-}
-
-.form-input {
-    /* Reduced vertical padding inside the input */
-    padding: 10px 15px;
-    border: 1px solid #cccccc;
-    border-radius: 8px;
-    font-size: 15px;
-    transition: border-color 0.3s;
-}
-
-.form-input:focus {
-    border-color: #4CAF50; /* Green highlight on focus */
-    outline: none;
-}
-
-/* --- 3. Password Visibility Toggle --- */
-
-.password-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-
-.password-wrapper .form-input {
-    width: 100%;
-    padding-right: 70px;
-}
-
-.show-password-btn {
-    position: absolute;
-    right: 5px;
-    /* Vertically align button */
-    top: 50%;
-    transform: translateY(-50%);
-    
-    padding: 5px 10px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 13px;
-    color: #007bff; /* Blue link color */
-    font-weight: 500;
-}
-
-.show-password-btn:hover {
-    text-decoration: underline;
-}
-
-/* --- 4. Login Button (Solid Green as seen in your screenshot) --- */
-
-.login-button {
-    padding: 12px;
-    background-color: #4CAF50; /* Primary Green Color */
-    color: white;
-    font-size: 18px;
-    font-weight: bold;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    /* Reduced margin above button */
-    margin-top: 20px; 
-}
-
-.login-button:hover {
-    background-color: #45a049; /* Darker green on hover */
-}
-
-/* --- 5. Message/Alerts --- */
-
+/* --- Messages --- */
 .login-message {
-    padding: 10px;
-    border-radius: 6px;
-    margin-bottom: 20px;
-    text-align: center;
-    font-size: 14px;
-    font-weight: 600;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-bottom: 15px;
+  text-align: center;
 }
 
 .login-message.error {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
+  background: #ffe5e5;
+  color: #d90000;
 }
 
 .login-message.success {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
+  background: #e5ffe9;
+  color: #0c8b2f;
+}
+
+/* --- Inputs --- */
+.form-group {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  font-size: 14px;
+  color: #444;
+  margin-bottom: 6px;
+}
+
+.form-input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 15px;
+  transition: 0.2s;
+}
+
+.form-input:focus {
+  border-color: #4c8df6;
+  box-shadow: 0 0 0 2px rgba(76,141,246,0.15);
+  outline: none;
+}
+
+/* --- Password Wrapper --- */
+.password-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.show-password-btn {
+  margin-left: 8px;
+  padding: 9px 12px;
+  font-size: 13px;
+  background: #eee;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.show-password-btn:hover {
+  background: #ddd;
+}
+
+/* --- Login Button --- */
+.login-button {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  margin-top: 5px;
+  background: #4c8df6;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.login-button:hover {
+  background: #3a7ce3;
 }
