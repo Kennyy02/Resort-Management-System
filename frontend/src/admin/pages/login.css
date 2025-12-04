@@ -1,108 +1,146 @@
-/* login.css */
+/* Root variables for colors and fonts */
+:root {
+  --primary-color: #38761d;
+  --secondary-color: #f8f9fa;
+  --text-color: #333;
+  --error-color: #d9534f;
+  --success-color: #5cb85c;
+  --input-border: #ccc;
+  --input-focus: #38761d;
+  --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 
-/* Container styling */
-.login-container {
+/* --------------------- Body & Container --------------------- */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-family);
+  background: linear-gradient(135deg, #93c47d, #6aa84f);
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  background: #f8f9fa;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.login-container {
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
 }
 
 .login-box {
-  background: #ffffff;
-  padding: 40px;
+  background-color: var(--secondary-color);
   border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 400px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  padding: 30px 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .login-title {
   text-align: center;
-  margin-bottom: 30px;
-  color: #38761d;
+  color: var(--primary-color);
+  font-size: 1.8rem;
+  margin: 0;
+  font-weight: bold;
 }
 
-/* Messages */
+/* --------------------- Messages --------------------- */
 .login-message {
   text-align: center;
-  margin-bottom: 20px;
   font-weight: 500;
-}
-
-.login-message.success {
-  color: green;
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin-bottom: 10px;
 }
 
 .login-message.error {
-  color: red;
+  background-color: #f8d7da;
+  color: var(--error-color);
 }
 
-/* Form fields */
-.login-form .form-group {
-  margin-bottom: 20px;
+.login-message.success {
+  background-color: #d4edda;
+  color: var(--success-color);
+}
+
+/* --------------------- Form & Inputs --------------------- */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
 }
 
 .form-group label {
-  display: block;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
+  color: var(--text-color);
   font-weight: 500;
-  color: #333333;
 }
 
 .form-input {
-  width: 100%;
   padding: 10px 12px;
-  border: 1px solid #cccccc;
-  border-radius: 6px;
-  font-size: 14px;
-  transition: border-color 0.3s;
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border 0.2s;
 }
 
 .form-input:focus {
   outline: none;
-  border-color: #38761d;
+  border-color: var(--input-focus);
+  box-shadow: 0 0 5px rgba(56, 118, 29, 0.5);
 }
 
-/* Password wrapper for Show/Hide */
+/* --------------------- Password Field --------------------- */
 .password-wrapper {
   position: relative;
+  display: flex;
 }
 
 .show-password-btn {
   position: absolute;
-  right: 10px;
+  right: 8px;
   top: 50%;
   transform: translateY(-50%);
   background: transparent;
   border: none;
-  color: #38761d;
-  font-weight: 500;
+  color: var(--primary-color);
+  font-weight: 600;
   cursor: pointer;
-  padding: 4px 8px;
-  font-size: 13px;
+  padding: 4px 6px;
+  font-size: 0.9rem;
 }
 
 .show-password-btn:hover {
-  text-decoration: underline;
+  opacity: 0.8;
 }
 
-/* Login button */
+/* --------------------- Submit Button --------------------- */
 .login-button {
-  width: 100%;
+  background-color: var(--primary-color);
+  color: white;
   padding: 12px;
-  background-color: #38761d;
-  color: #ffffff;
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: bold;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background 0.3s;
 }
 
 .login-button:hover {
-  background-color: #2e5a17;
+  background-color: #2e5d15;
+}
+
+/* --------------------- Responsive --------------------- */
+@media (max-width: 450px) {
+  .login-box {
+    padding: 25px 15px;
+  }
 }
