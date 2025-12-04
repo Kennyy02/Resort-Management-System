@@ -1,14 +1,10 @@
 :root {
-  /* UPDATED: Change primary color to a more modern dark blue/teal for the Hero */
-  --primary-color: #007bff; /* Use a strong blue for general accents and buttons */
-  --secondary-color: #F8F9FA; /* Off-white background */
+  --primary-color: #38761D;
+  --secondary-color: #F8F9FA;
   --text-color: #333333;
   --muted-text-color: #666666;
-  --hero-background: #0056b3; /* Darker blue for background if image fails */
+  --hero-background: #93C47D;
   --font-family-primary: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  
-  /* NEW: Variables for the floating box styling */
-  --floating-box-color: #FFFFFF;
 }
 
 * {
@@ -31,27 +27,11 @@ a {
   cursor: pointer;
 }
 
-/* --- Typography Scaling --- */
-.hero-pre-title {
-    font-size: 0.9rem;
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-    letter-spacing: 1px;
-    opacity: 0.8;
-}
-
 h1.hero-title {
-  font-size: 4rem; /* Increased size to match sample */
-  margin-bottom: 1.5rem; /* Increased space */
+  font-size: 3rem;
+  margin-bottom: 0.75rem;
   line-height: 1.1;
   font-weight: 700;
-  max-width: 700px; /* Constrain width for readability */
-}
-
-.hero-sub {
-    max-width: 550px;
-    font-size: 1.15rem;
-    margin-bottom: 2rem;
 }
 
 h3 {
@@ -67,11 +47,6 @@ h4 {
   margin-bottom: 0.5rem;
 }
 
-@media (max-width: 992px) {
-  h1.hero-title {
-    font-size: 2.8rem;
-  }
-}
 @media (max-width: 768px) {
   h1.hero-title {
     font-size: 2.2rem;
@@ -85,8 +60,6 @@ h4 {
   color: var(--muted-text-color);
   font-size: 0.9rem;
 }
-
-/* --- Utility Styles and Button Consistency --- */
 
 .btn {
   display: inline-block;
@@ -102,33 +75,26 @@ h4 {
   padding: 0.8rem 2rem;
   font-size: 1rem;
   text-transform: uppercase;
-  border-radius: 5px; 
 }
 
-/* Hero Button Styling - Using the sample's dark primary color */
 .hero-cta button {
   border: 2px solid white;
-  background-color: var(--primary-color); 
+  background-color: transparent;
   color: white;
   margin-right: 1rem;
 }
 
 .hero-cta button.ghost {
-  background-color: transparent; 
+  background-color: rgba(255, 255, 255, 0.2);
   border: 2px solid white;
 }
 
-.hero-cta button:hover {
-  background-color: #004d99; /* Darker blue on hover */
-  border-color: #004d99;
-}
+.hero-cta button:hover,
 .hero-cta button.ghost:hover {
   background-color: white;
   color: var(--primary-color);
 }
 
-
-/* About and Card Buttons - Retain previous green styling for non-hero sections */
 .about-actions .btn {
   border: 2px solid var(--primary-color);
   background-color: white;
@@ -148,10 +114,8 @@ h4 {
 }
 
 .card-footer .btn.small:hover {
-  background-color: #004d99; /* Use primary dark blue hover here too */
+  background-color: #2c5f17;
 }
-
-/* --- Homepage Layout & Spacing --- */
 
 .main-content {
   max-width: 1200px;
@@ -181,150 +145,46 @@ section.is-visible {
   color: var(--muted-text-color);
 }
 
-/* --- Hero Section (`.hero`) - FULL-BLEED IMAGE BANNER --- */
-
 .hero {
-  /* CRITICAL: Full-bleed background image with a dark overlay */
-  background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('../components/pictures/mountainView.jpg"'); 
-  background-color: var(--hero-background); 
-  background-size: cover;
-  background-position: center;
-  position: relative; /* REQUIRED for the absolute-positioned price box */
-
-  min-height: 90vh; /* Make it taller and more impressive */
+  background-color: var(--hero-background);
+  min-height: 80vh;
   display: flex;
   align-items: center;
   color: white;
   padding: 4rem 0;
-  overflow: hidden; 
 }
 
 .hero-inner {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 1.5rem;
-  display: block; /* Single column flow for banner text */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: center;
 }
 
-/* --- NEW: Price and Rating Floating Box --- */
-.price-rating-box {
-    /* Absolute Positioning to float it */
-    position: absolute;
-    bottom: 5%; 
-    left: 10%; 
-    transform: translateX(0); 
-    
-    /* Styling for the large white pill shape */
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-    padding: 1.5rem 3rem;
-    background-color: var(--floating-box-color);
-    border-radius: 50px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    color: var(--text-color);
+.hero-image-wrapper img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
-.price-info {
-    border-right: 2px solid #ddd;
-    padding-right: 2rem;
-}
-
-.price-label {
-    display: block;
-    font-size: 0.8rem;
-    font-weight: 500;
-    color: var(--muted-text-color);
-}
-
-.price-value {
-    display: flex;
-    align-items: baseline;
-    font-weight: 700;
-}
-
-.currency-amount {
-    font-size: 2.5rem;
-    line-height: 1;
-}
-
-.per-night {
-    font-size: 0.9rem;
-    margin-left: 0.5rem;
-    color: var(--muted-text-color);
-}
-
-.rating-info {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.rating-score {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: var(--primary-color);
-    line-height: 1;
-}
-
-.rating-details p {
-    font-size: 0.9rem;
-    margin: 0;
-    line-height: 1.2;
-}
-
-/* Hero Section Mobile/Tablet Overrides */
-@media (max-width: 1200px) {
-    .price-rating-box {
-        left: 50%; /* Center the box on smaller screens */
-        transform: translateX(-50%);
-        bottom: 50px;
-    }
-}
 @media (max-width: 992px) {
-    .hero-inner {
-      text-align: center;
-    }
-    .hero-left {
-        order: 1; /* Keep text centered on mobile */
-        margin-bottom: 2rem;
-    }
-    .hero-sub, h1.hero-title {
-        max-width: 100%;
-        margin-left: auto;
-        margin-right: auto;
-    }
-    .hero-cta {
-        justify-content: center;
-        display: flex;
-    }
+  .hero-inner {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .hero-left {
+    order: 2;
+  }
+  .hero-image-wrapper {
+    order: 1;
+    margin-bottom: 2rem;
+  }
 }
-@media (max-width: 768px) {
-    .price-rating-box {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 1.5rem;
-        gap: 1rem;
-        border-radius: 10px;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 90%; /* Make it wider on small screens */
-    }
-    .price-info {
-        border-right: none;
-        border-bottom: 1px solid #ddd;
-        padding-bottom: 1rem;
-        padding-right: 0;
-        width: 100%;
-    }
-    .hero {
-        min-height: 70vh;
-    }
-}
-
-
-/* --- About Section (`.about-section`) --- */
 
 .about-grid {
   display: grid;
@@ -369,9 +229,6 @@ section.is-visible {
     grid-template-columns: 1fr;
   }
 }
-
-
-/* --- Card Sections (Rooms & Island Hopping) --- */
 
 .horizontal-scroll {
   display: flex;
@@ -445,8 +302,6 @@ section.is-visible {
     flex: 1;
   }
 }
-
-/* --- Feedback Section (`.feedbacks-section`) --- */
 
 .feedback-carousel {
   display: flex;
