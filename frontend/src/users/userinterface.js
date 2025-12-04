@@ -268,6 +268,7 @@ export default function Homepage() {
                   type="date"
                   id="checkInDate"
                   name="checkInDate"
+                  placeholder="dd/mm/yyyy" // ADDED for consistency
                   value={searchQuery.checkInDate}
                   onChange={handleSearchChange}
                   required
@@ -279,6 +280,7 @@ export default function Homepage() {
                   type="date"
                   id="checkOutDate"
                   name="checkOutDate"
+                  placeholder="dd/mm/yyyy" // ADDED for consistency
                   value={searchQuery.checkOutDate}
                   onChange={handleSearchChange}
                   required
