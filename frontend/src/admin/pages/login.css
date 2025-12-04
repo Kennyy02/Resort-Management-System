@@ -1,140 +1,101 @@
-/* login.css - FINAL TIGHT SPACING CORRECTION */
+/* --- PAGE LAYOUT --- */
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background: #f0f0f0; /* light grey background */
+  height: 100%;
+}
 
-/* --- 1. Main Layout and Container --- */
-
+/* Center the login box */
 .login-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background-color: #f0f0f0; 
-    font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
 
+/* --- LOGIN CARD --- */
 .login-box {
-    background-color: #ffffff;
-    /* REDUCED PADDING to make the card shorter */
-    padding: 25px 30px; 
-    border-radius: 15px; 
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
-    width: 100%;
-    max-width: 350px; 
-    text-align: center;
+  background: #ffffff;
+  width: 280px;              /* Small box (2–3 inches) */
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0px 3px 10px rgba(0,0,0,0.15);
+  text-align: center;
 }
 
+/* Title */
 .login-title {
-    font-size: 24px;
-    font-weight: 600;
-    color: #333333;
-    /* REDUCED MARGIN BELOW TITLE */
-    margin-bottom: 20px; 
+  margin-bottom: 15px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
 }
 
-/* --- 2. Form Input Grouping (The Core Fix) --- */
-
-.login-form {
-    display: flex;
-    flex-direction: column;
-    /* AGGRESSIVELY REDUCED GAP between form groups */
-    gap: 10px; 
-}
-
+/* --- FORM --- */
 .form-group {
-    display: flex;
-    flex-direction: column;
-    /* REMOVE ALL EXTERNAL MARGINS */
-    margin: 0; 
-    padding: 0;
+  text-align: left;
+  margin-bottom: 12px;
 }
 
 .form-group label {
-    font-size: 13px;
-    color: #555555;
-    /* REDUCED MARGIN BELOW LABEL to move input closer */
-    margin-bottom: 5px; 
-    text-align: left;
-    font-weight: 500;
+  font-size: 13px;
+  color: #333;
 }
 
 .form-input {
-    /* REDUCED VERTICAL PADDING to make the input boxes thinner */
-    padding: 8px 15px; 
-    border: 1px solid #cccccc;
-    border-radius: 8px;
-    font-size: 15px;
-    height: auto; /* Allow padding to define height */
-    transition: border-color 0.3s;
+  width: 100%;
+  padding: 8px;
+  font-size: 13px;
+  margin-top: 4px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
 }
 
-.form-input:focus {
-    border-color: #4CAF50;
-    outline: none;
-}
-
-/* --- 3. Password Visibility Toggle --- */
-
+/* Password wrapper */
 .password-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-
-.password-wrapper .form-input {
-    width: 100%;
-    padding-right: 70px;
+  display: flex;
+  align-items: center;
 }
 
 .show-password-btn {
-    position: absolute;
-    right: 5px;
-    /* Aligned vertically */
-    top: 50%;
-    transform: translateY(-50%);
-    
-    padding: 5px 10px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 13px;
-    color: #007bff;
-    font-weight: 500;
+  margin-left: 6px;
+  padding: 6px 8px;
+  font-size: 11px;
+  border: none;
+  background: #e0e0e0;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
-/* --- 4. Login Button --- */
-
+/* --- BUTTON --- */
 .login-button {
-    padding: 12px;
-    background-color: #4CAF50; 
-    color: white;
-    font-size: 18px;
-    font-weight: bold;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    /* REDUCED MARGIN ABOVE BUTTON */
-    margin-top: 15px; 
+  width: 100%;
+  padding: 10px;
+  background: #4a6cf7;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  margin-top: 10px;
+  cursor: pointer;
+  font-size: 14px;
 }
 
 .login-button:hover {
-    background-color: #45a049;
+  background: #3b59d4;
 }
 
-/* --- 5. Message/Alerts (Kept compact) --- */
-
+/* --- MESSAGE --- */
 .login-message {
-    padding: 8px;
-    border-radius: 6px;
-    margin-bottom: 15px; /* Reduced margin */
-    font-size: 14px;
+  margin-bottom: 10px;
+  font-size: 12px;
 }
 
 .login-message.error {
-    background-color: #f8d7da;
-    color: #721c24;
+  color: red;
 }
 
 .login-message.success {
-    background-color: #d4edda;
-    color: #155724;
+  color: green;
 }
