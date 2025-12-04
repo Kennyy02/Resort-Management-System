@@ -50,26 +50,6 @@ h3 {
   margin-bottom: 0.5rem;
 }
 
-h4 {
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-}
-
-@media (max-width: 768px) {
-  h1.hero-title {
-    font-size: 2.2rem;
-  }
-  h3 {
-    font-size: 1.75rem;
-  }
-}
-
-.muted {
-  color: var(--muted-text-color);
-  font-size: 0.9rem;
-}
-
 /* --- Buttons (Base Style) --- */
 .btn {
   display: inline-block;
@@ -80,42 +60,40 @@ h4 {
   text-align: center;
 }
 
-/* Hero and About CTA Sizes */
-.hero-cta button,
-.about-actions .btn {
+/* Hero CTA Button Sizing */
+.hero-cta button {
   padding: 0.8rem 2rem;
   font-size: 1rem;
-  /* FIX: Changed text-transform and added more rounding to match the image */
   text-transform: none; 
   border-radius: 8px; 
 }
 
-/* --- FIX: Redefine Hero CTA buttons to match the image (Solid White with Dark Text) --- */
+/* 🔴 Hero CTA Button Styling (Solid White with Dark Text) 🔴 */
 .hero-cta button,
 .hero-cta button.ghost {
   border: none;
   background-color: white;
   color: var(--text-color);
   margin-right: 1rem;
-  /* Added subtle shadow to make buttons pop against the hero background */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); 
 }
 
-/* Hero CTA Hover State */
 .hero-cta button:hover,
 .hero-cta button.ghost:hover {
-  background-color: #e0e0e0; /* Light gray on hover */
+  background-color: #e0e0e0; 
   color: var(--text-color);
 }
-/* ---------------------------------------------------------------------------------------- */
+/* -------------------------------------------------------- */
 
 /* About Section Button (Primary Outline) */
 .about-actions .btn {
-  /* Kept original text-transform for this button style */
   text-transform: uppercase;
   border: 2px solid var(--primary-color);
   background-color: white;
   color: var(--primary-color);
+  padding: 0.8rem 2rem;
+  font-size: 1rem;
+  border-radius: 8px; 
 }
 
 .about-actions .btn:hover {
@@ -148,7 +126,6 @@ section {
   padding: 4rem 0;
   opacity: 0;
   transform: translateY(20px);
-  /* Smoothed the transition for a better visual effect on scroll-in */
   transition: opacity 1s ease-out, transform 1s ease-out; 
 }
 
@@ -162,17 +139,12 @@ section.is-visible {
   margin-bottom: 2.5rem;
 }
 
-.section-header p {
-  font-size: 1.1rem;
-  color: var(--muted-text-color);
-}
-
 /* --- Hero Section --- */
 .hero {
-  /* Increased min-height for better visual separation */
   min-height: 90vh; 
   display: flex;
-  align-items: center; 
+  /* Align items to the START to leave space for a navigation bar */
+  align-items: flex-start; 
   color: white;
   padding: 2rem 0 4rem; 
   background-size: cover;
@@ -181,41 +153,42 @@ section.is-visible {
   position: relative; 
 }
 
-/* Darkening Overlay for the background image */
+/* Darkening Overlay */
 .hero-overlay {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  /* FIX: Reduced opacity from 0.5 to 0.4 to match the image's slightly brighter tone */
   background-color: rgba(0, 0, 0, 0.4); 
   z-index: 1;
 }
 
-/* **FIX: Removed align-items: center from hero-inner to prevent vertical centering 
-    when the search box is absolutely positioned, allowing the text to sit higher.** */
 .hero-inner {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 1.5rem;
   display: flex; 
-  justify-content: center; 
-  /* align-items: flex-start; is not necessary here, but flex-direction is key on mobile */
+  flex-direction: column; 
+  justify-content: flex-start; 
+  align-items: center; 
   width: 100%;
   height: 100%;
   position: relative; 
   z-index: 2; 
 }
 
+/* 🔴 Centering the Hero Text Content (Title/Buttons) 🔴 */
 .hero-left {
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    /* FIX: Added margin-top to push the text down a bit from the top edge */
-    margin-top: 10vh;
+    /* Pushes content down from the top edge of the hero */
+    margin-top: 15vh; 
+    /* Space between the text block and the search box */
+    margin-bottom: 5rem; 
 }
 
 /* --- Availability Search Box Positioning (Desktop) --- */
@@ -227,16 +200,16 @@ section.is-visible {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   padding: 1.5rem;
   
-  /* POSITIONING FIX: Absolute positioning for the half-and-half look */
-  position: absolute;
+  /* 🔴 Overlapping Positioning 🔴 */
+  position: absolute; 
   left: 50%;
-  bottom: 10%; /* Place 10% from the bottom of the hero section */
-  transform: translateX(-50%); 
+  bottom: 0; /* Aligns with the bottom of the hero section */
+  /* Translates horizontally to center, and 50% down to create the overlap */
+  transform: translate(-50%, 50%); 
   z-index: 3; 
 }
 
 .search-fields {
-  /* Desktop Layout */
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr; 
   gap: 1.5rem;
@@ -278,6 +251,7 @@ section.is-visible {
   background-color: var(--primary-color);
   color: white;
   border: none;
+  border-radius: 6px;
 }
 
 .search-button:hover {
@@ -286,69 +260,43 @@ section.is-visible {
 
 /* --- MOBILE RESPONSIVENESS (<= 992px) --- */
 @media (max-width: 992px) {
-  .hero {
-      /* Keep min-height high for large mobile hero */
-      min-height: 90vh; 
-      /* Align items to the top on small screens */
-      align-items: flex-start;
-  }
-
-  /* Resetting hero-left for better mobile stacking */
   .hero-left {
-      margin-top: 20%; /* Push text content down from top edge */
-      align-items: flex-start;
-      text-align: left;
-      /* Padding for text on edges */
-      padding: 0 1rem; 
+      margin-top: 20%; 
+      margin-bottom: 2rem;
   }
   
-  /* CRITICAL FIX: Reset absolute positioning for mobile screens */
+  /* Resetting search box positioning for mobile */
   .hero-search-box {
-    position: relative; /* Switch to normal flow */
+    position: relative; 
     left: auto;
-    bottom: -10vh; /* Push the search box further down, outside the hero flow */
+    bottom: -70px; 
     transform: none;
     max-width: 100%;
-    margin: 0 auto; /* Center block */
-    z-index: 5; /* Keep it high */
+    margin: 0 auto;
+    z-index: 5;
   }
 
-  /* Stack search fields vertically on small screens */
   .search-fields {
     grid-template-columns: 1fr; 
     gap: 1rem;
   }
-  .search-button-container {
-      margin-top: 1rem;
-  }
 }
-
-/* --- Mobile Specific Fix for Search Box Overflow (<= 600px) --- */
-@media (max-width: 600px) {
-    .hero-search-box {
-        /* Adjusted positioning for very small screens */
-        bottom: -70px; 
-        padding: 1rem;
-    }
-}
-/* --- End Hero Fixes --- */
-
 
 /* --- About Section --- */
-/* FIX: Added margin-top to the about section to accommodate the search box 
-    that was pushed down on mobile */
 .about-section {
-    margin-top: 5rem; /* Ensure space after the floating/mobile search box */
+    /* 🔴 Increased margin-top to clear the overlapping search box */
+    margin-top: 10rem; 
 }
 
+/* --- About Section (Content below the Hero) --- */
 .about-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 3rem;
   align-items: start;
 }
+/* ... (rest of the CSS for about, cards, and feedback) ... */
 
-/* ... (rest of the CSS remains the same) ... */
 .about-video-title {
   font-size: 1.5rem;
   font-weight: 700;
@@ -390,7 +338,7 @@ section.is-visible {
     grid-template-columns: 1fr;
   }
   .about-text {
-    order: 2; /* Text below video on mobile */
+    order: 2;
   }
   .about-media {
     order: 1;
