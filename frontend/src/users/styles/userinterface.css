@@ -85,32 +85,34 @@ h4 {
 .about-actions .btn {
   padding: 0.8rem 2rem;
   font-size: 1rem;
-  text-transform: uppercase;
+  /* FIX: Changed text-transform and added more rounding to match the image */
+  text-transform: none; 
+  border-radius: 8px; 
 }
 
-/* Hero CTA Primary (White Outline) */
-.hero-cta button {
-  border: 2px solid white;
-  background-color: transparent;
-  color: white;
-  margin-right: 1rem;
-}
-
-/* Hero CTA Ghost (Slightly Opaque Fill) */
+/* --- FIX: Redefine Hero CTA buttons to match the image (Solid White with Dark Text) --- */
+.hero-cta button,
 .hero-cta button.ghost {
-  background-color: rgba(255, 255, 255, 0.2);
-  border: 2px solid white;
+  border: none;
+  background-color: white;
+  color: var(--text-color);
+  margin-right: 1rem;
+  /* Added subtle shadow to make buttons pop against the hero background */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); 
 }
 
 /* Hero CTA Hover State */
 .hero-cta button:hover,
 .hero-cta button.ghost:hover {
-  background-color: white;
-  color: var(--primary-color);
+  background-color: #e0e0e0; /* Light gray on hover */
+  color: var(--text-color);
 }
+/* ---------------------------------------------------------------------------------------- */
 
 /* About Section Button (Primary Outline) */
 .about-actions .btn {
+  /* Kept original text-transform for this button style */
+  text-transform: uppercase;
   border: 2px solid var(--primary-color);
   background-color: white;
   color: var(--primary-color);
@@ -186,12 +188,13 @@ section.is-visible {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); 
+  /* FIX: Reduced opacity from 0.5 to 0.4 to match the image's slightly brighter tone */
+  background-color: rgba(0, 0, 0, 0.4); 
   z-index: 1;
 }
 
 /* **FIX: Removed align-items: center from hero-inner to prevent vertical centering 
-   when the search box is absolutely positioned, allowing the text to sit higher.** */
+    when the search box is absolutely positioned, allowing the text to sit higher.** */
 .hero-inner {
   max-width: 1200px;
   margin: 0 auto;
@@ -323,9 +326,8 @@ section.is-visible {
 /* --- Mobile Specific Fix for Search Box Overflow (<= 600px) --- */
 @media (max-width: 600px) {
     .hero-search-box {
-        /* Use negative margin to pull the search box out of the hero for stacking,
-           but ensure it doesn't leave a huge gap or overlap with the next section */
-        bottom: -70px; /* Adjust this value if the search box is too tall */
+        /* Adjusted positioning for very small screens */
+        bottom: -70px; 
         padding: 1rem;
     }
 }
@@ -334,7 +336,7 @@ section.is-visible {
 
 /* --- About Section --- */
 /* FIX: Added margin-top to the about section to accommodate the search box 
-   that was pushed down on mobile */
+    that was pushed down on mobile */
 .about-section {
     margin-top: 5rem; /* Ensure space after the floating/mobile search box */
 }
@@ -346,15 +348,54 @@ section.is-visible {
   align-items: start;
 }
 
-/* ... (rest of the CSS remains the same for brevity) ... */
+/* ... (rest of the CSS remains the same) ... */
+.about-video-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.about-content p {
+  margin-bottom: 1rem;
+}
+
+.youtube-wrapper {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  height: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.youtube-wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.video-link {
+  display: block;
+  text-align: center;
+  margin-top: 1rem;
+  font-weight: 600;
+}
 
 @media (max-width: 992px) {
   .about-grid {
     grid-template-columns: 1fr;
   }
+  .about-text {
+    order: 2; /* Text below video on mobile */
+  }
+  .about-media {
+    order: 1;
+  }
 }
-
-/* ... (Rooms, Island, Feedback sections CSS below this point) ... */
 
 /* --- Cards and Horizontal Scroll --- */
 .horizontal-scroll {
@@ -373,7 +414,34 @@ section.is-visible {
 
 .card {
   flex: 0 0 320px;
-  /* ... (card styling) ... */
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  scroll-snap-align: start;
+}
+
+.card-media img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.card-body {
+  padding: 1rem;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.card-footer .price {
+  font-weight: 700;
+  color: var(--primary-color);
+  font-size: 1.1rem;
 }
 
 .island-section .card.wide {
@@ -409,5 +477,32 @@ section.is-visible {
 
 .feedback-card {
   flex: 0 0 450px;
-  /* ... (feedback styling) ... */
+  background: white;
+  border-left: 5px solid var(--primary-color);
+  padding: 2rem;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  scroll-snap-align: start;
+}
+
+.feedback-card .msg {
+  font-style: italic;
+  margin-bottom: 1rem;
+  color: var(--text-color);
+}
+
+.feedback-card .meta {
+  display: block;
+  text-align: right;
+  font-size: 0.9rem;
+}
+
+.feedback-card .meta strong {
+  display: block;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.feedback-card .meta .date {
+  color: var(--muted-text-color);
 }
