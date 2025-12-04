@@ -1,101 +1,94 @@
-/* --- PAGE LAYOUT --- */
-body, html {
-  margin: 0;
-  padding: 0;
-  font-family: Arial, sans-serif;
-  background: #f0f0f0; /* light grey background */
-  height: 100%;
+/* Root colors */
+:root {
+  --primary-color: #38761D;
+  --text-color: #333;
 }
 
-/* Center the login box */
-.login-container {
+/* Center container */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
+  background: #fff;
 }
 
-/* --- LOGIN CARD --- */
+.login-container {
+  width: 100%;
+  max-width: 350px;
+}
+
 .login-box {
-  background: #ffffff;
-  width: 280px;              /* Small box (2–3 inches) */
-  padding: 25px;
-  border-radius: 10px;
-  box-shadow: 0px 3px 10px rgba(0,0,0,0.15);
-  text-align: center;
+  background: #fff;
+  border: 1px solid var(--primary-color);
+  border-radius: 6px;
+  padding: 20px;
 }
 
-/* Title */
 .login-title {
+  text-align: center;
+  color: var(--primary-color);
   margin-bottom: 15px;
-  font-size: 20px;
-  font-weight: bold;
-  color: #333;
+  font-size: 1.4rem;
 }
 
-/* --- FORM --- */
-.form-group {
-  text-align: left;
-  margin-bottom: 12px;
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .form-group label {
-  font-size: 13px;
-  color: #333;
+  font-size: 0.9rem;
+  color: var(--text-color);
 }
 
 .form-input {
-  width: 100%;
   padding: 8px;
-  font-size: 13px;
-  margin-top: 4px;
   border: 1px solid #ccc;
-  border-radius: 6px;
+  border-radius: 4px;
+  font-size: 1rem;
 }
 
-/* Password wrapper */
+.form-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
 .password-wrapper {
-  display: flex;
-  align-items: center;
+  position: relative;
 }
 
 .show-password-btn {
-  margin-left: 6px;
-  padding: 6px 8px;
-  font-size: 11px;
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
   border: none;
-  background: #e0e0e0;
-  border-radius: 5px;
+  background: none;
+  color: var(--primary-color);
   cursor: pointer;
+  font-size: 0.8rem;
 }
 
-/* --- BUTTON --- */
 .login-button {
-  width: 100%;
   padding: 10px;
-  background: #4a6cf7;
+  background: var(--primary-color);
+  color: #fff;
   border: none;
-  border-radius: 6px;
-  color: white;
-  margin-top: 10px;
+  border-radius: 4px;
   cursor: pointer;
-  font-size: 14px;
+  font-weight: bold;
 }
 
 .login-button:hover {
-  background: #3b59d4;
+  background: #2e5d15;
 }
 
-/* --- MESSAGE --- */
 .login-message {
-  margin-bottom: 10px;
-  font-size: 12px;
-}
-
-.login-message.error {
+  text-align: center;
+  font-size: 0.85rem;
   color: red;
-}
-
-.login-message.success {
-  color: green;
 }
