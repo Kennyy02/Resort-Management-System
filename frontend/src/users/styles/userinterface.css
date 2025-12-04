@@ -7,17 +7,19 @@
   --font-family-primary: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* -------------------- Global Styles -------------------- */
+/* 1. Soft Scroll Effect for the entire page */
 html {
   scroll-behavior: smooth;
 }
 
+/* Global Reset and Box Sizing */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
+/* Base Body Styles */
 body {
   font-family: var(--font-family-primary);
   font-size: 16px;
@@ -26,19 +28,19 @@ body {
   line-height: 1.6;
 }
 
+/* Hyperlink Styling */
 a {
   text-decoration: none;
   color: var(--primary-color);
   cursor: pointer;
 }
 
-/* -------------------- Typography -------------------- */
+/* Typography */
 h1.hero-title {
   font-size: 3rem;
   margin-bottom: 0.75rem;
   line-height: 1.1;
   font-weight: 700;
-  text-align: center; /* center on hero */
 }
 
 h3 {
@@ -48,7 +50,7 @@ h3 {
   margin-bottom: 0.5rem;
 }
 
-/* -------------------- Buttons -------------------- */
+/* --- Buttons (Base Style) --- */
 .btn {
   display: inline-block;
   border-radius: 4px;
@@ -58,25 +60,32 @@ h3 {
   text-align: center;
 }
 
-/* Hero CTA Buttons */
+/* Hero CTA Button Sizing */
 .hero-cta button {
   padding: 0.8rem 2rem;
   font-size: 1rem;
-  border-radius: 8px;
-  background-color: transparent;
+  text-transform: none; 
+  border-radius: 8px; 
+}
+
+/* Hero CTA Button Styling (Transparent Background with White Border) */
+.hero-cta button,
+.hero-cta button.ghost {
+  background-color: transparent; 
   border: 2px solid white;
   color: white;
   margin-right: 1rem;
-  box-shadow: none;
+  box-shadow: none; 
 }
 
-.hero-cta button:hover {
-  background-color: white;
+.hero-cta button:hover,
+.hero-cta button.ghost:hover {
+  background-color: white; 
   color: var(--text-color);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); 
 }
 
-/* About Section Button */
+/* About Section Button (Primary Outline) */
 .about-actions .btn {
   text-transform: uppercase;
   border: 2px solid var(--primary-color);
@@ -84,7 +93,7 @@ h3 {
   color: var(--primary-color);
   padding: 0.8rem 2rem;
   font-size: 1rem;
-  border-radius: 8px;
+  border-radius: 8px; 
 }
 
 .about-actions .btn:hover {
@@ -92,7 +101,7 @@ h3 {
   color: white;
 }
 
-/* Card Footer Button */
+/* Card Footer Small Button (Primary Solid) */
 .card-footer .btn.small {
   background-color: var(--primary-color);
   color: white;
@@ -105,18 +114,19 @@ h3 {
   background-color: #2c5f17;
 }
 
-/* -------------------- Layout Containers -------------------- */
+/* --- Layout Containers --- */
 .main-content {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 1.5rem;
 }
 
+/* Section Visibility and Animation */
 section {
   padding: 4rem 0;
   opacity: 0;
   transform: translateY(20px);
-  transition: opacity 1s ease-out, transform 1s ease-out;
+  transition: opacity 1s ease-out, transform 1s ease-out; 
 }
 
 section.is-visible {
@@ -129,27 +139,28 @@ section.is-visible {
   margin-bottom: 2.5rem;
 }
 
-/* -------------------- Hero Section -------------------- */
+/* --- Hero Section --- */
 .hero {
-  min-height: 70vh;
+  /* Reduced min-height for further cropping */
+  min-height: 70vh; 
   display: flex;
-  align-items: center; /* vertically center content */
-  justify-content: center; /* horizontally center content */
+  align-items: flex-start; 
   color: white;
-  padding: 2rem 0;
+  padding: 2rem 0 4rem; 
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  position: relative;
+  position: relative; 
 }
 
+/* Darkening Overlay */
 .hero-overlay {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: rgba(0, 0, 0, 0.4); 
   z-index: 1;
 }
 
@@ -157,45 +168,52 @@ section.is-visible {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 1.5rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  position: relative;
-  z-index: 2;
-}
-
-/* Move hero text lower on the image */
-.hero-left {
-  margin-top: 25vh; /* push down to vertically center better */
-  margin-bottom: 5rem;
+  display: flex; 
+  flex-direction: column; 
+  justify-content: flex-start; 
+  align-items: center; 
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
+  height: 100%;
+  position: relative; 
+  z-index: 2; 
 }
 
-/* Hero Search Box */
+/* Centering and Positioning the Hero Text Content (Title/Buttons) */
+.hero-left {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    /* 🔴 FIX 1: Reduced margin-top (from 7vh) to move the text/buttons lower */
+    margin-top: 5vh; 
+    /* Space between text block and search bar */
+    margin-bottom: 9rem; 
+}
+
+/* --- Availability Search Box Positioning (Desktop) --- */
 .hero-search-box {
   width: 100%;
-  max-width: 900px;
+  max-width: 900px; 
   background-color: white;
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   padding: 1.5rem;
-  position: absolute;
+  
+  /* Overlapping Positioning */
+  position: absolute; 
   left: 50%;
-  bottom: 0;
-  transform: translate(-50%, 100%);
-  z-index: 3;
+  bottom: 0; /* Aligns with the bottom of the hero section */
+  /* 🔴 FIX 2: Increased translation to 100% to push the box down even further (a full box height overlap) */
+  transform: translate(-50%, 100%); 
+  z-index: 3; 
 }
 
 .search-fields {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
+  grid-template-columns: 2fr 1fr 1fr 1fr; 
   gap: 1.5rem;
-  align-items: flex-end;
+  align-items: flex-end; 
 }
 
 .search-field-group {
@@ -223,12 +241,13 @@ section.is-visible {
 .search-button-container {
   display: flex;
   align-items: flex-end;
-  height: 100%;
+  height: 100%; 
 }
 
 .search-button {
   width: 100%;
-  padding: 0.5rem 1rem;
+  /* 🔴 FIX 3: Reduced padding (from 0.6rem) to make the button even smaller */
+  padding: 0.5rem 1rem; 
   font-size: 1rem;
   background-color: var(--primary-color);
   color: white;
@@ -240,17 +259,18 @@ section.is-visible {
   background-color: #2c5f17;
 }
 
-/* -------------------- Responsive -------------------- */
+/* --- MOBILE RESPONSIVENESS (<= 992px) --- */
 @media (max-width: 992px) {
   .hero-left {
-    margin-top: 20%;
-    margin-bottom: 2rem;
+      margin-top: 20%; 
+      margin-bottom: 2rem;
   }
-
+  
+  /* Resetting search box positioning for mobile */
   .hero-search-box {
-    position: relative;
+    position: relative; 
     left: auto;
-    bottom: -70px;
+    bottom: -70px; 
     transform: none;
     max-width: 100%;
     margin: 0 auto;
@@ -258,24 +278,180 @@ section.is-visible {
   }
 
   .search-fields {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr; 
     gap: 1rem;
   }
+}
 
+/* --- About Section --- */
+.about-section {
+    /* 🔴 FIX 4: Increased margin-top (from 14rem) to clear the pushed-down search bar */
+    margin-top: 16rem; 
+}
+
+/* --- About Section (Content below the Hero) --- */
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: start;
+}
+/* ... (rest of the CSS for about, cards, and feedback) ... */
+
+.about-video-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.about-content p {
+  margin-bottom: 1rem;
+}
+
+.youtube-wrapper {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  height: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.youtube-wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.video-link {
+  display: block;
+  text-align: center;
+  margin-top: 1rem;
+  font-weight: 600;
+}
+
+@media (max-width: 992px) {
   .about-grid {
     grid-template-columns: 1fr;
   }
-
   .about-text {
     order: 2;
   }
-
   .about-media {
     order: 1;
   }
 }
 
-/* About Section */
-.about-section {
-  margin-top: 16rem; /* clear search box overlap */
+/* --- Cards and Horizontal Scroll --- */
+.horizontal-scroll {
+  display: flex;
+  overflow-x: auto;
+  gap: 2rem;
+  padding-bottom: 1.5rem;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  scroll-snap-type: x mandatory;
+}
+
+.horizontal-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.card {
+  flex: 0 0 320px;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  scroll-snap-align: start;
+}
+
+.card-media img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.card-body {
+  padding: 1rem;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.card-footer .price {
+  font-weight: 700;
+  color: var(--primary-color);
+  font-size: 1.1rem;
+}
+
+.island-section .card.wide {
+  flex: 0 0 400px;
+}
+
+@media (min-width: 768px) {
+  .island-section .card.wide {
+    display: flex; 
+    flex-direction: row;
+    flex: 0 0 550px;
+  }
+  .island-section .card.wide .card-media {
+    flex: 0 0 200px;
+    height: 100%;
+  }
+}
+
+/* --- Feedback Section --- */
+.feedback-carousel {
+  display: flex;
+  overflow-x: auto;
+  gap: 2rem;
+  padding-bottom: 1.5rem;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  scroll-snap-type: x mandatory;
+}
+
+.feedback-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.feedback-card {
+  flex: 0 0 450px;
+  background: white;
+  border-left: 5px solid var(--primary-color);
+  padding: 2rem;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  scroll-snap-align: start;
+}
+
+.feedback-card .msg {
+  font-style: italic;
+  margin-bottom: 1rem;
+  color: var(--text-color);
+}
+
+.feedback-card .meta {
+  display: block;
+  text-align: right;
+  font-size: 0.9rem;
+}
+
+.feedback-card .meta strong {
+  display: block;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.feedback-card .meta .date {
+  color: var(--muted-text-color);
 }
