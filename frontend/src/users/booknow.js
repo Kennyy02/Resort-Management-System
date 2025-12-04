@@ -103,7 +103,8 @@ const BookNow = () => {
     setFormData((p) => ({ ...p, [name]: value }));
 
     if (name === "modeOfPayment") {
-      setQrModalOpen(true); // Open QR modal
+      // Open QR modal whenever payment mode changes
+      setQrModalOpen(true);
     }
   };
 
@@ -201,7 +202,10 @@ const BookNow = () => {
               )}
             </div>
 
-            <button className="close-modal-btn" onClick={() => setQrModalOpen(false)}>
+            <button
+              className="close-modal-btn"
+              onClick={() => setQrModalOpen(false)}
+            >
               Close
             </button>
           </div>
@@ -271,7 +275,11 @@ const BookNow = () => {
         </button>
 
         {message && (
-          <p className={`booking-message ${message.includes("❌") ? "error" : "success"}`}>
+          <p
+            className={`booking-message ${
+              message.includes("❌") ? "error" : "success"
+            }`}
+          >
             {message}
           </p>
         )}
