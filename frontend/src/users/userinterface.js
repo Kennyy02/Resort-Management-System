@@ -173,6 +173,29 @@ export default function Homepage() {
     feedbacks: false,
   });
 
+  // State for the new Search Box
+  const [searchQuery, setSearchQuery] = useState({
+    roomName: '',
+    checkInDate: '',
+    checkOutDate: '',
+  });
+
+  const handleSearchChange = (e) => {
+    setSearchQuery({
+      ...searchQuery,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    // Logic to handle search/redirect to booking page with query parameters
+    const queryString = new URLSearchParams(searchQuery).toString();
+    // Navigate to a dedicated availability page or the services page with the search query
+    navigate(`/availability?${queryString}`); 
+    console.log("Searching with:", searchQuery);
+  };
+
   // Effect for IntersectionObserver (scroll animation), retained from original
   useEffect(() => {
     const callback = (entries) => {
@@ -222,6 +245,51 @@ export default function Homepage() {
               </button>
             </div>
           </div>
+
+          {/* --- NEW Availability Search Box --- */}
+          <form className="hero-search-box" onSubmit={handleSearchSubmit}>
+            <div className="search-fields">
+              <div className="search-field-group">
+                <label htmlFor="roomName">Room Name</label>
+                <input
+                  type="text"
+                  id="roomName"
+                  name="roomName"
+                  placeholder="e.g., Family Suite"
+                  value={searchQuery.roomName}
+                  onChange={handleSearchChange}
+                />
+              </div>
+              <div className="search-field-group">
+                <label htmlFor="checkInDate">Check-in</label>
+                <input
+                  type="date"
+                  id="checkInDate"
+                  name="checkInDate"
+                  value={searchQuery.checkInDate}
+                  onChange={handleSearchChange}
+                  required
+                />
+              </div>
+              <div className="search-field-group">
+                <label htmlFor="checkOutDate">Check-out</label>
+                <input
+                  type="date"
+                  id="checkOutDate"
+                  name="checkOutDate"
+                  value={searchQuery.checkOutDate}
+                  onChange={handleSearchChange}
+                  required
+                />
+              </div>
+              <div className="search-field-group search-button-container">
+                <button type="submit" className="btn search-button">
+                  Check Availability
+                </button>
+              </div>
+            </div>
+          </form>
+          {/* ------------------------------- */}
 
           {/* The image wrapper and image are REMOVED as the image is now the background of the header */}
         </div>
