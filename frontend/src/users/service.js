@@ -5,6 +5,7 @@ import tower from '../components/pictures/tower.jpg';
 
 function UserServices() {
     const [services, setServices] = useState([]);
+    const [payments, setPayments] = useState([]); // 🔥 New state for GCASH / BANK QR
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [activeTab, setActiveTab] = useState('rooms');
@@ -49,12 +50,22 @@ function UserServices() {
             const url = `${process.env.REACT_APP_SERVICES_API}/api/services`;
             const res = await fetch(url);
             if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+
             const contentType = res.headers.get("content-type");
             if (!contentType || !contentType.includes("application/json")) {
                 throw new Error(`Invalid response format: ${contentType}`);
             }
+
             const data = await res.json();
-            setServices(data);
+
+            // 🔥 Filter payment QR codes
+            const paymentQR = data.filter(s => s.type === "payment");
+            setPayments(paymentQR);
+
+            // keep only services
+            const filtered = data.filter(s => s.type !== "payment");
+            setServices(filtered);
+
             return true;
         } catch (err) {
             setError(`Failed to load services: ${err.message}`);
@@ -144,49 +155,64 @@ function UserServices() {
             </div>
 
             <div className="user-services-container">
-                {services.length === 0 ? (
+                {services.length === 0 && payments.length === 0 ? (
                     <p>No services available at the moment.</p>
                 ) : (
                     <>
                         <div className="controls-container">
                             <div className="tabs">
+
                                 <button
                                     className={activeTab === 'rooms' ? 'tab-button active' : 'tab-button'}
                                     onClick={() => setActiveTab('rooms')}
                                 >Rooms</button>
+
                                 <button
                                     className={activeTab === 'cottages' ? 'tab-button active' : 'tab-button'}
                                     onClick={() => setActiveTab('cottages')}
                                 >Cottages</button>
+
                                 <button
                                     className={activeTab === 'island_hopping' ? 'tab-button active' : 'tab-button'}
                                     onClick={() => setActiveTab('island_hopping')}
                                 >Island Hopping</button>
+
+                                {/* 🔥 NEW TAB: Mode of Payment */}
+                                <button
+                                    className={activeTab === 'payment' ? 'tab-button active' : 'tab-button'}
+                                    onClick={() => setActiveTab('payment')}
+                                >Mode of Payment</button>
                             </div>
 
-                            <div className="sort-controls">
-                                <label htmlFor="sort-by">Sort by:</label>
-                                <select id="sort-by" onChange={(e) => setSortOrder(e.target.value)} value={sortOrder}>
-                                    <option value="none">Default</option>
-                                    <option value="price_asc">Price: Low to High</option>
-                                    <option value="price_desc">Price: High to Low</option>
-                                </select>
-                            </div>
+                            {/* sort only for services */}
+                            {activeTab !== "payment" && (
+                                <div className="sort-controls">
+                                    <label htmlFor="sort-by">Sort by:</label>
+                                    <select id="sort-by" onChange={(e) => setSortOrder(e.target.value)} value={sortOrder}>
+                                        <option value="none">Default</option>
+                                        <option value="price_asc">Price: Low to High</option>
+                                        <option value="price_desc">Price: High to Low</option>
+                                    </select>
+                                </div>
+                            )}
                         </div>
 
                         <div className="services-content">
+
                             {activeTab === 'rooms' && rooms.length > 0 && (
                                 <div className="service-section">
                                     <h3 className="section-title">Rooms</h3>
                                     {renderServiceCards(rooms, 'room')}
                                 </div>
                             )}
+
                             {activeTab === 'cottages' && cottages.length > 0 && (
                                 <div className="service-section">
                                     <h3 className="section-title">Cottages</h3>
                                     {renderServiceCards(cottages, 'cottage')}
                                 </div>
                             )}
+
                             {activeTab === 'island_hopping' && islandHopping.length > 0 && (
                                 <div className="service-section">
                                     <h3 className="section-title">Island Hopping Tours</h3>
@@ -198,11 +224,35 @@ function UserServices() {
                                     )}
                                 </div>
                             )}
-                            {((activeTab === 'rooms' && rooms.length === 0) ||
-                              (activeTab === 'cottages' && cottages.length === 0) ||
-                              (activeTab === 'island_hopping' && islandHopping.length === 0)) && (
-                                <p className="no-services-message">No {activeTab.replace('_', ' ')} available at the moment.</p>
+
+                            {/* 🔥 PAYMENT QR DISPLAY */}
+                            {activeTab === 'payment' && (
+                                <div className="payment-section">
+                                    <h3 className="section-title">Mode of Payment</h3>
+
+                                    {payments.length === 0 ? (
+                                        <p>No payment methods available.</p>
+                                    ) : (
+                                        <div className="payment-grid">
+                                            {payments.map((p) => (
+                                                <div className="payment-card" key={p.id}>
+                                                    <h4>{p.name}</h4>
+                                                    {p.qr_url ? (
+                                                        <img
+                                                            src={`${process.env.REACT_APP_SERVICES_API}${p.qr_url}`}
+                                                            alt={`${p.name} QR`}
+                                                            className="payment-qr-image"
+                                                        />
+                                                    ) : (
+                                                        <p>No QR uploaded</p>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
                             )}
+
                         </div>
                     </>
                 )}
