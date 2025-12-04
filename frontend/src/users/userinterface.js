@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import mountainView from "../components/pictures/mountainView.jpg";
 import "./styles/userinterface.css";
 
 const ABOUT_BASE = "https://about-us-production.up.railway.app";
@@ -130,23 +129,44 @@ export default function Homepage() {
       <header className="hero large-hero">
         <div className="hero-inner">
           <div className="hero-left">
-            <h1 className="hero-title">EM'z Bayview Mountain Resort</h1>
+            {/* NEW: Pre-title matching the sample image */}
+            <p className="hero-pre-title">GET LUXURY & COMFORT</p> 
+            {/* NEW: Headline matching the sample image */}
+            <h1 className="hero-title">The Best Coolest Place Where Luxury Meets Affordability</h1>
             <p className="hero-sub">
-              A peaceful escape — book rooms, join island hopping, and make memories.
+                Natoque elementum sed pretium, orci officia penatibus eu venenatis imperdiet, donec sociis rhoncus diserant proin. Mius, blandias magnis do provident quoisque natnum sunt quia fuga.
             </p>
             <div className="hero-cta">
-              <button onClick={() => navigate("/services")}>Explore Rooms</button>
+              <button onClick={() => navigate("/services")}>BOOK NOW</button>
               <button className="ghost" onClick={() => navigate("/services")}>
-                Island Hopping
+                EXPLORE NOW
               </button>
             </div>
           </div>
-
-          <div className="hero-image-wrapper">
-            <img src={mountainView} alt="Mountain view resort" />
+          
+          {/* NEW: Price and Rating Floating Box */}
+          <div className="price-rating-box">
+            <div className="price-info">
+                <span className="price-label">PRICE STARTS FROM</span>
+                <div className="price-value">
+                    <span className="currency-amount">₱2,000</span>
+                    <span className="per-night">/NIGHT</span>
+                </div>
+            </div>
+            <div className="rating-info">
+                <div className="rating-score">4.7</div>
+                <div className="rating-details">
+                    <p>800 Reviews</p>
+                    <p>From Google Business</p>
+                </div>
+            </div>
           </div>
+          {/* REMOVED: hero-image-wrapper */}
+
         </div>
       </header>
+      
+      {/* ... The rest of your main content remains the same ... */}
 
       <main className="main-content">
         {/* ABOUT */}
