@@ -1,123 +1,145 @@
-:root {
-    --primary-sage: #8fbc8f;
-    --light-sage: #a6d9a6;
-    --background-light-grey: #f8f9fa;
-    --text-dark: #343a40;
-    --text-medium: #6c757d;
-    --card-shadow: rgba(0, 0, 0, 0.05);
-    --card-hover-shadow: rgba(0, 0, 0, 0.1);
-}
+/* --- Resort Management Dashboard Theme --- */
 
-body {
-    font-family: "Inter", sans-serif;
-    background-color: var(--background-light-grey);
-    margin: 0;
-    padding: 0;
-    color: var(--text-dark);
-    box-sizing: border-box;
-}
-
-/* --- WRAPPER --- */
+/* 1. Layout */
 .dashboard-container {
-    display: flex;
-    min-height: 100vh;
-    background-color: var(--background-light-grey);
+  display: flex;
+  min-height: 100vh;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f0f8ff; /* Light resort sky-blue background */
 }
 
-/* --- SIDEBAR --- */
+/* 2. Sidebar */
 .dashboard-sidebar {
-    width: 220px; /* smaller sidebar */
-    background-color: white;
-    padding: 1rem 0.8rem; /* reduced padding */
-    box-shadow: 2px 0 6px rgba(0, 0, 0, 0.05);
-    position: fixed;
-    left: 0;
-    top: 0;
-    height: 100vh;
-    overflow-y: auto;
-    border-right: 1px solid #e0e0e0;
-    display: flex;
-    flex-direction: column;
+  width: 250px;
+  min-width: 250px;
+  background-color: #006994; /* Deep resort blue */
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 0;
+  box-shadow: 3px 0 6px rgba(0, 0, 0, 0.15);
 }
 
-/* --- HEADER --- */
 .sidebar-header {
-    padding-bottom: 1rem;
-    border-bottom: 1px solid #eee;
-    margin-bottom: 1rem;
-    text-align: center;
+  text-align: center;
+  margin-bottom: 30px;
 }
 
 .sidebar-title {
-    font-size: 1.25rem; /* smaller title */
-    font-weight: 700;
-    color: var(--primary-sage);
-    margin: 0;
+  color: #fffacd; /* Soft resort cream */
+  font-size: 1.5rem;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #48d1cc; /* Aqua accent line */
 }
 
-/* --- SIDEBAR NAV --- */
+/* Sidebar nav cards */
 .sidebar-nav-cards {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem; /* reduced gap */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 15px;
 }
 
 .card {
-    background-color: #f0f2f5;
-    padding: 0.6rem 0.8rem; /* smaller cards */
-    border-radius: 0.6rem;
-    cursor: pointer;
-    font-size: 0.9rem; /* smaller text */
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-weight: 500;
-    transition: 0.2s ease;
+  background-color: #008cba; /* Resort-friendly blue */
+  color: #ffffff;
+  padding: 15px 20px;
+  font-size: 1em;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .card:hover {
-    background-color: var(--light-sage);
-    color: white;
-    box-shadow: 0 3px 6px var(--card-hover-shadow);
+  background-color: #00bfff; /* Lighter blue on hover */
 }
 
-.card.active-card {
-    background-color: var(--primary-sage);
-    color: white;
-    font-weight: 600;
-    box-shadow: 0 3px 8px rgba(143, 188, 143, 0.3);
+.active-card {
+  background-color: #20b2aa; /* Active card teal */
+  color: #fff;
+  font-weight: bold;
 }
 
-/* --- FOOTER --- */
+/* Sidebar footer logout button */
 .sidebar-footer {
-    padding-top: 1rem;
-    border-top: 1px solid #eee;
-    text-align: center;
+  margin-top: auto;
+  padding: 15px;
 }
 
 .logout-button {
-    background-color: #dc3545;
-    color: white;
-    padding: 0.6rem 1rem; /* smaller button */
-    border: none;
-    border-radius: 0.4rem;
-    cursor: pointer;
-    font-size: 0.9rem;
-    font-weight: 600;
-    transition: 0.2s;
+  width: 100%;
+  background-color: #ff4c4c; /* Resort red for logout */
+  color: white;
+  padding: 15px;
+  font-size: 1em;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 .logout-button:hover {
-    background-color: #c82333;
+  background-color: #cc0000;
 }
 
-/* --- MAIN CONTENT --- */
+/* 3. Main Content */
 .dashboard-main {
-    flex-grow: 1;
-    margin-left: 220px; /* match sidebar width */
-    padding: 1rem; /* smaller padding */
-    height: 100vh;
-    overflow-y: auto;
-    background-color: var(--background-light-grey);
+  flex-grow: 1;
+  padding: 40px;
+  background-color: #f0f8ff; /* Match container background */
+}
+
+.dashboard-main h1 {
+  color: #006994; /* Deep resort blue */
+  border-bottom: 3px solid #20b2aa; /* Teal accent */
+  padding-bottom: 10px;
+  margin-bottom: 25px;
+}
+
+.dashboard-main p {
+  color: #004466;
+  font-size: 1.1em;
+}
+
+/* Responsive Layout */
+@media (max-width: 768px) {
+  .dashboard-container {
+    flex-direction: column;
+  }
+
+  .dashboard-sidebar {
+    width: 100%;
+    flex-direction: row;
+    overflow-x: auto;
+    padding: 0;
+  }
+
+  .sidebar-header {
+    display: none;
+  }
+
+  .sidebar-nav-cards {
+    flex-direction: row;
+    gap: 5px;
+    padding: 5px;
+  }
+
+  .card {
+    flex-shrink: 0;
+    padding: 10px 15px;
+    text-align: center;
+    justify-content: center;
+  }
+
+  .sidebar-footer {
+    margin-top: 0;
+    padding: 10px;
+  }
+
+  .logout-button {
+    width: auto;
+  }
 }
