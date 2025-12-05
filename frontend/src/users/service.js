@@ -5,7 +5,7 @@ import tower from '../components/pictures/tower.jpg';
 
 function UserServices() {
     const [services, setServices] = useState([]);
-    const [payments, setPayments] = useState([]); // 🔥 New state for GCASH / BANK QR
+    const [payments, setPayments] = useState([]); 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [activeTab, setActiveTab] = useState('rooms');
@@ -41,6 +41,7 @@ function UserServices() {
                 return;
             }
         }
+        // This is where the error was flagged (or immediately after)
         navigate('/booknow', { state: { serviceId, serviceName, servicePrice } });
     }, [navigate, isLoggedIn, userEmail, hasRoomOrCottageBooking]);
 
@@ -58,7 +59,7 @@ function UserServices() {
 
             const data = await res.json();
 
-            // 🔥 Filter payment QR codes
+            // Filter payment QR codes
             const paymentQR = data.filter(s => s.type === "payment");
             setPayments(paymentQR);
 
@@ -177,7 +178,7 @@ function UserServices() {
                                     onClick={() => setActiveTab('island_hopping')}
                                 >Island Hopping</button>
 
-                                {/* 🔥 NEW TAB: Mode of Payment */}
+                                {/* Mode of Payment Tab */}
                                 <button
                                     className={activeTab === 'payment' ? 'tab-button active' : 'tab-button'}
                                     onClick={() => setActiveTab('payment')}
@@ -225,7 +226,7 @@ function UserServices() {
                                 </div>
                             )}
 
-                            {/* 🔥 PAYMENT QR DISPLAY (FIX APPLIED HERE) */}
+                            {/* PAYMENT QR DISPLAY */}
                             {activeTab === 'payment' && (
                                 <div className="payment-section">
                                     <h3 className="section-title">Mode of Payment</h3>
@@ -237,9 +238,9 @@ function UserServices() {
                                             {payments.map((p) => (
                                                 <div className="payment-card" key={p.id}>
                                                     <h4>{p.name}</h4>
-                                                    {p.image_url ? ( {/* FIX: Changed p.qr_url to p.image_url */}
+                                                    {p.image_url ? ( 
                                                         <img
-                                                            src={`${process.env.REACT_APP_SERVICES_API}${p.image_url}`} {/* FIX: Changed p.qr_url to p.image_url */}
+                                                            src={`${process.env.REACT_APP_SERVICES_API}${p.image_url}`} 
                                                             alt={`${p.name} QR`}
                                                             className="payment-qr-image"
                                                         />
