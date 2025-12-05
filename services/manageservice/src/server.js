@@ -4,7 +4,7 @@ const mysql = require('mysql2/promise');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const { v4: uuidv4 } = require('uuid'); // Add uuid for unique filenames
+const { v4: uuidv4 } = require('uuid'); // ✅ Added uuid for unique filenames
 
 const app = express();
 
@@ -13,7 +13,7 @@ const FRONTEND_URL = 'https://emzbayviewmountainresort.up.railway.app';
 const PORT = 5002;
 
 // ✅ CRITICAL FIX: Define the absolute mount path for the persistent volume
-const UPLOAD_DIR = '/usr/src/app/uploads'; 
+const UPLOAD_DIR = '/app/uploads'; 
 // ----------------------------
 
 // Configure CORS
@@ -25,7 +25,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // Middleware
-app.use(express.json());
+app.use(express.json()); // Parse JSON
 
 // Request logger
 app.use((req, res, next) => {
@@ -33,21 +33,35 @@ app.use((req, res, next) => {
     next();
 });
 
-// ✅ FIX 1: Serve uploads statically from the absolute volume mount path
+// ----------------------------------------------------
+// ✅ FIX 1: Guarded Directory Creation
+// ----------------------------------------------------
+try {
+    if (!fs.existsSync(UPLOAD_DIR)) {
+        fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+        console.log(`✅ Persistent upload directory created at: ${UPLOAD_DIR}`);
+    } else {
+        console.log(`✅ Persistent upload directory found at: ${UPLOAD_DIR}`);
+    }
+} catch (error) {
+    console.error(`❌ FATAL ERROR: Could not access or create upload directory at ${UPLOAD_DIR}`);
+    console.error(`Please ensure Railway Volume Mount Path is set to /app/uploads and RAILWAY_RUN_UID=0.`);
+    // We will let the app continue, but file uploads might fail if the error is permissions related.
+}
+// ----------------------------------------------------
+
+
+// ✅ FIX 2: Serve uploads statically from the absolute volume mount path
 app.use('/uploads', express.static(UPLOAD_DIR));
 
 // Multer setup
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        // ✅ FIX 2: Multer must save files directly to the absolute mount path
-        if (!fs.existsSync(UPLOAD_DIR)) {
-             // CRITICAL: Ensure the directory exists on volume initialization
-             fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-        }
+        // ✅ Multer must save files directly to the absolute mount path
         cb(null, UPLOAD_DIR);
     },
     filename: (req, file, cb) => {
-        // ✅ Improvement: Use UUID for unique filenames to prevent overwrites
+        // ✅ FIX 3: Use UUID and original extension for robust, unique filenames
         const uniqueSuffix = uuidv4();
         const fileExtension = path.extname(file.originalname);
         cb(null, uniqueSuffix + fileExtension);
@@ -55,7 +69,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// MySQL connection (No changes needed here)
+// MySQL connection (No changes needed)
 const db = mysql.createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
@@ -81,8 +95,7 @@ db.getConnection()
 app.post('/api/services', upload.single('image'), async (req, res) => {
     const { name, description, price, status, type } = req.body;
     
-    // ✅ FIX 3: image_url must use the public URL path /uploads/ and the unique filename
-    // Multer saves the full path to req.file.path, but we use req.file.filename
+    // ✅ Use the unique filename saved by Multer
     let image_url = req.file ? `/uploads/${req.file.filename}` : null; 
 
     const finalPrice = (type === 'payment' || !price) ? null : price;
@@ -157,6 +170,7 @@ app.put('/api/services/:id', upload.single('image'), async (req, res) => {
 
         // Delete the old file after a successful DB update
         if (oldImagePath && fs.existsSync(oldImagePath)) {
+             // Using async unlink is better than sync unlinkSync()
              fs.unlink(oldImagePath, (unlinkErr) => {
                 if (unlinkErr) console.error("Error deleting old file:", unlinkErr);
             });
@@ -184,7 +198,6 @@ app.delete('/api/services/:id', async (req, res) => {
             const imagePath = path.join(UPLOAD_DIR, filename);
 
             if (fs.existsSync(imagePath)) {
-                // Use async unlink to prevent blocking the event loop
                 fs.unlink(imagePath, (err) => {
                     if (err) console.error("Error deleting file:", err);
                 });
