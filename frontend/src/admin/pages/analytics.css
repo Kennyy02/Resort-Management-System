@@ -1,33 +1,132 @@
 :root {
-    --primary-purple: #663399;
-    --primary-sage: #8fbc8f;
-    --light-sage: #a6d9a6;
-    --extra-light-sage: #c2e6c2;
-    --background-light-grey: #f3f4f6;
-    --text-dark: #1f2937;
-    --text-medium: #4b5563;
+    --primary-sage: #9caf88;
+    --light-sage: #c5d0b0;
+    --background-light: #f5f7f3;
+    --text-dark: #4a5a40;
+    --text-light: #ffffff;
     --shadow-color: rgba(0, 0, 0, 0.05);
     --hover-shadow-color: rgba(0, 0, 0, 0.1);
 }
 
-body {
-    background-color: var(--background-light-grey);
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+/* --- Layout --- */
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--background-light);
+    overflow: hidden; /* Prevent horizontal scroll */
 }
 
+/* Sidebar */
+.dashboard-sidebar {
+    width: 250px;
+    min-width: 250px;
+    background-color: var(--primary-sage);
+    color: var(--text-light);
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+    box-shadow: 3px 0 6px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    overflow-y: auto;
+}
+
+.sidebar-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.sidebar-title {
+    font-size: 1.5rem;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--light-sage);
+}
+
+/* Sidebar nav links */
+.sidebar-nav-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 0 20px;
+}
+
+.card {
+    background: none;
+    color: var(--text-light);
+    padding: 8px 0;
+    font-size: 0.95rem;
+    cursor: pointer;
+    border-bottom: 1px solid transparent;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.card:hover {
+    border-bottom: 2px solid var(--text-light);
+}
+
+.active-card {
+    border-bottom: 2px solid var(--text-light);
+    font-weight: bold;
+}
+
+/* Sidebar footer logout button */
+.sidebar-footer {
+    margin-top: auto;
+    padding: 15px 20px;
+}
+
+.logout-button {
+    background: none;
+    color: var(--text-light);
+    font-size: 0.95rem;
+    padding: 8px 0;
+    cursor: pointer;
+    border-bottom: 1px solid transparent;
+    transition: all 0.2s ease;
+    text-align: left;
+}
+
+.logout-button:hover {
+    border-bottom: 2px solid var(--text-light);
+}
+
+/* --- Main Content --- */
+.dashboard-main {
+    flex-grow: 1;
+    margin-left: 250px; /* Match sidebar width */
+    padding: 25px 30px;
+    height: 100vh;
+    overflow-y: auto; /* Enable vertical scrolling */
+    background-color: var(--background-light);
+}
+
+/* Page Header */
+.dashboard-main h1 {
+    font-size: 1.8rem;
+    color: var(--primary-sage);
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--primary-sage);
+    padding-bottom: 10px;
+}
+
+/* --- Chart Cards --- */
 .chart-card {
-    background-color: white;
-    padding: 1.5rem;
-    border: none;
-    border-radius: 1.25rem;
+    background-color: #ffffff;
+    padding: 15px 20px;
+    border-radius: 12px;
     box-shadow: 0 4px 12px var(--shadow-color);
     transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     width: 100%;
+    margin-bottom: 20px;
 }
 
 .chart-card:hover {
@@ -35,8 +134,126 @@ body {
     box-shadow: 0 8px 16px var(--hover-shadow-color);
 }
 
-select.focus\:ring-purple-500:focus {
-    border-color: var(--primary-sage);
-    box-shadow: 0 0 0 3px var(--extra-light-sage);
-    outline: none;
+.chart-card canvas {
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+/* --- Tables --- */
+.analytics-table-container {
+    overflow-x: auto; /* Horizontal scroll for small screens */
+    margin-top: 20px;
+    width: 100%;
+}
+
+.analytics-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.analytics-table th,
+.analytics-table td {
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.analytics-table th {
+    background-color: var(--primary-sage);
+    color: #fff;
+    font-size: 0.9rem;
+}
+
+/* --- Buttons --- */
+.analytics-actions button {
+    background-color: var(--primary-sage);
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-right: 8px;
+}
+
+.analytics-actions button:hover {
+    background-color: var(--light-sage);
+}
+
+/* --- Responsive Layout --- */
+@media (max-width: 1024px) {
+    .dashboard-main {
+        padding: 20px 20px;
+    }
+    .chart-card {
+        padding: 12px 15px;
+    }
+    .analytics-table th,
+    .analytics-table td {
+        font-size: 0.8rem;
+        padding: 6px 10px;
+    }
+    .analytics-actions button {
+        font-size: 0.8rem;
+        padding: 5px 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-container {
+        flex-direction: column;
+    }
+    .dashboard-sidebar {
+        width: 100%;
+        min-width: 100%;
+        height: auto;
+        flex-direction: row;
+        overflow-x: auto;
+        padding: 10px 0;
+        position: relative;
+    }
+    .sidebar-header {
+        display: none;
+    }
+    .sidebar-nav-cards {
+        flex-direction: row;
+        gap: 8px;
+        padding: 0 10px;
+    }
+    .card {
+        flex-shrink: 0;
+        padding: 8px 12px;
+        text-align: center;
+        justify-content: center;
+    }
+    .sidebar-footer {
+        margin-top: 0;
+        padding: 10px;
+    }
+    .logout-button {
+        width: auto;
+        border-bottom: 1px solid transparent;
+    }
+    .dashboard-main {
+        margin-left: 0;
+        height: auto;
+        overflow-y: visible;
+        padding: 15px;
+    }
+    .dashboard-main h1 {
+        font-size: 1.5rem;
+    }
+    .chart-card {
+        padding: 10px 12px;
+    }
+    .analytics-table th,
+    .analytics-table td {
+        font-size: 0.75rem;
+        padding: 5px 8px;
+    }
+    .analytics-actions button {
+        font-size: 0.75rem;
+        padding: 4px 8px;
+    }
 }
