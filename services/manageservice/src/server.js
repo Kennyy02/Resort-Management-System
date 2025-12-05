@@ -6,7 +6,7 @@ const path = require('path');
 const fs = require('fs');
 
 const app = express();
-// --- FIX #1: Explicit CORS Configuration ---
+// CORS FIX: Explicitly allowing your frontend domain
 const allowedOrigin = 'https://emzbayviewmountainresort.up.railway.app'; 
 
 app.use(cors({
@@ -39,7 +39,6 @@ const storage = multer.diskStorage({
         cb(null, uploadDir);
     },
     filename: (req, file, cb) => {
-        // Appending Date.now() to ensure unique filenames
         cb(null, Date.now() + '-' + file.originalname);
     }
 });
@@ -68,10 +67,9 @@ db.getConnection()
     });
 
 
-// POST new service (FIXED: Added mode_of_payment column to query)
+// POST new service (FINAL FIX: Explicitly set price/description to NULL if empty)
 app.post('/api/services', upload.single('image'), async (req, res) => {
     console.log('Backend: POST /api/services hit!');
-    // **CHANGED: Extracted mode_of_payment**
     const { name, description, price, status, type, mode_of_payment } = req.body;
     let image_url = null;
     if (req.file) {
@@ -79,15 +77,17 @@ app.post('/api/services', upload.single('image'), async (req, res) => {
         console.log(`Image uploaded: ${image_url}`);
     }
 
-    // Default to 'online' if not explicitly sent
     const final_mode_of_payment = mode_of_payment || 'online'; 
+
+    // **FINAL FIX: Convert empty string to NULL for database**
+    const final_price = (price === '' || price === undefined) ? null : price;
+    const final_description = (description === '' || description === undefined) ? null : description;
+    // ---------------------------------------------------------
 
     try {
         const [result] = await db.query(
-            // **CHANGED: Added mode_of_payment to column list**
             'INSERT INTO services (name, description, price, image_url, status, type, mode_of_payment) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            // **CHANGED: Added final_mode_of_payment to value list**
-            [name, description, price, image_url, status, type, final_mode_of_payment]
+            [name, final_description, final_price, image_url, status, type, final_mode_of_payment]
         );
         console.log('Service added to DB, ID:', result.insertId);
         res.status(201).json({ message: 'Service added successfully', id: result.insertId });
@@ -110,15 +110,18 @@ app.get('/api/services', async (req, res) => {
     }
 });
 
-// PUT (Update) a service (FIXED: Added mode_of_payment column to query)
+// PUT (Update) a service (FINAL FIX: Explicitly set price/description to NULL if empty)
 app.put('/api/services/:id', upload.single('image'), async (req, res) => {
     console.log(`Backend: PUT /api/services/${req.params.id} hit!`);
-    // **CHANGED: Extracted mode_of_payment**
     const { name, description, price, status, type, mode_of_payment } = req.body;
     const serviceId = req.params.id;
 
-    // Default to 'online' if not explicitly sent
     const final_mode_of_payment = mode_of_payment || 'online';
+    
+    // **FINAL FIX: Convert empty string to NULL for database**
+    const final_price = (price === '' || price === undefined) ? null : price;
+    const final_description = (description === '' || description === undefined) ? null : description;
+    // ---------------------------------------------------------
 
     try {
         const [rows] = await db.query('SELECT image_url FROM services WHERE id = ?', [serviceId]);
@@ -139,10 +142,8 @@ app.put('/api/services/:id', upload.single('image'), async (req, res) => {
         }
 
         await db.query(
-            // **CHANGED: Added mode_of_payment to SET clause**
             'UPDATE services SET name=?, description=?, price=?, image_url=?, status=?, type=?, mode_of_payment=? WHERE id=?',
-            // **CHANGED: Added final_mode_of_payment to value list**
-            [name, description, price, image_url, status, type, final_mode_of_payment, serviceId]
+            [name, final_description, final_price, image_url, status, type, final_mode_of_payment, serviceId]
         );
 
         // Delete old image file after successful DB update
