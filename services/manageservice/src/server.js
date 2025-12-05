@@ -4,29 +4,28 @@ const mysql = require('mysql2/promise');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const { v4: uuidv4 } = require('uuid'); // Add uuid for unique filenames
 
 const app = express();
 
-// --- START: CORS CONFIGURATION FIX ---
-// Define the specific origin of your frontend application
+// --- START: CONFIGURATION ---
 const FRONTEND_URL = 'https://emzbayviewmountainresort.up.railway.app';
+const PORT = 5002;
 
-// Configure CORS options
+// ✅ CRITICAL FIX: Define the absolute mount path for the persistent volume
+const UPLOAD_DIR = '/usr/src/app/uploads'; 
+// ----------------------------
+
+// Configure CORS
 const corsOptions = {
-    // Only allow requests from your deployed frontend URL
-    origin: FRONTEND_URL, 
-    // Allow the HTTP methods used in your application (GET, POST, PUT, DELETE)
+    origin: FRONTEND_URL,
     methods: ['GET', 'POST', 'PUT', 'DELETE'], 
-    // Allows credentials (like cookies or Authorization headers) to be sent
     credentials: true,
 };
-
-// Apply the specific CORS configuration middleware
 app.use(cors(corsOptions));
-// --- END: CORS CONFIGURATION FIX ---
 
 // Middleware
-app.use(express.json()); // Parse JSON
+app.use(express.json());
 
 // Request logger
 app.use((req, res, next) => {
@@ -34,21 +33,29 @@ app.use((req, res, next) => {
     next();
 });
 
-// Serve uploads statically
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// ✅ FIX 1: Serve uploads statically from the absolute volume mount path
+app.use('/uploads', express.static(UPLOAD_DIR));
 
 // Multer setup
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        const uploadDir = path.join(__dirname, 'uploads');
-        if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
-        cb(null, uploadDir);
+        // ✅ FIX 2: Multer must save files directly to the absolute mount path
+        if (!fs.existsSync(UPLOAD_DIR)) {
+             // CRITICAL: Ensure the directory exists on volume initialization
+             fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+        }
+        cb(null, UPLOAD_DIR);
     },
-    filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname)
+    filename: (req, file, cb) => {
+        // ✅ Improvement: Use UUID for unique filenames to prevent overwrites
+        const uniqueSuffix = uuidv4();
+        const fileExtension = path.extname(file.originalname);
+        cb(null, uniqueSuffix + fileExtension);
+    }
 });
 const upload = multer({ storage });
 
-// MySQL connection
+// MySQL connection (No changes needed here)
 const db = mysql.createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
@@ -72,28 +79,33 @@ db.getConnection()
 
 // POST new service
 app.post('/api/services', upload.single('image'), async (req, res) => {
-    // Destructure fields from the request body
     const { name, description, price, status, type } = req.body;
-    let image_url = req.file ? `/uploads/${req.file.filename}` : null;
+    
+    // ✅ FIX 3: image_url must use the public URL path /uploads/ and the unique filename
+    // Multer saves the full path to req.file.path, but we use req.file.filename
+    let image_url = req.file ? `/uploads/${req.file.filename}` : null; 
 
-    // --- FIX: Handle price being null for 'payment' type services ---
-    // Price should be NULL if the type is 'payment' or if the price value is missing/empty
     const finalPrice = (type === 'payment' || !price) ? null : price;
 
     try {
         const [result] = await db.query(
-            // Use finalPrice in the query
             'INSERT INTO services (name, description, price, image_url, status, type) VALUES (?, ?, ?, ?, ?, ?)',
             [name, description, finalPrice, image_url, status, type] 
         );
-        res.status(201).json({ message: 'Service added successfully', id: result.insertId });
+        res.status(201).json({ message: 'Service added successfully', id: result.insertId, image_url });
     } catch (err) {
         console.error("Error inserting service:", err);
+        // Clean up the uploaded file if DB insert fails
+        if (req.file) {
+            fs.unlink(req.file.path, (unlinkErr) => {
+                if (unlinkErr) console.error("Error cleaning up file:", unlinkErr);
+            });
+        }
         res.status(500).json({ error: err.message, detail: 'Failed to insert into database.' });
     }
 });
 
-// GET all services
+// GET all services (No changes needed)
 app.get('/api/services', async (req, res) => {
     try {
         const [services] = await db.query('SELECT * FROM services');
@@ -113,22 +125,42 @@ app.put('/api/services/:id', upload.single('image'), async (req, res) => {
         if (rows.length === 0) return res.status(404).json({ error: 'Service not found' });
 
         let image_url = rows[0].image_url;
-        let oldImage = null;
+        let oldImagePath = null;
 
         if (req.file) {
-            if (image_url) oldImage = path.join(__dirname, image_url);
+            // New file was uploaded. Prepare to delete the old one.
+            if (image_url) {
+                // ✅ FIX 4: Construct old file path using the absolute UPLOAD_DIR
+                const oldFilename = path.basename(image_url); // Extract only the filename from the URL
+                oldImagePath = path.join(UPLOAD_DIR, oldFilename);
+            }
+            // Update URL to the new file's public path
             image_url = `/uploads/${req.file.filename}`;
         }
         
-        // Handle price for updates too, to be safe.
         const finalPrice = (type === 'payment' || !price) ? null : price;
 
-        await db.query(
+        const [updateResult] = await db.query(
             'UPDATE services SET name=?, description=?, price=?, image_url=?, status=?, type=? WHERE id=?',
             [name, description, finalPrice, image_url, status, type, serviceId]
         );
+        
+        if (updateResult.affectedRows === 0) {
+            // Clean up the new file if DB update failed
+            if (req.file) {
+                 fs.unlink(req.file.path, (unlinkErr) => {
+                    if (unlinkErr) console.error("Error cleaning up new file:", unlinkErr);
+                });
+            }
+            return res.status(404).json({ error: 'Service update failed or not found' });
+        }
 
-        if (oldImage && fs.existsSync(oldImage)) fs.unlinkSync(oldImage);
+        // Delete the old file after a successful DB update
+        if (oldImagePath && fs.existsSync(oldImagePath)) {
+             fs.unlink(oldImagePath, (unlinkErr) => {
+                if (unlinkErr) console.error("Error deleting old file:", unlinkErr);
+            });
+        }
 
         res.json({ message: 'Service updated successfully' });
     } catch (err) {
@@ -147,8 +179,16 @@ app.delete('/api/services/:id', async (req, res) => {
 
         const image_url = rows[0].image_url;
         if (image_url) {
-            const imagePath = path.join(__dirname, image_url);
-            if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
+             // ✅ FIX 5: Construct image path using the absolute UPLOAD_DIR
+            const filename = path.basename(image_url);
+            const imagePath = path.join(UPLOAD_DIR, filename);
+
+            if (fs.existsSync(imagePath)) {
+                // Use async unlink to prevent blocking the event loop
+                fs.unlink(imagePath, (err) => {
+                    if (err) console.error("Error deleting file:", err);
+                });
+            }
         }
 
         const [result] = await db.query('DELETE FROM services WHERE id = ?', [serviceId]);
@@ -173,5 +213,4 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-const PORT = 5002;
 app.listen(PORT, () => console.log(`🚀 Services Server running at port ${PORT}`));
