@@ -1,163 +1,235 @@
 import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
-import "./styles/aboutus.css";
-import aboutusbg from "../components/pictures/aboutusbg.jpg";
+import "./aboutus.css";
 
 const BASE_URL = process.env.REACT_APP_ABOUTUS_API;
 
 const GENERAL_API_URL = `${BASE_URL}/pre/api/aboutus`;
 const POLICIES_API_URL = `${BASE_URL}/pre/api/policies`;
 
-const AboutUs = () => {
-  const [activeTab, setActiveTab] = useState("general");
-  const [aboutUsData, setAboutUsData] = useState({
-    general: "",
-    policies: [],
-  });
+const AdminAboutUs = () => {
+  const [generalContent, setGeneralContent] = useState("");
+  const [generalId, setGeneralId] = useState(null);
 
-  const [loading, setLoading] = useState(true);
+  const [policiesList, setPoliciesList] = useState([]);
+  const [newPolicyText, setNewPolicyText] = useState("");
+  const [newPolicyCategory, setNewPolicyCategory] = useState("");
+  const [editingPolicy, setEditingPolicy] = useState(null);
+
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
   const policyCategories = useMemo(
-    () => ({
-      terms_booking: "Terms of Payment & Booking Policies",
-      check_in_out: "Check-in & Check-out Policies",
-      occupancy_room_service: "Occupancy & Room Service",
-      safety_conduct: "Safety Precautions, Risk Control & Proper Conduct",
-      swimming_pool_rules: "Swimming Pool Rules",
-      other_policies: "Other Resort Policies",
-    }),
+    () => [
+      { value: "terms_booking", label: "Terms of Payment & Booking Policies" },
+      { value: "check_in_out", label: "Check-in & Check-out Policies" },
+      { value: "occupancy_room_service", label: "Occupancy & Room Service" },
+      { value: "safety_conduct", label: "Safety & Conduct" },
+      { value: "swimming_pool_rules", label: "Swimming Pool Rules" },
+      { value: "other_policies", label: "Other Resort Policies" },
+    ],
     []
   );
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [generalRes, policyRes] = await Promise.allSettled([
-          axios.get(GENERAL_API_URL),
-          axios.get(POLICIES_API_URL),
-        ]);
-
-        const safeGetData = (res) =>
-          res.status === "fulfilled" && res.value.data
-            ? res.value.data
-            : [];
-
-        const generalData = safeGetData(generalRes);
-        const policiesData = safeGetData(policyRes);
-
-        const generalContent =
-          generalData.length > 0
-            ? generalData[0].content
-            : "No general information available.";
-
-        setAboutUsData({
-          general: generalContent,
-          policies: policiesData,
-        });
-
-        if (generalRes.status === "rejected" || policyRes.status === "rejected") {
-          setError("Warning: Some content failed to load.");
-        }
-      } catch (err) {
-        console.error(err);
-        setError("Failed to load About Us information.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
+    fetchAllContent();
+    if (policyCategories.length > 0)
+      setNewPolicyCategory(policyCategories[0].value);
   }, []);
 
-  const groupedPolicies = useMemo(() => {
-    return aboutUsData.policies.reduce((acc, policy) => {
-      const label = policy.category
-        ? policyCategories[policy.category] || "Uncategorized"
-        : "Uncategorized";
-      if (!acc[label]) acc[label] = [];
-      acc[label].push(policy);
-      return acc;
-    }, {});
-  }, [aboutUsData.policies, policyCategories]);
+  const fetchAllContent = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const generalRes = await axios.get(GENERAL_API_URL);
 
-  const renderContent = () => {
-    if (loading) return <p>Loading...</p>;
+      if (generalRes.data.length) {
+        setGeneralContent(generalRes.data[0].content);
+        setGeneralId(generalRes.data[0].id);
+      }
 
-    switch (activeTab) {
-      case "general":
-        return (
-          <div className="plain-section">
-            <h2 className="section-title">General Information</h2>
-            <div className="plain-text">
-              {aboutUsData.general
-                .split(/\r?\n/)
-                .filter((line) => line.trim() !== "")
-                .map((line, index) => (
-                  <p key={index}>{line}</p>
-                ))}
-            </div>
-          </div>
-        );
-
-      case "policies":
-        return (
-          <div className="plain-section">
-            <h2 className="section-title">Resort Policies</h2>
-            {aboutUsData.policies.length > 0 ? (
-              Object.keys(groupedPolicies).map((category) => (
-                <div key={category} className="policy-block">
-                  <h3>{category}</h3>
-                  <ol>
-                    {groupedPolicies[category].map((policy) => (
-                      <li key={policy.id}>{policy.policy_text}</li>
-                    ))}
-                  </ol>
-                </div>
-              ))
-            ) : (
-              <p>No policies found.</p>
-            )}
-          </div>
-        );
-
-      default:
-        return null;
+      const policiesRes = await axios.get(POLICIES_API_URL);
+      setPoliciesList(policiesRes.data);
+    } catch (err) {
+      setError("Failed to fetch content.");
+    } finally {
+      setLoading(false);
     }
   };
 
+  const handleGeneralSubmit = async () => {
+    if (!generalContent.trim()) return setError("Content cannot be empty");
+    setLoading(true);
+    try {
+      const data = { type: "general", content: generalContent };
+      await axios.post(GENERAL_API_URL, data);
+      setMessage("General content saved!");
+      fetchAllContent();
+    } catch {
+      setError("Failed to save general content");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGeneralDelete = async () => {
+    if (!window.confirm("Delete general content?")) return;
+    setLoading(true);
+    try {
+      await axios.delete(`${GENERAL_API_URL}/general`);
+      setGeneralContent("");
+      setGeneralId(null);
+      setMessage("General content deleted.");
+    } catch {
+      setError("Failed to delete.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddUpdatePolicy = async () => {
+    if (!newPolicyText.trim())
+      return setError("Policy text cannot be empty");
+
+    setLoading(true);
+    try {
+      const data = {
+        policy_text: newPolicyText,
+        category: newPolicyCategory,
+      };
+
+      if (editingPolicy) {
+        await axios.put(`${POLICIES_API_URL}/${editingPolicy.id}`, data);
+        setMessage("Policy updated!");
+        setEditingPolicy(null);
+      } else {
+        await axios.post(POLICIES_API_URL, data);
+        setMessage("Policy added!");
+      }
+
+      setNewPolicyText("");
+      fetchAllContent();
+    } catch {
+      setError("Failed to save policy");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeletePolicy = async (id) => {
+    if (!window.confirm("Delete this policy?")) return;
+    setLoading(true);
+    try {
+      await axios.delete(`${POLICIES_API_URL}/${id}`);
+      setMessage("Policy deleted!");
+      fetchAllContent();
+    } catch {
+      setError("Failed to delete policy");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const startEditPolicy = (policy) => {
+    setEditingPolicy(policy);
+    setNewPolicyText(policy.policy_text);
+    setNewPolicyCategory(policy.category);
+  };
+
+  const cancelEdit = () => {
+    setEditingPolicy(null);
+    setNewPolicyText("");
+    setNewPolicyCategory(policyCategories[0].value);
+  };
+
+  const getCategoryLabel = (value) =>
+    policyCategories.find((c) => c.value === value)?.label || "N/A";
+
   return (
-    <div className="aboutus-page">
-      <div className="aboutus-hero-section">
-        <img src={aboutusbg} alt="About Us" className="aboutus-hero-image" />
-        <div className="aboutus-hero-overlay" />
-        <div className="aboutus-hero-content">
-          <h1 className="hero-title">ABOUT US</h1>
+    <div className="aboutus-container full-page">
+      <h1>Manage About Us</h1>
+
+      {loading && <p>Loading...</p>}
+      {message && <p className="success-message">{message}</p>}
+      {error && <p className="error-message">{error}</p>}
+
+      <div className="admin-section general-section">
+        <h2>General Information</h2>
+        <textarea
+          rows="8"
+          value={generalContent}
+          onChange={(e) => setGeneralContent(e.target.value)}
+        />
+
+        <div className="admin-actions">
+          <button onClick={handleGeneralSubmit}>
+            {generalId ? "Update" : "Save"}
+          </button>
+          {generalId && (
+            <button className="delete-btn" onClick={handleGeneralDelete}>
+              Delete
+            </button>
+          )}
         </div>
       </div>
 
-      <div className="aboutus-content-container">
-        <div className="tabs">
-          <button
-            className={activeTab === "general" ? "tab active" : "tab"}
-            onClick={() => setActiveTab("general")}
-          >
-            General Information
-          </button>
+      <div className="admin-section policies-section">
+        <h2>Policies</h2>
 
-          <button
-            className={activeTab === "policies" ? "tab active" : "tab"}
-            onClick={() => setActiveTab("policies")}
-          >
-            Policies
+        <textarea
+          rows="3"
+          value={newPolicyText}
+          onChange={(e) => setNewPolicyText(e.target.value)}
+          placeholder="Enter policy text..."
+        />
+
+        <select
+          value={newPolicyCategory}
+          onChange={(e) => setNewPolicyCategory(e.target.value)}
+        >
+          {policyCategories.map((c) => (
+            <option key={c.value} value={c.value}>
+              {c.label}
+            </option>
+          ))}
+        </select>
+
+        <div className="admin-actions">
+          {editingPolicy && (
+            <button className="cancel-btn" onClick={cancelEdit}>
+              Cancel Edit
+            </button>
+          )}
+          <button onClick={handleAddUpdatePolicy}>
+            {editingPolicy ? "Update Policy" : "Add Policy"}
           </button>
         </div>
 
-        {error && <p className="error-message">{error}</p>}
-        <div className="content">{renderContent()}</div>
+        <h3>Existing Policies</h3>
+        {policiesList.map((p) => (
+          <div key={p.id} className="item-card policy-card">
+            <div>
+              <strong>{p.policy_text}</strong>
+              <div>Category: {getCategoryLabel(p.category)}</div>
+            </div>
+
+            <div className="item-actions">
+              <button onClick={() => startEditPolicy(p)} className="edit-btn">
+                Edit
+              </button>
+              <button
+                onClick={() => handleDeletePolicy(p.id)}
+                className="delete-btn"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
 };
 
-export default AboutUs;
+export default AdminAboutUs;
