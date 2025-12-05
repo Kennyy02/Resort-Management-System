@@ -5,7 +5,7 @@ import tower from '../components/pictures/tower.jpg';
 
 function UserServices() {
     const [services, setServices] = useState([]);
-    const [payments, setPayments] = useState([]); 
+    const [payments, setPayments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [activeTab, setActiveTab] = useState('rooms');
@@ -16,6 +16,7 @@ function UserServices() {
 
     const navigate = useNavigate();
 
+    // Check if user has prerequisite booking
     const checkBookingPrerequisite = useCallback(async (email) => {
         if (!email) return false;
         try {
@@ -30,28 +31,31 @@ function UserServices() {
         }
     }, []);
 
-    const handleBookNowClick = useCallback(async (serviceId, serviceName, servicePrice, serviceType) => {
-        if (serviceType === 'island_hopping') {
-            if (!isLoggedIn || !userEmail) {
-                alert("Please log in and book a Room or Cottage first before booking an Island Hopping Tour.");
-                return;
+    // Handle "Book Now" click
+    const handleBookNowClick = useCallback(
+        async (serviceId, serviceName, servicePrice, serviceType) => {
+            if (serviceType === 'island_hopping') {
+                if (!isLoggedIn || !userEmail) {
+                    alert("Please log in and book a Room or Cottage first before booking an Island Hopping Tour.");
+                    return;
+                }
+                if (!hasRoomOrCottageBooking) {
+                    alert("You must have an APPROVED Room or Cottage booking first.");
+                    return;
+                }
             }
-            if (!hasRoomOrCottageBooking) {
-                alert("You must have an APPROVED Room or Cottage booking first.");
-                return;
-            }
-        }
-        // This is where the error was flagged (or immediately after)
-        navigate('/booknow', { state: { serviceId, serviceName, servicePrice } });
-    }, [navigate, isLoggedIn, userEmail, hasRoomOrCottageBooking]);
+            navigate('/booknow', { state: { serviceId, serviceName, servicePrice } });
+        },
+        [navigate, isLoggedIn, userEmail, hasRoomOrCottageBooking]
+    );
 
+    // Fetch services and payment QR codes
     const fetchServices = async () => {
         setError(null);
         try {
             const url = `${process.env.REACT_APP_SERVICES_API}/api/services`;
             const res = await fetch(url);
             if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-
             const contentType = res.headers.get("content-type");
             if (!contentType || !contentType.includes("application/json")) {
                 throw new Error(`Invalid response format: ${contentType}`);
@@ -59,13 +63,10 @@ function UserServices() {
 
             const data = await res.json();
 
-            // Filter payment QR codes
-            const paymentQR = data.filter(s => s.type === "payment");
-            setPayments(paymentQR);
-
-            // keep only services
-            const filtered = data.filter(s => s.type !== "payment");
-            setServices(filtered);
+            // Separate payment QR codes
+            setPayments(data.filter(s => s.type === "payment"));
+            // Keep only services (room, cottage, island_hopping)
+            setServices(data.filter(s => s.type !== "payment"));
 
             return true;
         } catch (err) {
@@ -74,6 +75,7 @@ function UserServices() {
         }
     };
 
+    // Load services and check prerequisite
     useEffect(() => {
         const loadData = async () => {
             setLoading(true);
@@ -87,6 +89,7 @@ function UserServices() {
         loadData();
     }, [userEmail, isLoggedIn, checkBookingPrerequisite]);
 
+    // Sort services by price
     const sortedServices = useMemo(() => {
         if (sortOrder === 'none') return services;
         return [...services].sort((a, b) => {
@@ -96,13 +99,15 @@ function UserServices() {
         });
     }, [services, sortOrder]);
 
-    const rooms = sortedServices.filter(service => service.type === 'room');
-    const cottages = sortedServices.filter(service => service.type === 'cottage');
-    const islandHopping = sortedServices.filter(service => service.type === 'island_hopping');
+    // Filter by service type
+    const rooms = sortedServices.filter(s => s.type === 'room');
+    const cottages = sortedServices.filter(s => s.type === 'cottage');
+    const islandHopping = sortedServices.filter(s => s.type === 'island_hopping');
 
     if (loading) return <div className="user-services-page loading">Loading services...</div>;
     if (error) return <div className="user-services-page error-message">{error}</div>;
 
+    // Render service cards
     const renderServiceCards = (serviceList, serviceType) => (
         <div className="services-grid">
             {serviceList.map((service) => {
@@ -133,7 +138,9 @@ function UserServices() {
                             {isAvailable && (
                                 <button
                                     className="book-now-button"
-                                    onClick={() => handleBookNowClick(service.id, service.name, service.price, serviceType)}
+                                    onClick={() =>
+                                        handleBookNowClick(service.id, service.name, service.price, serviceType)
+                                    }
                                 >
                                     Book Now
                                 </button>
@@ -162,34 +169,40 @@ function UserServices() {
                     <>
                         <div className="controls-container">
                             <div className="tabs">
-
                                 <button
                                     className={activeTab === 'rooms' ? 'tab-button active' : 'tab-button'}
                                     onClick={() => setActiveTab('rooms')}
-                                >Rooms</button>
-
+                                >
+                                    Rooms
+                                </button>
                                 <button
                                     className={activeTab === 'cottages' ? 'tab-button active' : 'tab-button'}
                                     onClick={() => setActiveTab('cottages')}
-                                >Cottages</button>
-
+                                >
+                                    Cottages
+                                </button>
                                 <button
                                     className={activeTab === 'island_hopping' ? 'tab-button active' : 'tab-button'}
                                     onClick={() => setActiveTab('island_hopping')}
-                                >Island Hopping</button>
-
-                                {/* Mode of Payment Tab */}
+                                >
+                                    Island Hopping
+                                </button>
                                 <button
                                     className={activeTab === 'payment' ? 'tab-button active' : 'tab-button'}
                                     onClick={() => setActiveTab('payment')}
-                                >Mode of Payment</button>
+                                >
+                                    Mode of Payment
+                                </button>
                             </div>
 
-                            {/* sort only for services */}
                             {activeTab !== "payment" && (
                                 <div className="sort-controls">
                                     <label htmlFor="sort-by">Sort by:</label>
-                                    <select id="sort-by" onChange={(e) => setSortOrder(e.target.value)} value={sortOrder}>
+                                    <select
+                                        id="sort-by"
+                                        onChange={(e) => setSortOrder(e.target.value)}
+                                        value={sortOrder}
+                                    >
                                         <option value="none">Default</option>
                                         <option value="price_asc">Price: Low to High</option>
                                         <option value="price_desc">Price: High to Low</option>
@@ -199,7 +212,6 @@ function UserServices() {
                         </div>
 
                         <div className="services-content">
-
                             {activeTab === 'rooms' && rooms.length > 0 && (
                                 <div className="service-section">
                                     <h3 className="section-title">Rooms</h3>
@@ -226,11 +238,9 @@ function UserServices() {
                                 </div>
                             )}
 
-                            {/* PAYMENT QR DISPLAY */}
                             {activeTab === 'payment' && (
                                 <div className="payment-section">
                                     <h3 className="section-title">Mode of Payment</h3>
-
                                     {payments.length === 0 ? (
                                         <p>No payment methods available.</p>
                                     ) : (
@@ -238,9 +248,9 @@ function UserServices() {
                                             {payments.map((p) => (
                                                 <div className="payment-card" key={p.id}>
                                                     <h4>{p.name}</h4>
-                                                    {p.image_url ? ( 
+                                                    {p.qr_url ? (
                                                         <img
-                                                            src={`${process.env.REACT_APP_SERVICES_API}${p.image_url}`} 
+                                                            src={`${process.env.REACT_APP_SERVICES_API}${p.qr_url}`}
                                                             alt={`${p.name} QR`}
                                                             className="payment-qr-image"
                                                         />
@@ -253,7 +263,6 @@ function UserServices() {
                                     )}
                                 </div>
                             )}
-
                         </div>
                     </>
                 )}
