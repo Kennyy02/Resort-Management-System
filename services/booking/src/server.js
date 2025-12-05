@@ -83,12 +83,25 @@ app.get('/api/bookings/service/:serviceId', async (req, res) => {
     }
 });
 
+// ----------------- ✅ FIXED POST /api/bookings ROUTE -----------------
 app.post('/api/bookings', async (req, res) => {
     try {
-        const { name, email, phoneNumber, checkInDate, checkOutDate, serviceId, serviceName, modeOfPayment } = req.body;
+        // ✅ FIX 1: Destructure referenceNumber from the request body
+        const { name, email, phoneNumber, checkInDate, checkOutDate, serviceId, serviceName, modeOfPayment, referenceNumber } = req.body;
 
-        const requiredFields = { name, email, phoneNumber, checkInDate, checkOutDate, serviceId, serviceName, modeOfPayment };
-        const missingFields = Object.keys(requiredFields).filter(key => !requiredFields[key]);
+        // ✅ FIX 2: Include referenceNumber in the required fields check
+        const requiredFields = { name, email, phoneNumber, checkInDate, checkOutDate, serviceId, serviceName, modeOfPayment, referenceNumber };
+        // The frontend handles making referenceNumber optional for onsite payment, so we can simplify the backend check here.
+        // If referenceNumber is required by the form (e.g., online payment), the frontend ensures it's passed.
+        const missingFields = Object.keys(requiredFields).filter(key => {
+            // Check if the field is modeOfPayment and its value is missing
+            if (key === 'referenceNumber' && modeOfPayment === 'onsite') {
+                // referenceNumber is not required for onsite (or can be treated as an empty string)
+                return false; 
+            }
+            // Check if any other required field is missing/falsy
+            return !requiredFields[key];
+        });
 
         if (missingFields.length > 0) {
             console.error("❌ Missing required fields for booking:", missingFields.join(', '));
@@ -97,6 +110,9 @@ app.post('/api/bookings', async (req, res) => {
 
         const formattedCheckIn = new Date(checkInDate).toISOString().split('T')[0];
         const formattedCheckOut = new Date(checkOutDate).toISOString().split('T')[0];
+        
+        // Ensure referenceNumber is stored as null if empty (for onsite payments)
+        const finalReferenceNumber = (modeOfPayment === 'onsite' && !referenceNumber) ? null : referenceNumber;
 
         const [conflicts] = await db.promise().query(
             "SELECT id FROM bookings WHERE serviceId = ? AND checkInDate = ?",
@@ -107,11 +123,11 @@ app.post('/api/bookings', async (req, res) => {
         }
 
         const sql = `INSERT INTO bookings 
-            (name, email, phoneNumber, checkInDate, checkOutDate, serviceId, serviceName, modeOfPayment) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+             (name, email, phoneNumber, checkInDate, checkOutDate, serviceId, serviceName, modeOfPayment, referenceNumber) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`; // ✅ FIX 3: Added referenceNumber column
 
         const [result] = await db.promise().query(sql, [
-            name, email, phoneNumber, formattedCheckIn, formattedCheckOut, serviceId, serviceName, modeOfPayment
+            name, email, phoneNumber, formattedCheckIn, formattedCheckOut, serviceId, serviceName, modeOfPayment, finalReferenceNumber // ✅ FIX 4: Added referenceNumber value
         ]);
 
         res.status(201).json({ message: 'Booking created', bookingId: result.insertId });
@@ -120,6 +136,8 @@ app.post('/api/bookings', async (req, res) => {
         res.status(500).json({ error: 'Server error while booking' });
     }
 });
+// ----------------- END FIXED POST /api/bookings ROUTE -----------------
+
 
 app.get('/api/bookings', (req, res) => {
     db.query("SELECT * FROM bookings ORDER BY created_at DESC", (err, results) => {
