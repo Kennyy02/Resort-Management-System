@@ -31,15 +31,18 @@ app.use((req, res, next) => {
     next();
 });
 
-// Static folder for uploads
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// =========================
+// STATIC FILES (Railway Volume)
+// =========================
+app.use('/uploads', express.static('/data/uploads'));
+
 
 // =========================
-// MULTER (FILE UPLOADS)
+// MULTER (FILE UPLOADS) — FIXED FOR RAILWAY VOLUME
 // =========================
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        const uploadDir = path.join(__dirname, 'uploads');
+        const uploadDir = '/data/uploads'; // persistent volume
         if (!fs.existsSync(uploadDir)) {
             fs.mkdirSync(uploadDir, { recursive: true });
         }
@@ -52,8 +55,9 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+
 // =========================
-// DATABASE CONNECTION
+/* DATABASE CONNECTION */
 // =========================
 const db = mysql.createPool({
     host: process.env.DB_HOST,
@@ -73,6 +77,7 @@ db.getConnection()
         conn.release();
     })
     .catch(err => console.error('DB connection failed:', err));
+
 
 // =========================
 // ROUTES
@@ -105,6 +110,7 @@ app.post('/api/services', upload.single('image'), async (req, res) => {
     }
 });
 
+
 // READ services
 app.get('/api/services', async (req, res) => {
     try {
@@ -116,6 +122,7 @@ app.get('/api/services', async (req, res) => {
         });
     }
 });
+
 
 // UPDATE service
 app.put('/api/services/:id', upload.single('image'), async (req, res) => {
@@ -136,7 +143,9 @@ app.put('/api/services/:id', upload.single('image'), async (req, res) => {
         let oldImage = null;
 
         if (req.file) {
-            if (image_url) oldImage = path.join(__dirname, image_url);
+            if (image_url) {
+                oldImage = path.join('/data/uploads', path.basename(image_url));
+            }
             image_url = `/uploads/${req.file.filename}`;
         }
 
@@ -158,6 +167,7 @@ app.put('/api/services/:id', upload.single('image'), async (req, res) => {
     }
 });
 
+
 // DELETE service
 app.delete('/api/services/:id', async (req, res) => {
     const serviceId = req.params.id;
@@ -175,7 +185,7 @@ app.delete('/api/services/:id', async (req, res) => {
         const image_url = rows[0].image_url;
 
         if (image_url) {
-            const imagePath = path.join(__dirname, image_url);
+            const imagePath = path.join('/data/uploads', path.basename(image_url));
             if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
         }
 
@@ -195,6 +205,7 @@ app.delete('/api/services/:id', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
+
 
 // Root
 app.get('/', (req, res) => {
