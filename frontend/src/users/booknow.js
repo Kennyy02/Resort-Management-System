@@ -7,10 +7,10 @@ const BOOKING_API_URL =
     ? process.env.REACT_APP_BOOKING_API_URL
     : "http://localhost:5003";
 
-const SERVICES_API_URL =
+const PAYMENT_API_URL =
   process.env.NODE_ENV === "production"
-    ? process.env.REACT_APP_SERVICES_API
-    : "http://localhost:5002";
+    ? process.env.REACT_APP_PAYMENT_API
+    : "http://localhost:5002"; // <-- THIS MUST POINT TO PAYMENT QR SERVER
 
 const BookNow = () => {
   const location = useLocation();
@@ -30,7 +30,7 @@ const BookNow = () => {
   });
 
   const [bookedDates, setBookedDates] = useState([]);
-  const [paymentQRs, setPaymentQRs] = useState([]);
+  const [paymentQRs, setPaymentQRs] = useState([]);     // <-- QR list here
   const [qrModalOpen, setQrModalOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -39,7 +39,7 @@ const BookNow = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   const isPhoneNumberDisabled = user && user.phone;
 
-  // ---------------- LOAD USER + QR PAYMENT SERVICES ----------------
+  // ---------------- LOAD USER + QR ----------------
   useEffect(() => {
     const loggedIn = localStorage.getItem("isLoggedIn");
     const user = JSON.parse(localStorage.getItem("user"));
@@ -51,46 +51,30 @@ const BookNow = () => {
       return;
     }
 
-    if (!serviceId) {
-      setMessage("❌ Error: Missing service details.");
-      setIsLoading(false);
-      return;
-    }
-
-    let userFullName = user.fullname;
-    let userEmail = user.email || "";
-    let userPhone = user.phone || "";
-
-    if (!userFullName && userEmail) {
-      const emailPrefix = userEmail.split("@")[0];
-      userFullName = emailPrefix
-        .replace(/[^a-zA-Z.]/g, " ")
-        .split(".")
-        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-        .join(" ")
-        .trim();
-    }
-
-    userFullName = userFullName || userEmail || "Guest User";
-
+    // PRE-FILL USER INFO
     setFormData((prev) => ({
       ...prev,
-      name: userFullName,
-      email: userEmail,
-      phoneNumber: userPhone,
+      name: user.fullname || "Guest User",
+      email: user.email || "",
+      phoneNumber: user.phone || "",
     }));
 
-    // Fetch booked dates
+    // Fetch Booked Dates
     fetch(`${BOOKING_API_URL}/api/bookings/service/${serviceId}`)
       .then((res) => res.json())
       .then((data) => setBookedDates(data))
       .catch((err) => console.error("Error fetching booked dates:", err));
 
-    // Fetch QR payment images
-    fetch(`${SERVICES_API_URL}/api/services?type=payment`)
+    // -----------------------------------------------
+    // 🚀 FETCH ONLY QR PAYMENTS — NOT ROOMS ANYMORE
+    // -----------------------------------------------
+    fetch(`${PAYMENT_API_URL}/api/payment-qrs`)
       .then((res) => res.json())
-      .then((data) => setPaymentQRs(data))
-      .catch((err) => console.error("Error fetching QR payments:", err));
+      .then((data) => {
+        console.log("Loaded QR codes:", data);
+        setPaymentQRs(data);
+      })
+      .catch((err) => console.error("Error fetching payment QRs:", err));
 
     setIsLoading(false);
   }, [navigate, serviceId]);
@@ -103,8 +87,7 @@ const BookNow = () => {
     setFormData((p) => ({ ...p, [name]: value }));
 
     if (name === "modeOfPayment") {
-      // Open QR modal whenever payment mode changes
-      setQrModalOpen(true);
+      if (paymentQRs.length > 0) setQrModalOpen(true);
     }
   };
 
@@ -163,12 +146,8 @@ const BookNow = () => {
     }
   };
 
-  if (isLoading)
-    return <div className="loading-container">Loading booking form...</div>;
+  if (isLoading) return <div className="loading-container">Loading booking form...</div>;
 
-  // ---------------------------------------------------------------------
-  //                               UI
-  // ---------------------------------------------------------------------
   return (
     <div className="booking-container">
       <h2 className="booking-title">Book Now: {serviceName}</h2>
@@ -190,7 +169,7 @@ const BookNow = () => {
                 paymentQRs.map((qr) => (
                   <div key={qr.id} className="qr-item">
                     <img
-                      src={`${SERVICES_API_URL}${qr.image_url}`}
+                      src={`${PAYMENT_API_URL}${qr.image_url}`}
                       alt={qr.name}
                       className="qr-image"
                     />
@@ -202,10 +181,7 @@ const BookNow = () => {
               )}
             </div>
 
-            <button
-              className="close-modal-btn"
-              onClick={() => setQrModalOpen(false)}
-            >
+            <button className="close-modal-btn" onClick={() => setQrModalOpen(false)}>
               Close
             </button>
           </div>
@@ -248,7 +224,6 @@ const BookNow = () => {
           required
         />
 
-        {/* Mode of Payment (Triggers QR Modal) */}
         <label>Mode of Payment</label>
         <select
           name="modeOfPayment"
@@ -259,7 +234,6 @@ const BookNow = () => {
           <option value="onsite">🏠 Pay Onsite</option>
         </select>
 
-        {/* Reference Number (REQUIRED) */}
         <label>Reference Number</label>
         <input
           type="text"
@@ -275,11 +249,7 @@ const BookNow = () => {
         </button>
 
         {message && (
-          <p
-            className={`booking-message ${
-              message.includes("❌") ? "error" : "success"
-            }`}
-          >
+          <p className={`booking-message ${message.includes("❌") ? "error" : "success"}`}>
             {message}
           </p>
         )}
