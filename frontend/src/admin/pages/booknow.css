@@ -220,18 +220,13 @@ body {
     line-height: 1.4;
 }
 
-.modal-content strong.status-approved {
-    color: #7C9271;
+/* --- Fix: Modal message status word normal color --- */
+.modal-content p strong {
+    color: #333; /* readable inside modal */
+    font-weight: 600;
 }
 
-.modal-content strong.status-declined {
-    color: #d32f2f;
-}
-
-.modal-content strong.status-pending {
-    color: #f0ad4e;
-}
-
+/* --- Modal Actions --- */
 .modal-actions {
     display: flex;
     justify-content: center;
