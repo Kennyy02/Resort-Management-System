@@ -1,328 +1,163 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import axios from 'axios';
-import './aboutus.css';
+import React, { useState, useEffect, useMemo } from "react";
+import axios from "axios";
+import "./styles/aboutus.css";
+import aboutusbg from "../components/pictures/aboutusbg.jpg";
 
 const BASE_URL = process.env.REACT_APP_ABOUTUS_API;
 
 const GENERAL_API_URL = `${BASE_URL}/pre/api/aboutus`;
-const FACILITIES_API_URL = `${BASE_URL}/pre/api/facilities`;
 const POLICIES_API_URL = `${BASE_URL}/pre/api/policies`;
 
-const AdminAboutUs = () => {
-    const [generalContent, setGeneralContent] = useState('');
-    const [generalId, setGeneralId] = useState(null); 
+const AboutUs = () => {
+  const [activeTab, setActiveTab] = useState("general");
+  const [aboutUsData, setAboutUsData] = useState({
+    general: "",
+    policies: [],
+  });
 
-    const [facilitiesList, setFacilitiesList] = useState([]);
-    const [newFacilityName, setNewFacilityName] = useState('');
-    const [newFacilityDescription, setNewFacilityDescription] = useState('');
-    // REMOVED: const [newFacilityImageUrl, setNewFacilityImageUrl] = useState('');
-    const [editingFacility, setEditingFacility] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-    const [policiesList, setPoliciesList] = useState([]);
-    const [newPolicyText, setNewPolicyText] = useState(''); 
-    const [newPolicyCategory, setNewPolicyCategory] = useState(''); 
-    const [editingPolicy, setEditingPolicy] = useState(null); 
+  const policyCategories = useMemo(
+    () => ({
+      terms_booking: "Terms of Payment & Booking Policies",
+      check_in_out: "Check-in & Check-out Policies",
+      occupancy_room_service: "Occupancy & Room Service",
+      safety_conduct: "Safety Precautions, Risk Control & Proper Conduct",
+      swimming_pool_rules: "Swimming Pool Rules",
+      other_policies: "Other Resort Policies",
+    }),
+    []
+  );
 
-    const [loading, setLoading] = useState(false);
-    const [message, setMessage] = useState('');
-    const [error, setError] = useState('');
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [generalRes, policyRes] = await Promise.allSettled([
+          axios.get(GENERAL_API_URL),
+          axios.get(POLICIES_API_URL),
+        ]);
 
-    // Pagination
-    const [facilityPage, setFacilityPage] = useState(1);
-    const [policyPage, setPolicyPage] = useState(1);
-    const pageSize = 5;
+        const safeGetData = (res) =>
+          res.status === "fulfilled" && res.value.data
+            ? res.value.data
+            : [];
 
-    const policyCategories = useMemo(() => ([
-        { value: 'terms_booking', label: 'Terms of Payment & Booking Policies' },
-        { value: 'check_in_out', label: 'Check-in & Check-out Policies' },
-        { value: 'occupancy_room_service', label: 'Occupancy & Room Service' },
-        { value: 'safety_conduct', label: 'Safety Precautions, Risk Control & Proper Conduct' },
-        { value: 'swimming_pool_rules', label: 'Swimming Pool Rules' },
-        { value: 'other_policies', label: 'Other Resort Policies' },
-    ]), []);
+        const generalData = safeGetData(generalRes);
+        const policiesData = safeGetData(policyRes);
 
-    useEffect(() => {
-        fetchAllContent();
-        if (policyCategories.length > 0) setNewPolicyCategory(policyCategories[0].value);
-    }, [policyCategories]);
+        const generalContent =
+          generalData.length > 0
+            ? generalData[0].content
+            : "No general information available.";
 
-    const fetchAllContent = async () => {
-        setLoading(true);
-        setError('');
-        try {
-            const generalResponse = await axios.get(GENERAL_API_URL);
-            if(generalResponse.data.length) {
-                setGeneralContent(generalResponse.data[0].content);
-                setGeneralId(generalResponse.data[0].id);
-            } else {
-                setGeneralContent('');
-                setGeneralId(null);
-            }
+        setAboutUsData({
+          general: generalContent,
+          policies: policiesData,
+        });
 
-            // Backend is now clean, so we only fetch name/description
-            const facilitiesResponse = await axios.get(FACILITIES_API_URL);
-            setFacilitiesList(facilitiesResponse.data);
-
-            const policiesResponse = await axios.get(POLICIES_API_URL);
-            setPoliciesList(policiesResponse.data);
-        } catch (err) {
-            console.error(err);
-            setError('Failed to fetch content. Check backend.');
-        } finally {
-            setLoading(false);
+        if (generalRes.status === "rejected" || policyRes.status === "rejected") {
+          setError("Warning: Some content failed to load.");
         }
+      } catch (err) {
+        console.error(err);
+        setError("Failed to load About Us information.");
+      } finally {
+        setLoading(false);
+      }
     };
 
-    // General Info Functions (Unchanged)
-    const handleGeneralSubmit = async () => {
-        if (!generalContent.trim()) { setError('General content cannot be empty'); return; }
-        setLoading(true); setMessage(''); setError('');
-        try {
-            const data = { type: 'general', content: generalContent };
-            await axios.post(GENERAL_API_URL, data);
-            setMessage('General content saved successfully!');
-            fetchAllContent();
-        } catch (err) { setError('Failed to save general content'); }
-        finally { setLoading(false); }
-    };
+    fetchData();
+  }, []);
 
-    const handleGeneralDelete = async () => {
-        if (!window.confirm('Are you sure you want to delete the General Content?')) return;
-        setLoading(true); setMessage(''); setError('');
-        try {
-            await axios.delete(`${GENERAL_API_URL}/general`);
-            setMessage('General content deleted!');
-            setGeneralContent('');
-            setGeneralId(null);
-        } catch (err) { setError('Failed to delete general content'); }
-        finally { setLoading(false); }
-    };
+  const groupedPolicies = useMemo(() => {
+    return aboutUsData.policies.reduce((acc, policy) => {
+      const label = policy.category
+        ? policyCategories[policy.category] || "Uncategorized"
+        : "Uncategorized";
+      if (!acc[label]) acc[label] = [];
+      acc[label].push(policy);
+      return acc;
+    }, {});
+  }, [aboutUsData.policies, policyCategories]);
 
-    // Facilities Functions (CLEANED)
-    const handleAddUpdateFacility = async () => {
-        if (!newFacilityName.trim()) { setError('Facility name cannot be empty'); return; }
-        setLoading(true); setMessage(''); setError('');
-        try {
-            // Data ONLY includes Name and Description
-            const data = { 
-                name: newFacilityName, 
-                description: newFacilityDescription
-            };
+  const renderContent = () => {
+    if (loading) return <p>Loading...</p>;
 
-            if (editingFacility) {
-                await axios.put(`${FACILITIES_API_URL}/${editingFacility.id}`, data);
-                setMessage('Facility updated successfully!');
-                setEditingFacility(null);
-            } else {
-                await axios.post(FACILITIES_API_URL, data);
-                setMessage('Facility added successfully!');
-            }
-            // Reset fields
-            setNewFacilityName(''); 
-            setNewFacilityDescription('');
-            fetchAllContent();
-        } catch (err) { setError('Failed to save facility'); }
-        finally { setLoading(false); }
-    };
-
-    const handleDeleteFacility = async (id, name) => {
-        if (!window.confirm(`Delete "${name}"?`)) return;
-        setLoading(true); setMessage(''); setError('');
-        try {
-            await axios.delete(`${FACILITIES_API_URL}/${id}`);
-            setMessage(`Facility "${name}" deleted!`);
-            fetchAllContent();
-        } catch (err) { setError('Failed to delete facility'); }
-        finally { setLoading(false); }
-    };
-
-    const startEditFacility = (f) => { 
-        setEditingFacility(f); 
-        setNewFacilityName(f.name); 
-        setNewFacilityDescription(f.description || ''); 
-        // REMOVED: setNewFacilityImageUrl(f.image_url || '');
-        setEditingPolicy(null);
-        setNewPolicyText('');
-    };
-
-    const cancelEditFacility = () => { 
-        setEditingFacility(null); 
-        setNewFacilityName(''); 
-        setNewFacilityDescription(''); 
-        // REMOVED: setNewFacilityImageUrl('');
-    };
-
-    // Policies Functions (Unchanged)
-    const handleAddUpdatePolicy = async () => {
-        if (!newPolicyText.trim() || !newPolicyCategory) { setError('Policy text and category are required'); return; }
-        setLoading(true); setMessage(''); setError('');
-        try {
-            const data = { policy_text: newPolicyText, category: newPolicyCategory };
-            if (editingPolicy) {
-                await axios.put(`${POLICIES_API_URL}/${editingPolicy.id}`, data);
-                setMessage('Policy updated successfully!');
-                setEditingPolicy(null);
-            } else {
-                await axios.post(POLICIES_API_URL, data);
-                setMessage('Policy added successfully!');
-            }
-            setNewPolicyText('');
-            fetchAllContent();
-        } catch (err) { setError('Failed to save policy'); }
-        finally { setLoading(false); }
-    };
-
-    const handleDeletePolicy = async (id) => {
-        if (!window.confirm('Delete this policy?')) return;
-        setLoading(true); setMessage(''); setError('');
-        try {
-            await axios.delete(`${POLICIES_API_URL}/${id}`);
-            setMessage('Policy deleted!');
-            fetchAllContent();
-        } catch (err) { setError('Failed to delete policy'); }
-        finally { setLoading(false); }
-    };
-
-    const startEditPolicy = (p) => {
-        setEditingPolicy(p);
-        setNewPolicyText(p.policy_text);
-        setNewPolicyCategory(p.category);
-        cancelEditFacility();
-    };
-
-    const cancelEditPolicy = () => {
-        setEditingPolicy(null);
-        setNewPolicyText('');
-        setNewPolicyCategory(policyCategories[0].value);
-    };
-
-    const getCategoryLabel = (value) => {
-        const category = policyCategories.find(c => c.value === value);
-        return category ? category.label : 'N/A';
-    };
-
-    // Pagination helpers
-    const paginate = (items, page) => items.slice((page-1)*pageSize, page*pageSize);
-    const totalPolicyPages = Math.ceil(policiesList.length / pageSize);
-    const totalFacilityPages = Math.ceil(facilitiesList.length / pageSize); // Added for completeness
-
-    return (
-        <div className="aboutus-container full-page">
-            <h1>Manage About Us Content</h1>
-
-            {loading && <p className="info-message">Loading...</p>}
-            {message && <p className="success-message">{message}</p>}
-            {error && <p className="error-message">{error}</p>}
-
-            <div className="main-content-wrapper">
-
-                {/* General Info */}
-                <div className="admin-section general-section">
-                    <h2>General Information</h2>
-                    <div className="form-group">
-                        <label>Content</label>
-                        <textarea value={generalContent} onChange={e => setGeneralContent(e.target.value)} rows="8" placeholder="Enter general resort information..."/>
-                    </div>
-                    <div className="admin-actions">
-                        <button onClick={handleGeneralSubmit}>{generalId ? 'Update Content' : 'Save Content'}</button>
-                        {generalId && <button onClick={handleGeneralDelete} className="delete-btn">Delete Content</button>}
-                    </div>
-                </div>
-
-                {/* Facilities (CLEANED) */}
-                <div className="admin-section facilities-section">
-                    <h2>Manage Facilities</h2>
-                    <div className="form-group">
-                        <label>Facility Name</label>
-                        <input value={newFacilityName} onChange={e=>setNewFacilityName(e.target.value)} placeholder="e.g., Swimming Pool"/>
-                    </div>
-                    <div className="form-group">
-                        <label>Description (Optional)</label>
-                        <textarea value={newFacilityDescription} onChange={e=>setNewFacilityDescription(e.target.value)} rows="3" placeholder="Description..."/>
-                    </div>
-                    
-                    {/* REMOVED: Image URL Input field */}
-                    
-                    <div className="admin-actions">
-                        {editingFacility && <button onClick={cancelEditFacility} className="cancel-btn">Cancel Edit</button>}
-                        <button onClick={handleAddUpdateFacility}>{editingFacility ? 'Update' : 'Add'} Facility</button>
-                    </div>
-
-                    {facilitiesList.length > 0 && (
-                        <>
-                            <h3>Existing Facilities</h3>
-                            <div className="item-list">
-                                {paginate(facilitiesList, facilityPage).map(f => (
-                                    <div key={f.id} className="item-card">
-                                        <div className="item-details">
-                                            <strong>{f.name}</strong>
-                                            {f.description && <p>{f.description}</p>}
-                                            {/* REMOVED: Image status display */}
-                                        </div>
-                                        <div className="item-actions">
-                                            <button onClick={()=>startEditFacility(f)} className="edit-btn">Edit</button>
-                                            <button onClick={()=>handleDeleteFacility(f.id, f.name)} className="delete-btn">Delete</button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                            <div className="pagination">
-                                {Array.from({length: totalFacilityPages}, (_,i)=>(
-                                    <button key={i} className={facilityPage===i+1?'active':'inactive'} onClick={()=>setFacilityPage(i+1)}>{i+1}</button>
-                                ))}
-                            </div>
-                        </>
-                    )}
-                </div>
-
-                {/* Policies (Unchanged) */}
-                <div className="admin-section policies-section">
-                    <h2>Manage Policies</h2>
-                    <div className="form-group">
-                        <label>Policy Text</label>
-                        <textarea value={newPolicyText} onChange={e => setNewPolicyText(e.target.value)} rows="3" placeholder="Enter policy text (e.g., Check-out is strictly 12:00 PM)"/>
-                    </div>
-                    <div className="form-group">
-                        <label>Category</label>
-                        <select value={newPolicyCategory} onChange={e => setNewPolicyCategory(e.target.value)}>
-                            {policyCategories.map(cat => (
-                                <option key={cat.value} value={cat.value}>{cat.label}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className="admin-actions">
-                        {editingPolicy && <button onClick={cancelEditPolicy} className="cancel-btn">Cancel Edit</button>}
-                        <button onClick={handleAddUpdatePolicy}>{editingPolicy ? 'Update' : 'Add'} Policy</button>
-                    </div>
-
-                    {policiesList.length > 0 && (
-                        <>
-                            <h3>Existing Policies</h3>
-                            <div className="item-list">
-                                {paginate(policiesList, policyPage).map(p => (
-                                    <div key={p.id} className="item-card policy-card">
-                                        <div className="item-details">
-                                            <p className="policy-text-display"><strong>{p.policy_text}</strong></p>
-                                            <small className="policy-category-display">Category: {getCategoryLabel(p.category)}</small>
-                                        </div>
-                                        <div className="item-actions">
-                                            <button onClick={() => startEditPolicy(p)} className="edit-btn">Edit</button>
-                                            <button onClick={() => handleDeletePolicy(p.id)} className="delete-btn">Delete</button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                            <div className="pagination">
-                                {Array.from({length: totalPolicyPages}, (_, i) => (
-                                    <button key={i} className={policyPage === i + 1 ? 'active' : 'inactive'} onClick={() => setPolicyPage(i + 1)}>{i + 1}</button>
-                                ))}
-                            </div>
-                        </>
-                    )}
-                </div>
+    switch (activeTab) {
+      case "general":
+        return (
+          <div className="plain-section">
+            <h2 className="section-title">General Information</h2>
+            <div className="plain-text">
+              {aboutUsData.general
+                .split(/\r?\n/)
+                .filter((line) => line.trim() !== "")
+                .map((line, index) => (
+                  <p key={index}>{line}</p>
+                ))}
             </div>
+          </div>
+        );
+
+      case "policies":
+        return (
+          <div className="plain-section">
+            <h2 className="section-title">Resort Policies</h2>
+            {aboutUsData.policies.length > 0 ? (
+              Object.keys(groupedPolicies).map((category) => (
+                <div key={category} className="policy-block">
+                  <h3>{category}</h3>
+                  <ol>
+                    {groupedPolicies[category].map((policy) => (
+                      <li key={policy.id}>{policy.policy_text}</li>
+                    ))}
+                  </ol>
+                </div>
+              ))
+            ) : (
+              <p>No policies found.</p>
+            )}
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="aboutus-page">
+      <div className="aboutus-hero-section">
+        <img src={aboutusbg} alt="About Us" className="aboutus-hero-image" />
+        <div className="aboutus-hero-overlay" />
+        <div className="aboutus-hero-content">
+          <h1 className="hero-title">ABOUT US</h1>
         </div>
-    );
+      </div>
+
+      <div className="aboutus-content-container">
+        <div className="tabs">
+          <button
+            className={activeTab === "general" ? "tab active" : "tab"}
+            onClick={() => setActiveTab("general")}
+          >
+            General Information
+          </button>
+
+          <button
+            className={activeTab === "policies" ? "tab active" : "tab"}
+            onClick={() => setActiveTab("policies")}
+          >
+            Policies
+          </button>
+        </div>
+
+        {error && <p className="error-message">{error}</p>}
+        <div className="content">{renderContent()}</div>
+      </div>
+    </div>
+  );
 };
 
-export default AdminAboutUs;
+export default AboutUs;
