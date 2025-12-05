@@ -51,10 +51,22 @@ const BookNow = () => {
       return;
     }
 
-    // PRE-FILL USER INFO
+    // ---------------- CORRECTED NAME LOGIC ----------------
+    let userFullName = user.name || user.fullname || "";
+    if (!userFullName && user.email) {
+      const emailPrefix = user.email.split("@")[0];
+      userFullName = emailPrefix
+        .replace(/[^a-zA-Z.]/g, " ")
+        .split(".")
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(" ")
+        .trim();
+    }
+    userFullName = userFullName || "Guest User";
+
     setFormData((prev) => ({
       ...prev,
-      name: user.fullname || "Guest User",
+      name: userFullName,
       email: user.email || "",
       phoneNumber: user.phone || "",
     }));
