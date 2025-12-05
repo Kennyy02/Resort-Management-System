@@ -1,18 +1,18 @@
 const express = require('express');
 const cors = require('cors');
-const mysql = require('mysql2/promise'); // Using promise-based mysql2
+const mysql = require('mysql2/promise');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
 const app = express();
 app.use(cors());
-app.use(express.json()); // For parsing application/json
+app.use(express.json()); 
 
-// Middleware to log all incoming requests (VERY helpful for debugging)
+// Middleware to log all incoming requests
 app.use((req, res, next) => {
     console.log(`[${new Date().toISOString()}] Incoming Request: ${req.method} ${req.url}`);
-    next(); // Pass control to the next middleware/route handler
+    next(); 
 });
 
 // Serve uploaded files statically
@@ -24,7 +24,7 @@ const storage = multer.diskStorage({
         const uploadDir = path.join(__dirname, 'uploads');
         if (!fs.existsSync(uploadDir)) {
             console.log(`Creating uploads directory: ${uploadDir}`);
-            fs.mkdirSync(uploadDir, { recursive: true }); // Ensure recursive creation
+            fs.mkdirSync(uploadDir, { recursive: true }); 
         }
         cb(null, uploadDir);
     },
@@ -47,33 +47,37 @@ const db = mysql.createPool({
     queueLimit: 0
 });
 
-// Test DB connection (optional, but good for initial setup)
+// Test DB connection
 db.getConnection()
     .then(connection => {
         console.log('Connected to MySQL database: manageservices');
-        connection.release(); // Release the connection immediately
+        connection.release();
     })
     .catch(err => {
         console.error('Failed to connect to MySQL database "manageservices":', err);
-        // You might want to exit the process or handle this more gracefully in production
-        // process.exit(1); 
     });
 
 
-// POST new service
+// POST new service (FIXED: Added mode_of_payment column)
 app.post('/api/services', upload.single('image'), async (req, res) => {
     console.log('Backend: POST /api/services hit!');
-    const { name, description, price, status, type } = req.body;
+    // **CHANGED: Extracted mode_of_payment**
+    const { name, description, price, status, type, mode_of_payment } = req.body;
     let image_url = null;
     if (req.file) {
         image_url = `/uploads/${req.file.filename}`;
         console.log(`Image uploaded: ${image_url}`);
     }
 
+    // Default to 'online' if not explicitly sent (relying on DB default is also fine, but this is safer)
+    const final_mode_of_payment = mode_of_payment || 'online'; 
+
     try {
         const [result] = await db.query(
-            'INSERT INTO services (name, description, price, image_url, status, type) VALUES (?, ?, ?, ?, ?, ?)',
-            [name, description, price, image_url, status, type]
+            // **CHANGED: Added mode_of_payment to column list**
+            'INSERT INTO services (name, description, price, image_url, status, type, mode_of_payment) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            // **CHANGED: Added final_mode_of_payment to value list**
+            [name, description, price, image_url, status, type, final_mode_of_payment]
         );
         console.log('Service added to DB, ID:', result.insertId);
         res.status(201).json({ message: 'Service added successfully', id: result.insertId });
@@ -83,9 +87,9 @@ app.post('/api/services', upload.single('image'), async (req, res) => {
     }
 });
 
-// GET all services (THE PROBLEM ROUTE - CAREFULLY RETYPED)
+// GET all services
 app.get('/api/services', async (req, res) => {
-    console.log('Backend: GET /api/services route handler executed!'); // THIS LOG IS CRUCIAL
+    console.log('Backend: GET /api/services route handler executed!'); 
     try {
         const [services] = await db.query('SELECT * FROM services');
         console.log('Backend: Services fetched from DB. Count:', services.length);
@@ -96,11 +100,15 @@ app.get('/api/services', async (req, res) => {
     }
 });
 
-// PUT (Update) a service
+// PUT (Update) a service (FIXED: Added mode_of_payment column)
 app.put('/api/services/:id', upload.single('image'), async (req, res) => {
     console.log(`Backend: PUT /api/services/${req.params.id} hit!`);
-    const { name, description, price, status, type } = req.body;
+    // **CHANGED: Extracted mode_of_payment**
+    const { name, description, price, status, type, mode_of_payment } = req.body;
     const serviceId = req.params.id;
+
+    // Default to 'online' if not explicitly sent
+    const final_mode_of_payment = mode_of_payment || 'online';
 
     try {
         const [rows] = await db.query('SELECT image_url FROM services WHERE id = ?', [serviceId]);
@@ -109,20 +117,22 @@ app.put('/api/services/:id', upload.single('image'), async (req, res) => {
             return res.status(404).json({ error: 'Service not found' });
         }
 
-        let image_url = rows[0].image_url; // Keep existing image if no new one
+        let image_url = rows[0].image_url; 
         let oldImagePathForDeletion = null;
 
         if (req.file) {
-            if (image_url) { // If there was an old image, prepare to delete it
+            if (image_url) { 
                 oldImagePathForDeletion = path.join(__dirname, image_url);
             }
-            image_url = `/uploads/${req.file.filename}`; // New image URL
+            image_url = `/uploads/${req.file.filename}`; 
             console.log(`New image uploaded for service ID ${serviceId}: ${image_url}`);
         }
 
         await db.query(
-            'UPDATE services SET name=?, description=?, price=?, image_url=?, status=?, type=? WHERE id=?',
-            [name, description, price, image_url, status, type, serviceId]
+            // **CHANGED: Added mode_of_payment to SET clause**
+            'UPDATE services SET name=?, description=?, price=?, image_url=?, status=?, type=?, mode_of_payment=? WHERE id=?',
+            // **CHANGED: Added final_mode_of_payment to value list**
+            [name, description, price, image_url, status, type, final_mode_of_payment, serviceId]
         );
 
         // Delete old image file after successful DB update
@@ -161,7 +171,7 @@ app.delete('/api/services/:id', async (req, res) => {
 
         const [result] = await db.query('DELETE FROM services WHERE id = ?', [serviceId]);
         if (result.affectedRows === 0) {
-             console.log(`Service with ID ${serviceId} not deleted (affectedRows was 0).`);
+               console.log(`Service with ID ${serviceId} not deleted (affectedRows was 0).`);
             return res.status(404).json({ error: 'Service not found after image delete attempt' });
         }
         res.json({ message: 'Service deleted successfully' });
@@ -177,13 +187,13 @@ app.get('/', (req, res) => {
     res.send('🎉 Resort Management Backend is Running');
 });
 
-// Catch-all for undefined routes (order matters: this MUST be last among routes)
+// Catch-all for undefined routes
 app.use((req, res, next) => {
     console.log(`Backend: No route found for ${req.method} ${req.url}`);
     res.status(404).json({ error: `API endpoint '${req.url}' not found.` });
 });
 
-// Global error handler (for unexpected errors in middleware/routes)
+// Global error handler
 app.use((err, req, res, next) => {
     console.error('Backend: Uncaught error:', err.stack);
     res.status(500).json({ error: 'Something went wrong on the server.', details: err.message });
