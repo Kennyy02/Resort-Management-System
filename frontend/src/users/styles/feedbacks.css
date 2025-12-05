@@ -1,28 +1,128 @@
-.feedbacks-page {
-    font-family: 'Segoe UI', sans-serif;
-    background: #f4f7f6;
+/* --- Root / Base Styles --- */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7f6;
     color: #333;
+    margin: 0;
+    padding: 0;
 }
 
+/* --- Hero Section --- */
+.feedbacks-hero-section {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+}
+
+.feedbacks-hero-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.feedbacks-hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(76, 90, 72, 0.5);
+}
+
+.feedbacks-hero-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    text-align: center;
+}
+
+.hero-title {
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+/* --- Content Container --- */
 .feedbacks-content-container {
-    max-width: 900px;
-    margin: auto;
-    padding: 1rem;
+    max-width: 1100px;
+    margin: 2rem auto;
+    padding: 0 1rem;
 }
 
+/* --- Write Feedback Button --- */
+.write-feedback-btn {
+    text-align: right;
+    margin-bottom: 1rem;
+}
+
+.write-feedback-btn button {
+    background-color: #7C9271;
+    color: #fff;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.write-feedback-btn button:hover {
+    background-color: #6A7C5F;
+    transform: translateY(-1px);
+}
+
+/* --- Filters / Sort Section --- */
+.filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 1.5rem;
+    align-items: center;
+}
+
+.filters select,
+.filters input[type="date"] {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.filters select:hover,
+.filters input[type="date"]:hover,
+.filters select:focus,
+.filters input[type="date"]:focus {
+    border-color: #7C9271;
+    box-shadow: 0 2px 6px rgba(124, 146, 113, 0.2);
+    outline: none;
+}
+
+/* --- Feedback Cards --- */
 .feedback-card {
-    background: #fff;
-    border-radius: 8px;
+    background-color: #fff;
+    border-radius: 10px;
     padding: 1rem;
     margin-bottom: 1rem;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    transition: all 0.2s ease;
+}
+
+.feedback-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .feedback-header {
     display: flex;
+    gap: 12px;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.8rem;
 }
 
 .feedback-header img {
@@ -32,123 +132,110 @@
     object-fit: cover;
 }
 
+.feedback-header strong {
+    font-size: 1rem;
+    display: block;
+}
+
 .stars {
-    color: #f5c518;
+    color: #FFD700;
     font-size: 0.9rem;
 }
 
+.feedback-message {
+    margin-bottom: 0.8rem;
+    line-height: 1.4;
+}
+
+/* --- Feedback Photos --- */
+.feedback-photos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
 .feedback-photos img {
-    max-width: 100px;
-    max-height: 100px;
-    margin-right: 5px;
-    cursor: pointer;
-    border-radius: 5px;
+    width: 80px;
+    height: 80px;
     object-fit: cover;
-    transition: transform 0.2s;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid #ddd;
 }
 
 .feedback-photos img:hover {
     transform: scale(1.05);
+    border-color: #7C9271;
 }
 
-.write-feedback-btn button {
-    background: #7C9271;
-    color: white;
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: 600;
-}
-
-.write-feedback-btn button:hover {
-    background: #6a7c5f;
-}
-
-/* LIGHTBOX */
-.lightbox-overlay {
-    position: fixed;
-    top:0; left:0;
-    width:100%; height:100%;
-    background: rgba(0,0,0,0.8);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-}
-
-.lightbox-image {
-    max-width: 90%;
-    max-height: 90%;
-    border-radius: 8px;
-}
-
-/* HERO */
-.feedbacks-hero-section {
-    position: relative;
-    height: 250px;
-    overflow: hidden;
-}
-
-.feedbacks-hero-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.feedbacks-hero-overlay {
-    position: absolute;
-    top:0; left:0;
-    width:100%; height:100%;
-    background: rgba(0,0,0,0.4);
-}
-
-.feedbacks-hero-content {
-    position: absolute;
-    top:50%; left:50%;
-    transform: translate(-50%, -50%);
-    color: #fff;
-    text-align: center;
-}
-
-.hero-title {
-    font-size: 2rem;
-    font-weight: 700;
-}
-
-/* PAGINATION */
+/* --- Pagination --- */
 .pagination {
     display: flex;
     justify-content: center;
+    align-items: center;
     gap: 10px;
-    margin: 1rem 0;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
 }
 
 .pagination button {
-    padding: 5px 10px;
-    border-radius: 5px;
-    border: none;
-    background: #7C9271;
-    color: white;
+    background-color: #fff;
+    color: #6c757d;
+    border: 1px solid #ccc;
+    padding: 6px 12px;
+    border-radius: 6px;
     cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.pagination button:hover:not(:disabled) {
+    background-color: #7C9271;
+    color: #fff;
+    border-color: #7C9271;
 }
 
 .pagination button:disabled {
-    background: #ccc;
     cursor: not-allowed;
+    opacity: 0.5;
 }
 
-/* MOBILE */
+/* --- Mobile Responsive --- */
+@media (max-width: 1024px) {
+    .filters {
+        gap: 8px;
+    }
+    .filters select,
+    .filters input[type="date"] {
+        font-size: 0.85rem;
+        padding: 6px 10px;
+    }
+    .feedback-header img {
+        width: 45px;
+        height: 45px;
+    }
+}
+
 @media (max-width: 768px) {
-    .feedback-header {
+    .filters {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: stretch;
     }
+
+    .write-feedback-btn {
+        text-align: center;
+    }
+
     .feedback-photos img {
-        max-width: 70px;
-        max-height: 70px;
-        margin-bottom: 5px;
+        width: 60px;
+        height: 60px;
     }
+
+    .feedback-card {
+        padding: 0.8rem;
+    }
+
     .hero-title {
         font-size: 1.5rem;
     }
