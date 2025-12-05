@@ -85,7 +85,7 @@
   margin-left: 200px; /* sidebar width */
   padding: 30px;
   height: 100vh;
-  overflow: hidden; /* no scroll */
+  overflow-y: auto;
   background-color: #f5f7f3;
 }
 
