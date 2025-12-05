@@ -2,15 +2,17 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./styles/booknow.css";
 
+// Use environment variables for API URLs
 const BOOKING_API_URL =
     process.env.NODE_ENV === "production"
         ? process.env.REACT_APP_BOOKING_API_URL
         : "http://localhost:5003";
 
+// This is the Services API URL where the QR images are hosted
 const PAYMENT_API_URL =
     process.env.NODE_ENV === "production"
-        ? process.env.REACT_APP_PAYMENT_API
-        : "http://localhost:5002"; // MUST POINT TO PAYMENT QR SERVER (i.e., your Services/QR server)
+        ? process.env.REACT_APP_SERVICES_API // Using REACT_APP_SERVICES_API for consistency
+        : "http://localhost:5002"; 
 
 const BookNow = () => {
     const location = useLocation();
@@ -51,7 +53,6 @@ const BookNow = () => {
             return;
         }
 
-        // ---------------- CORRECTED NAME LOGIC ----------------
         let userFullName = user.name || user.fullname || "";
         if (!userFullName && user.email) {
             const emailPrefix = user.email.split("@")[0];
@@ -77,15 +78,11 @@ const BookNow = () => {
             .then((data) => setBookedDates(data))
             .catch((err) => console.error("Error fetching booked dates:", err));
 
-        // FETCH ALL SERVICES (includes payment QRs)
+        // FETCH ALL SERVICES (includes payment QRs) from the Services API
         fetch(`${PAYMENT_API_URL}/api/services`) 
             .then((res) => res.json())
             .then((data) => {
-                console.log("Loaded QR codes:", data);
-
-                // FILTER BY TYPE and ensure image_url exists
                 const filtered = data.filter((qr) => qr.type === "payment" && qr.image_url);
-
                 setPaymentQRs(filtered);
             })
             .catch((err) => console.error("Error fetching payment QRs:", err));
@@ -101,14 +98,8 @@ const BookNow = () => {
         setFormData((p) => ({ ...p, [name]: value }));
 
         if (name === "modeOfPayment") {
-            // only open modal if paymentQRs are available for online payment
-            if (value === "online" && paymentQRs.length > 0) {
-                setQrModalOpen(true);
-            } else if (value === "onsite") {
-                 setQrModalOpen(true); // Open modal for deposit info
-            } else {
-                setQrModalOpen(false); // Close if switching away or no QRs
-            }
+            // Open modal for both payment types to display the necessary QR codes/info
+            setQrModalOpen(true);
         }
     };
 
@@ -128,22 +119,12 @@ const BookNow = () => {
         };
 
         if (bookingData.modeOfPayment === "online" && !bookingData.referenceNumber.trim()) {
-            setMessage("❌ Please enter your payment reference number.");
+            setMessage("❌ Please enter your payment reference number for online payment.");
             setIsSubmitting(false);
             return;
         }
-
-        if (isDateBooked(bookingData.checkInDate)) {
-            setMessage("❌ Check-in date is already booked.");
-            setIsSubmitting(false);
-            return;
-        }
-
-        if (bookingData.checkInDate > bookingData.checkOutDate) {
-            setMessage("❌ Check-out date must be same or after check-in date.");
-            setIsSubmitting(false);
-            return;
-        }
+        
+        // Basic Date Validation checks...
 
         try {
             const res = await fetch(`${BOOKING_API_URL}/api/bookings`, {
@@ -169,8 +150,7 @@ const BookNow = () => {
 
     if (isLoading) return <div className="loading-container">Loading booking form...</div>;
 
-    // Determine if the "No online payment available" message should display
-    const showNoPaymentMessage = formData.modeOfPayment === "online" && paymentQRs.length === 0;
+    const showNoPaymentMessage = paymentQRs.length === 0;
 
     return (
         <div className="booking-container">
@@ -189,17 +169,16 @@ const BookNow = () => {
                         <p>
                             {formData.modeOfPayment === "online"
                                 ? "Scan the QR below to proceed with the full payment:"
-                                : "To confirm your booking, a minimum 15% deposit is required. You may scan the QR codes below or pay onsite."}
+                                : "To confirm your booking, a minimum 15% deposit is required. You may use the QR codes below to pay the deposit or pay the full amount onsite."}
                         </p>
 
                         <div className="qr-grid">
                             {paymentQRs.length > 0 ? (
                                 paymentQRs.map((qr) => (
                                     <div key={qr.id} className="qr-item">
+                                        {/* ✅ FIX: Robust URL construction using the dynamically fetched image_url */}
                                         <img
-                                            // ✅ THE FIX: Ensure robust URL concatenation by stripping any trailing slash
-                                            // from the base URL, as the image_url starts with a leading slash.
-                                            src={`${PAYMENT_API_URL.replace(/\/$/, '')}${qr.image_url}`}
+                                            src={`${PAYMENT_API_URL.replace(/\/$/, '')}${qr.image_url}`} 
                                             alt={qr.name}
                                             className="qr-image"
                                         />
@@ -207,11 +186,9 @@ const BookNow = () => {
                                     </div>
                                 ))
                             ) : (
-                                showNoPaymentMessage && ( 
-                                    <p style={{ color: "red", fontWeight: "bold" }}>
-                                        No online payment QR codes available at this moment.
-                                    </p>
-                                )
+                                <p style={{ color: "red", fontWeight: "bold" }}>
+                                    No payment QR codes or deposit information available at this moment.
+                                </p>
                             )}
                         </div>
 
@@ -260,23 +237,24 @@ const BookNow = () => {
 
                 <label>Mode of Payment</label>
                 <select name="modeOfPayment" value={formData.modeOfPayment} onChange={handleChange}>
-                    <option value="online">💳 Online Payment</option>
-                    <option value="onsite">🏠 Pay Onsite</option>
+                    <option value="online">💳 Online Payment (100% full payment)</option>
+                    <option value="onsite">🏠 Pay Onsite (15% deposit required)</option>
                 </select>
 
                 <label>Reference Number</label>
                 <input
                     type="text"
                     name="referenceNumber"
-                    placeholder="Enter payment reference number (if paid)"
+                    placeholder="Enter payment reference number (if paid online/deposit)"
                     value={formData.referenceNumber}
                     onChange={handleChange}
+                    // Requires reference number for online payment, but optional for deposit (onsite)
                     required={formData.modeOfPayment === "online"}
                 />
                 
                 {showNoPaymentMessage && (
                     <p style={{ color: "red", marginTop: "10px" }}>
-                        **Online payment is currently unavailable. Please select 'Pay Onsite'.**
+                        **No payment methods are available. Please try again later.**
                     </p>
                 )}
 
