@@ -248,15 +248,18 @@ function UserServices() {
                                             {payments.map((p) => (
                                                 <div className="payment-card" key={p.id}>
                                                     <h4>{p.name}</h4>
-                                                    {p.qr_url ? (
+                                                    {/* ✅ FIX APPLIED HERE: Changed p.qr_url to p.image_url */}
+                                                    {p.image_url ? ( 
                                                         <img
-                                                            src={`${process.env.REACT_APP_SERVICES_API}${p.qr_url}`}
+                                                            /* ✅ FIX APPLIED HERE: Changed p.qr_url to p.image_url */
+                                                            src={`${process.env.REACT_APP_SERVICES_API}${p.image_url}`} 
                                                             alt={`${p.name} QR`}
                                                             className="payment-qr-image"
                                                         />
                                                     ) : (
                                                         <p>No QR uploaded</p>
                                                     )}
+                                                    <p className="payment-description">{p.description}</p>
                                                 </div>
                                             ))}
                                         </div>
