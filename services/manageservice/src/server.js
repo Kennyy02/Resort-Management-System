@@ -1,12 +1,22 @@
 const express = require('express');
 const cors = require('cors');
-const mysql = require('mysql2/promise');
+const mysql = require('mysql2/promise'); 
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
 const app = express();
-app.use(cors());
+// --- FIX #1: Explicit CORS Configuration ---
+const allowedOrigin = 'https://emzbayviewmountainresort.up.railway.app'; 
+
+app.use(cors({
+    origin: allowedOrigin,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true, 
+    optionsSuccessStatus: 204
+})); 
+// -------------------------------------------
+
 app.use(express.json()); 
 
 // Middleware to log all incoming requests
@@ -58,7 +68,7 @@ db.getConnection()
     });
 
 
-// POST new service (FIXED: Added mode_of_payment column)
+// POST new service (FIXED: Added mode_of_payment column to query)
 app.post('/api/services', upload.single('image'), async (req, res) => {
     console.log('Backend: POST /api/services hit!');
     // **CHANGED: Extracted mode_of_payment**
@@ -69,7 +79,7 @@ app.post('/api/services', upload.single('image'), async (req, res) => {
         console.log(`Image uploaded: ${image_url}`);
     }
 
-    // Default to 'online' if not explicitly sent (relying on DB default is also fine, but this is safer)
+    // Default to 'online' if not explicitly sent
     const final_mode_of_payment = mode_of_payment || 'online'; 
 
     try {
@@ -100,7 +110,7 @@ app.get('/api/services', async (req, res) => {
     }
 });
 
-// PUT (Update) a service (FIXED: Added mode_of_payment column)
+// PUT (Update) a service (FIXED: Added mode_of_payment column to query)
 app.put('/api/services/:id', upload.single('image'), async (req, res) => {
     console.log(`Backend: PUT /api/services/${req.params.id} hit!`);
     // **CHANGED: Extracted mode_of_payment**
