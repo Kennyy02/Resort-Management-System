@@ -14,7 +14,7 @@
     min-height: 100vh;
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     background-color: var(--background-light);
-    overflow: hidden; /* Prevent horizontal scroll */
+    overflow: hidden;
 }
 
 /* Sidebar */
@@ -99,10 +99,10 @@
 /* --- Main Content --- */
 .dashboard-main {
     flex-grow: 1;
-    margin-left: 250px; /* Match sidebar width */
+    margin-left: 250px;
     padding: 25px 30px;
     min-height: 100vh;
-    overflow-y: auto; /* Enable vertical scrolling */
+    overflow-y: auto;
     background-color: var(--background-light);
 }
 
@@ -127,7 +127,7 @@
     flex-direction: column;
     width: 100%;
     margin-bottom: 20px;
-    min-height: 450px; /* increased chart height */
+    min-height: 250px; /* back to default/small height */
 }
 
 .chart-card:hover {
@@ -143,7 +143,7 @@
 
 /* --- Tables --- */
 .analytics-table-container {
-    overflow-x: auto; /* Horizontal scroll for small screens */
+    overflow-x: auto;
     margin-top: 20px;
     width: 100%;
 }
@@ -190,7 +190,7 @@
     }
     .chart-card {
         padding: 12px 15px;
-        min-height: 400px;
+        min-height: 220px; /* smaller for medium screens */
     }
     .analytics-table th,
     .analytics-table td {
@@ -251,7 +251,7 @@
     }
     .chart-card {
         padding: 10px 12px;
-        min-height: 350px;
+        min-height: 200px; /* small height for mobile */
     }
     .analytics-table th,
     .analytics-table td {
