@@ -4,28 +4,26 @@ const mysql = require('mysql2/promise');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const { v4: uuidv4 } = require('uuid'); // ✅ Added uuid for unique filenames
 
 const app = express();
 
-// --- START: CONFIGURATION ---
+// =========================
+// CORS CONFIGURATION
+// =========================
 const FRONTEND_URL = 'https://emzbayviewmountainresort.up.railway.app';
-const PORT = 5002;
 
-// ✅ CRITICAL FIX: Define the absolute mount path for the persistent volume
-const UPLOAD_DIR = '/app/uploads'; 
-// ----------------------------
-
-// Configure CORS
 const corsOptions = {
     origin: FRONTEND_URL,
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], 
-    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true
 };
+
 app.use(cors(corsOptions));
 
-// Middleware
-app.use(express.json()); // Parse JSON
+// =========================
+// MIDDLEWARE
+// =========================
+app.use(express.json());
 
 // Request logger
 app.use((req, res, next) => {
@@ -33,43 +31,30 @@ app.use((req, res, next) => {
     next();
 });
 
-// ----------------------------------------------------
-// ✅ FIX 1: Guarded Directory Creation
-// ----------------------------------------------------
-try {
-    if (!fs.existsSync(UPLOAD_DIR)) {
-        fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-        console.log(`✅ Persistent upload directory created at: ${UPLOAD_DIR}`);
-    } else {
-        console.log(`✅ Persistent upload directory found at: ${UPLOAD_DIR}`);
-    }
-} catch (error) {
-    console.error(`❌ FATAL ERROR: Could not access or create upload directory at ${UPLOAD_DIR}`);
-    console.error(`Please ensure Railway Volume Mount Path is set to /app/uploads and RAILWAY_RUN_UID=0.`);
-    // We will let the app continue, but file uploads might fail if the error is permissions related.
-}
-// ----------------------------------------------------
+// Static folder for uploads
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-
-// ✅ FIX 2: Serve uploads statically from the absolute volume mount path
-app.use('/uploads', express.static(UPLOAD_DIR));
-
-// Multer setup
+// =========================
+// MULTER (FILE UPLOADS)
+// =========================
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        // ✅ Multer must save files directly to the absolute mount path
-        cb(null, UPLOAD_DIR);
+        const uploadDir = path.join(__dirname, 'uploads');
+        if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, { recursive: true });
+        }
+        cb(null, uploadDir);
     },
     filename: (req, file, cb) => {
-        // ✅ FIX 3: Use UUID and original extension for robust, unique filenames
-        const uniqueSuffix = uuidv4();
-        const fileExtension = path.extname(file.originalname);
-        cb(null, uniqueSuffix + fileExtension);
+        cb(null, Date.now() + '-' + file.originalname);
     }
 });
+
 const upload = multer({ storage });
 
-// MySQL connection (No changes needed)
+// =========================
+// DATABASE CONNECTION
+// =========================
 const db = mysql.createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
@@ -89,96 +74,86 @@ db.getConnection()
     })
     .catch(err => console.error('DB connection failed:', err));
 
-// ----------------- ROUTES -----------------
+// =========================
+// ROUTES
+// =========================
 
-// POST new service
+// CREATE service
 app.post('/api/services', upload.single('image'), async (req, res) => {
     const { name, description, price, status, type } = req.body;
-    
-    // ✅ Use the unique filename saved by Multer
-    let image_url = req.file ? `/uploads/${req.file.filename}` : null; 
+    let image_url = req.file ? `/uploads/${req.file.filename}` : null;
 
+    // Ensure price is NULL when type = "payment"
     const finalPrice = (type === 'payment' || !price) ? null : price;
 
     try {
         const [result] = await db.query(
             'INSERT INTO services (name, description, price, image_url, status, type) VALUES (?, ?, ?, ?, ?, ?)',
-            [name, description, finalPrice, image_url, status, type] 
+            [name, description, finalPrice, image_url, status, type]
         );
-        res.status(201).json({ message: 'Service added successfully', id: result.insertId, image_url });
+
+        res.status(201).json({
+            message: 'Service added successfully',
+            id: result.insertId
+        });
     } catch (err) {
-        console.error("Error inserting service:", err);
-        // Clean up the uploaded file if DB insert fails
-        if (req.file) {
-            fs.unlink(req.file.path, (unlinkErr) => {
-                if (unlinkErr) console.error("Error cleaning up file:", unlinkErr);
-            });
-        }
-        res.status(500).json({ error: err.message, detail: 'Failed to insert into database.' });
+        console.error('Error inserting service:', err);
+        res.status(500).json({
+            error: err.message,
+            detail: 'Failed to insert into database.'
+        });
     }
 });
 
-// GET all services (No changes needed)
+// READ services
 app.get('/api/services', async (req, res) => {
     try {
         const [services] = await db.query('SELECT * FROM services');
         res.json(services);
     } catch (err) {
-        res.status(500).json({ error: 'Failed to fetch services: ' + err.message });
+        res.status(500).json({
+            error: 'Failed to fetch services: ' + err.message
+        });
     }
 });
 
-// PUT (Update) service
+// UPDATE service
 app.put('/api/services/:id', upload.single('image'), async (req, res) => {
     const serviceId = req.params.id;
     const { name, description, price, status, type } = req.body;
 
     try {
-        const [rows] = await db.query('SELECT image_url FROM services WHERE id = ?', [serviceId]);
-        if (rows.length === 0) return res.status(404).json({ error: 'Service not found' });
+        const [rows] = await db.query(
+            'SELECT image_url FROM services WHERE id = ?',
+            [serviceId]
+        );
+
+        if (rows.length === 0) {
+            return res.status(404).json({ error: 'Service not found' });
+        }
 
         let image_url = rows[0].image_url;
-        let oldImagePath = null;
+        let oldImage = null;
 
         if (req.file) {
-            // New file was uploaded. Prepare to delete the old one.
-            if (image_url) {
-                // ✅ FIX 4: Construct old file path using the absolute UPLOAD_DIR
-                const oldFilename = path.basename(image_url); // Extract only the filename from the URL
-                oldImagePath = path.join(UPLOAD_DIR, oldFilename);
-            }
-            // Update URL to the new file's public path
+            if (image_url) oldImage = path.join(__dirname, image_url);
             image_url = `/uploads/${req.file.filename}`;
         }
-        
+
         const finalPrice = (type === 'payment' || !price) ? null : price;
 
-        const [updateResult] = await db.query(
+        await db.query(
             'UPDATE services SET name=?, description=?, price=?, image_url=?, status=?, type=? WHERE id=?',
             [name, description, finalPrice, image_url, status, type, serviceId]
         );
-        
-        if (updateResult.affectedRows === 0) {
-            // Clean up the new file if DB update failed
-            if (req.file) {
-                 fs.unlink(req.file.path, (unlinkErr) => {
-                    if (unlinkErr) console.error("Error cleaning up new file:", unlinkErr);
-                });
-            }
-            return res.status(404).json({ error: 'Service update failed or not found' });
-        }
 
-        // Delete the old file after a successful DB update
-        if (oldImagePath && fs.existsSync(oldImagePath)) {
-             // Using async unlink is better than sync unlinkSync()
-             fs.unlink(oldImagePath, (unlinkErr) => {
-                if (unlinkErr) console.error("Error deleting old file:", unlinkErr);
-            });
+        if (oldImage && fs.existsSync(oldImage)) {
+            fs.unlinkSync(oldImage);
         }
 
         res.json({ message: 'Service updated successfully' });
     } catch (err) {
-        console.error("Error updating service:", err);
+        console.error('Error updating service:', err);
         res.status(500).json({ error: err.message });
     }
 });
@@ -188,24 +163,32 @@ app.delete('/api/services/:id', async (req, res) => {
     const serviceId = req.params.id;
 
     try {
-        const [rows] = await db.query('SELECT image_url FROM services WHERE id = ?', [serviceId]);
-        if (rows.length === 0) return res.status(404).json({ error: 'Service not found' });
+        const [rows] = await db.query(
+            'SELECT image_url FROM services WHERE id = ?',
+            [serviceId]
+        );
 
-        const image_url = rows[0].image_url;
-        if (image_url) {
-             // ✅ FIX 5: Construct image path using the absolute UPLOAD_DIR
-            const filename = path.basename(image_url);
-            const imagePath = path.join(UPLOAD_DIR, filename);
-
-            if (fs.existsSync(imagePath)) {
-                fs.unlink(imagePath, (err) => {
-                    if (err) console.error("Error deleting file:", err);
-                });
-            }
+        if (rows.length === 0) {
+            return res.status(404).json({ error: 'Service not found' });
         }
 
-        const [result] = await db.query('DELETE FROM services WHERE id = ?', [serviceId]);
-        if (result.affectedRows === 0) return res.status(404).json({ error: 'Service not found after deletion' });
+        const image_url = rows[0].image_url;
+
+        if (image_url) {
+            const imagePath = path.join(__dirname, image_url);
+            if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
+        }
+
+        const [result] = await db.query(
+            'DELETE FROM services WHERE id = ?',
+            [serviceId]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({
+                error: 'Service not found after deletion'
+            });
+        }
 
         res.json({ message: 'Service deleted successfully' });
     } catch (err) {
@@ -213,17 +196,29 @@ app.delete('/api/services/:id', async (req, res) => {
     }
 });
 
-// Root route
-app.get('/', (req, res) => res.send('🎉 Resort Management Backend is Running'));
+// Root
+app.get('/', (req, res) => {
+    res.send('🎉 Resort Management Backend is Running');
+});
 
 // Catch-all 404
-app.use((req, res) => res.status(404).json({ error: `API endpoint '${req.url}' not found.` }));
+app.use((req, res) => {
+    res.status(404).json({
+        error: `API endpoint '${req.url}' not found.`
+    });
+});
 
 // Global error handler
 app.use((err, req, res, next) => {
     console.error('Uncaught error:', err.stack);
-    res.status(500).json({ error: 'Something went wrong on the server.', details: err.message });
+    res.status(500).json({
+        error: 'Something went wrong on the server.',
+        details: err.message
+    });
 });
 
 // Start server
-app.listen(PORT, () => console.log(`🚀 Services Server running at port ${PORT}`));
+const PORT = 5002;
+app.listen(PORT, () => {
+    console.log(`🚀 Services Server running at port ${PORT}`);
+});
