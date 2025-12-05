@@ -127,7 +127,7 @@
     flex-direction: column;
     width: 100%;
     margin-bottom: 20px;
-    min-height: 250px; /* back to default/small height */
+    min-height: 180px; /* smaller chart height */
 }
 
 .chart-card:hover {
@@ -137,8 +137,7 @@
 
 .chart-card canvas {
     width: 100% !important;
-    height: 100% !important;
-    flex-grow: 1;
+    height: 140px !important; /* smaller canvas height */
 }
 
 /* --- Tables --- */
@@ -190,7 +189,10 @@
     }
     .chart-card {
         padding: 12px 15px;
-        min-height: 220px; /* smaller for medium screens */
+        min-height: 160px;
+    }
+    .chart-card canvas {
+        height: 120px !important;
     }
     .analytics-table th,
     .analytics-table td {
@@ -243,7 +245,7 @@
     .dashboard-main {
         margin-left: 0;
         min-height: auto;
-        overflow-y: visible;
+        overflow-y: auto; /* make scrollable on mobile */
         padding: 15px;
     }
     .dashboard-main h1 {
@@ -251,7 +253,10 @@
     }
     .chart-card {
         padding: 10px 12px;
-        min-height: 200px; /* small height for mobile */
+        min-height: 140px;
+    }
+    .chart-card canvas {
+        height: 100px !important;
     }
     .analytics-table th,
     .analytics-table td {
