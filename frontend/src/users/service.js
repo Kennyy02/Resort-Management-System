@@ -225,7 +225,7 @@ function UserServices() {
                                 </div>
                             )}
 
-                            {/* 🔥 PAYMENT QR DISPLAY */}
+                            {/* 🔥 PAYMENT QR DISPLAY (FIX APPLIED HERE) */}
                             {activeTab === 'payment' && (
                                 <div className="payment-section">
                                     <h3 className="section-title">Mode of Payment</h3>
@@ -237,9 +237,9 @@ function UserServices() {
                                             {payments.map((p) => (
                                                 <div className="payment-card" key={p.id}>
                                                     <h4>{p.name}</h4>
-                                                    {p.qr_url ? (
+                                                    {p.image_url ? ( {/* FIX: Changed p.qr_url to p.image_url */}
                                                         <img
-                                                            src={`${process.env.REACT_APP_SERVICES_API}${p.qr_url}`}
+                                                            src={`${process.env.REACT_APP_SERVICES_API}${p.image_url}`} {/* FIX: Changed p.qr_url to p.image_url */}
                                                             alt={`${p.name} QR`}
                                                             className="payment-qr-image"
                                                         />
