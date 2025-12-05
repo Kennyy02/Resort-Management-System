@@ -8,20 +8,20 @@ const fs = require('fs');
 const app = express();
 
 // --- START: CORS CONFIGURATION FIX ---
-// 1. Define the specific origin of your frontend application
+// Define the specific origin of your frontend application
 const FRONTEND_URL = 'https://emzbayviewmountainresort.up.railway.app';
 
-// 2. Configure CORS options
+// Configure CORS options
 const corsOptions = {
     // Only allow requests from your deployed frontend URL
     origin: FRONTEND_URL, 
     // Allow the HTTP methods used in your application (GET, POST, PUT, DELETE)
     methods: ['GET', 'POST', 'PUT', 'DELETE'], 
-    // Allows credentials (like cookies or Authorization headers) to be sent, if needed later
+    // Allows credentials (like cookies or Authorization headers) to be sent
     credentials: true,
 };
 
-// 3. Apply the specific CORS configuration middleware
+// Apply the specific CORS configuration middleware
 app.use(cors(corsOptions));
 // --- END: CORS CONFIGURATION FIX ---
 
@@ -72,17 +72,24 @@ db.getConnection()
 
 // POST new service
 app.post('/api/services', upload.single('image'), async (req, res) => {
+    // Destructure fields from the request body
     const { name, description, price, status, type } = req.body;
     let image_url = req.file ? `/uploads/${req.file.filename}` : null;
 
+    // --- FIX: Handle price being null for 'payment' type services ---
+    // Price should be NULL if the type is 'payment' or if the price value is missing/empty
+    const finalPrice = (type === 'payment' || !price) ? null : price;
+
     try {
         const [result] = await db.query(
+            // Use finalPrice in the query
             'INSERT INTO services (name, description, price, image_url, status, type) VALUES (?, ?, ?, ?, ?, ?)',
-            [name, description, price, image_url, status, type]
+            [name, description, finalPrice, image_url, status, type] 
         );
         res.status(201).json({ message: 'Service added successfully', id: result.insertId });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error("Error inserting service:", err);
+        res.status(500).json({ error: err.message, detail: 'Failed to insert into database.' });
     }
 });
 
@@ -112,16 +119,20 @@ app.put('/api/services/:id', upload.single('image'), async (req, res) => {
             if (image_url) oldImage = path.join(__dirname, image_url);
             image_url = `/uploads/${req.file.filename}`;
         }
+        
+        // Handle price for updates too, to be safe.
+        const finalPrice = (type === 'payment' || !price) ? null : price;
 
         await db.query(
             'UPDATE services SET name=?, description=?, price=?, image_url=?, status=?, type=? WHERE id=?',
-            [name, description, price, image_url, status, type, serviceId]
+            [name, description, finalPrice, image_url, status, type, serviceId]
         );
 
         if (oldImage && fs.existsSync(oldImage)) fs.unlinkSync(oldImage);
 
         res.json({ message: 'Service updated successfully' });
     } catch (err) {
+        console.error("Error updating service:", err);
         res.status(500).json({ error: err.message });
     }
 });
