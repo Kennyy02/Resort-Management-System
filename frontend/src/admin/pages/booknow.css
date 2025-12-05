@@ -1,3 +1,4 @@
+/* --- Root / Base Styles --- */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f4f7f6;
@@ -8,25 +9,25 @@ body {
 
 .admin-bookings-card {
     width: 100%;
-    padding: 1.5rem 2rem;
+    padding: 1rem 1.5rem;
     background-color: transparent;
 }
 
 .admin-bookings-title {
     text-align: center;
     color: #4C5A48;
-    margin-bottom: 1.5rem;
-    font-size: 2rem;
+    margin-bottom: 1rem;
+    font-size: 1.8rem;
     font-weight: 600;
 }
 
-/* Status Messages */
+/* --- Status Messages --- */
 .status-message {
     text-align: center;
-    font-size: 1em;
-    padding: 0.75rem 1rem;
-    border-radius: 5px;
-    margin-top: 1.5rem;
+    font-size: 0.95em;
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
+    margin-top: 1rem;
 }
 
 .status-message.loading-message {
@@ -47,29 +48,27 @@ body {
     border: 1px solid #ccc;
 }
 
-/* Table */
+/* --- Table Container --- */
 .table-responsive {
     width: 100%;
-    overflow-x: auto;
+    overflow-x: auto; /* allow horizontal scroll if needed */
 }
 
+/* --- Table Styles --- */
 .bookings-table {
     width: 100%;
     border-collapse: collapse;
     background-color: #ffffff;
-    border-radius: 8px;
-    overflow: hidden;
     margin-top: 1rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    min-width: 800px; /* ensure table scrolls on small screens */
+    font-size: 0.85em; /* smaller font */
+    min-width: 900px; /* ensures scroll on small screens */
 }
 
 .bookings-table th,
 .bookings-table td {
-    padding: 10px 12px;
+    padding: 6px 8px; /* smaller padding for compact view */
     text-align: left;
     border-bottom: 1px solid #e0e0e0;
-    font-size: 0.9em;
 }
 
 .bookings-table th {
@@ -77,6 +76,7 @@ body {
     color: #ffffff;
     font-weight: 600;
     text-transform: uppercase;
+    font-size: 0.8em;
 }
 
 .bookings-table tbody tr:nth-child(even) {
@@ -87,48 +87,37 @@ body {
     background-color: #E6EAE4;
 }
 
-/* Status badges */
+/* --- Status Badges --- */
 .status-badge {
-    padding: 4px 8px;
+    padding: 2px 6px;
     border-radius: 4px;
     font-weight: 600;
     text-transform: capitalize;
-    font-size: 0.8em;
+    font-size: 0.75em;
 }
 
-.status-pending {
-    background-color: #f0ad4e;
-    color: white;
-}
+.status-pending { background-color: #f0ad4e; color: white; }
+.status-approved { background-color: #7C9271; color: white; }
+.status-declined { background-color: #d32f2f; color: white; }
 
-.status-approved {
-    background-color: #7C9271;
-    color: white;
-}
-
-.status-declined {
-    background-color: #d32f2f;
-    color: white;
-}
-
-/* Action Buttons */
+/* --- Action Buttons --- */
 .action-buttons {
     display: flex;
-    gap: 8px;
-    align-items: flex-start;
-    flex-wrap: wrap;
+    gap: 4px;
+    align-items: center;
+    flex-wrap: nowrap; /* keep buttons in one line */
 }
 
 .action-buttons button {
-    padding: 6px 10px;
+    padding: 4px 6px;
+    font-size: 0.75em;
+    min-width: 60px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     font-weight: 500;
-    font-size: 0.85em;
-    min-width: 70px;
     white-space: nowrap;
-    transition: background-color 0.2s ease, transform 0.2s ease;
+    transition: all 0.2s ease;
 }
 
 .approve-button {
@@ -151,26 +140,25 @@ body {
     transform: translateY(-1px);
 }
 
-/* Pagination */
+/* --- Pagination --- */
 .pagination-controls {
     display: flex;
     justify-content: center;
-    align-items: center;
-    margin-top: 1.5rem;
-    gap: 0.5rem;
+    gap: 0.3rem;
     flex-wrap: wrap;
+    margin-top: 1rem;
 }
 
 .pagination-button {
-    background-color: #ffffff;
-    border: 1px solid #dee2e6;
-    color: #6c757d;
-    padding: 0.45rem 0.9rem;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.75rem;
     border-radius: 4px;
+    border: 1px solid #dee2e6;
+    background-color: #ffffff;
+    color: #6c757d;
     cursor: pointer;
-    font-size: 0.85rem;
     font-weight: 500;
-    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    transition: all 0.2s ease;
 }
 
 .pagination-button:hover:not(:disabled) {
@@ -182,7 +170,7 @@ body {
 .pagination-button.active {
     background-color: #5E6D58;
     border-color: #5E6D58;
-    color: white;
+    color: #ffffff;
     font-weight: 600;
 }
 
@@ -195,15 +183,21 @@ body {
 
 /* --- Mobile Responsive --- */
 @media (max-width: 1024px) {
+    .bookings-table {
+        font-size: 0.8em;
+    }
     .bookings-table th,
     .bookings-table td {
-        padding: 8px 10px;
-        font-size: 0.85em;
+        padding: 4px 6px;
     }
     .action-buttons button {
-        padding: 5px 8px;
-        font-size: 0.8em;
-        min-width: 60px;
+        font-size: 0.7em;
+        padding: 3px 5px;
+        min-width: 50px;
+    }
+    .pagination-button {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.7em;
     }
 }
 
@@ -213,54 +207,30 @@ body {
     }
 
     .bookings-table {
-        min-width: unset;
         width: 100%;
-        border-radius: 0;
-        box-shadow: none;
+        font-size: 0.75em;
+        min-width: 750px; /* allow scroll instead of cutting columns */
     }
 
-    .bookings-table thead {
-        display: none;
-    }
-
-    .bookings-table tbody tr {
-        display: block;
-        margin-bottom: 1rem;
-        border: 1px solid #e0e0e0;
-        border-radius: 6px;
-        padding: 0.5rem;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-    }
-
+    .bookings-table th,
     .bookings-table td {
-        display: flex;
-        justify-content: space-between;
-        padding: 6px 10px;
-        border-bottom: 1px dashed #eee;
-        text-align: left;
-        position: relative;
-    }
-
-    .bookings-table td::before {
-        content: attr(data-label);
-        font-weight: 600;
-        color: #4C5A48;
-        flex-basis: 45%;
-        text-align: left;
+        padding: 3px 5px;
     }
 
     .action-buttons {
         flex-direction: column;
-        gap: 0.4rem;
+        gap: 2px;
     }
 
     .action-buttons button {
         width: 100%;
         min-width: unset;
+        font-size: 0.7em;
+        padding: 3px 5px;
     }
 
     .pagination-button {
-        padding: 0.35rem 0.7rem;
-        font-size: 0.75rem;
+        padding: 0.2rem 0.5rem;
+        font-size: 0.65em;
     }
 }
