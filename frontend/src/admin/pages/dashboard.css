@@ -1,164 +1,138 @@
-/* --- Resort Management Dashboard Theme (Fixed Sidebar, Sage Green Minimal) --- */
+/* --- Fixed Sidebar Minimal Dashboard --- */
 
 /* 1. Layout */
 .dashboard-container {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f5f7f3; /* Light neutral background */
-  overflow: hidden; /* Prevent horizontal scroll */
+  background-color: #f5f7f3;
+  overflow: hidden; /* no scroll */
 }
 
-/* 2. Sidebar (fixed) */
+/* 2. Sidebar */
 .dashboard-sidebar {
-  width: 250px;
-  min-width: 250px;
+  width: 200px;
   background-color: #9caf88; /* Sage green */
-  color: #ffffff;
+  color: #fff;
   display: flex;
   flex-direction: column;
-  padding: 20px 0;
-  box-shadow: 3px 0 6px rgba(0, 0, 0, 0.1);
-  position: fixed; /* Fix sidebar */
+  padding: 20px 10px;
+  box-shadow: 3px 0 6px rgba(0,0,0,0.1);
+  position: fixed;
   top: 0;
   bottom: 0;
-  left: 0;
-  overflow-y: auto; /* Scroll only if content exceeds sidebar height */
 }
 
 .sidebar-header {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 25px;
 }
 
 .sidebar-title {
-  color: #f5f7f3; /* Light cream */
-  font-size: 1.5rem;
-  padding-bottom: 10px;
-  border-bottom: 2px solid #c5d0b0; /* Lighter sage line */
+  color: #f5f7f3;
+  font-size: 1.3rem;
+  border-bottom: 1px solid #c5d0b0;
+  padding-bottom: 5px;
 }
 
-/* Sidebar nav cards as minimal text links */
-.sidebar-nav-cards {
+/* Sidebar nav links */
+.sidebar-nav {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 0 20px;
-}
-
-.card {
-  background: none;
-  color: #f5f7f3;
-  padding: 10px 0;
-  font-size: 1em;
-  cursor: pointer;
-  border-bottom: 1px solid transparent;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
   gap: 10px;
 }
 
-.card:hover {
-  border-bottom: 2px solid #f5f7f3;
+.nav-link {
+  cursor: pointer;
+  padding: 5px 0;
+  font-size: 0.95rem;
+  color: #f5f7f3;
+  border-left: 3px solid transparent;
+  transition: all 0.2s ease;
 }
 
-.active-card {
-  border-bottom: 2px solid #ffffff;
+.nav-link:hover {
+  border-left: 3px solid #f5f7f3;
+}
+
+.active-link {
   font-weight: bold;
+  border-left: 3px solid #ffffff;
 }
 
-/* Sidebar footer logout button */
+/* Sidebar footer */
 .sidebar-footer {
   margin-top: auto;
-  padding: 15px 20px;
+  padding-top: 15px;
 }
 
-.logout-button {
-  background: none;
-  color: #ffffff;
-  font-size: 1em;
-  padding: 10px 0;
+.logout-link {
   cursor: pointer;
-  border-bottom: 1px solid transparent;
+  font-size: 0.95rem;
+  color: #fff;
+  border-left: 3px solid transparent;
+  padding: 5px 0;
   transition: all 0.2s ease;
-  text-align: left;
 }
 
-.logout-button:hover {
-  border-bottom: 2px solid #ffffff;
+.logout-link:hover {
+  border-left: 3px solid #fff;
 }
 
 /* 3. Main Content */
 .dashboard-main {
   flex-grow: 1;
-  margin-left: 250px; /* Offset to match fixed sidebar width */
-  padding: 40px;
+  margin-left: 200px; /* sidebar width */
+  padding: 30px;
   height: 100vh;
-  overflow-y: auto; /* Scroll vertically if content exceeds viewport */
+  overflow: hidden; /* no scroll */
   background-color: #f5f7f3;
 }
 
 .dashboard-main h1 {
-  color: #617d55; /* Dark sage heading */
-  border-bottom: 3px solid #9caf88; /* Sage accent line */
-  padding-bottom: 10px;
-  margin-bottom: 25px;
+  color: #617d55;
+  border-bottom: 2px solid #9caf88;
+  padding-bottom: 8px;
+  margin-bottom: 20px;
 }
 
 .dashboard-main p {
   color: #4a5a40;
-  font-size: 1.1em;
+  font-size: 1.05em;
 }
 
-/* Responsive Layout */
+/* Responsive */
 @media (max-width: 768px) {
   .dashboard-container {
     flex-direction: column;
   }
 
   .dashboard-sidebar {
-    position: relative;
     width: 100%;
-    min-width: 100%;
-    height: auto;
+    position: relative;
     flex-direction: row;
     overflow-x: auto;
-    padding: 10px 0;
+    padding: 10px;
   }
 
   .sidebar-header {
     display: none;
   }
 
-  .sidebar-nav-cards {
+  .sidebar-nav {
     flex-direction: row;
-    gap: 8px;
-    padding: 0 10px;
+    gap: 10px;
   }
 
-  .card {
-    flex-shrink: 0;
-    padding: 8px 12px;
-    border-bottom: 1px solid transparent;
+  .nav-link, .logout-link {
+    padding: 5px 8px;
+    border-left: none;
     text-align: center;
-    justify-content: center;
-  }
-
-  .sidebar-footer {
-    margin-top: 0;
-    padding: 10px;
-  }
-
-  .logout-button {
-    width: auto;
-    border-bottom: 1px solid transparent;
   }
 
   .dashboard-main {
     margin-left: 0;
+    padding: 15px;
     height: auto;
-    overflow: visible;
-    padding: 20px;
   }
 }
