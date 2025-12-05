@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import './booknow.css'; 
+import './booknow.css'; // Assuming this CSS file includes table and modal styles 
 
 const BOOKINGS_PER_PAGE = 10;
 
@@ -95,6 +95,7 @@ function AdminBookNow() {
     return (
         <div className="admin-bookings-card">
             <h2 className="admin-bookings-title">Booking Management</h2>
+            {/* ... (Loading/Error/No Bookings messages) ... */}
             {loading ? (
                 <p className="status-message loading-message">Loading bookings...</p>
             ) : error ? (
@@ -119,6 +120,7 @@ function AdminBookNow() {
                                 <th>Check-in</th>
                                 <th>Check-out</th>
                                 <th>Mode of Payment</th>
+                                <th>Reference Number</th> {/* ✅ ADDED REFERENCE NUMBER HEADER */}
                                 <th>Date Submitted</th>
                                 <th>Status</th>
                                 <th>Actions</th>
@@ -135,6 +137,10 @@ function AdminBookNow() {
                                     <td>{booking.checkInDate ? new Date(booking.checkInDate).toLocaleDateString() : 'N/A'}</td>
                                     <td>{booking.checkOutDate ? new Date(booking.checkOutDate).toLocaleDateString() : 'N/A'}</td>
                                     <td className="capitalize">{booking.modeOfPayment || 'N/A'}</td>
+                                    {/* ✅ ADDED REFERENCE NUMBER DATA CELL */}
+                                    <td className="reference-number-cell">
+                                        {booking.referenceNumber || (booking.modeOfPayment === 'onsite' ? 'Onsite' : 'N/A')}
+                                    </td>
                                     <td>{booking.created_at ? new Date(booking.created_at).toLocaleString() : 'N/A'}</td>
                                     <td>
                                         <span className={`status-badge status-${booking.status}`}>
@@ -167,7 +173,7 @@ function AdminBookNow() {
                     </table>
                 </div>
             )}
-
+            {/* ... (Pagination controls) ... */}
             {bookings.length > BOOKINGS_PER_PAGE && (
                 <div className="pagination-controls">
                     <button
@@ -196,7 +202,7 @@ function AdminBookNow() {
                 </div>
             )}
 
-            {/* Custom Confirmation Modal UI (Replaces window.confirm/alert) */}
+            {/* Custom Confirmation Modal UI */}
             {showConfirmModal && actionDetails && (
                 <div className="modal-overlay">
                     <div className="modal-content">
