@@ -2,17 +2,16 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./styles/booknow.css";
 
-// Use environment variables for API URLs
+// API URLS
 const BOOKING_API_URL =
     process.env.NODE_ENV === "production"
         ? process.env.REACT_APP_BOOKING_API_URL
         : "http://localhost:5003";
 
-// This is the Services API URL where the QR images are hosted
 const PAYMENT_API_URL =
     process.env.NODE_ENV === "production"
-        ? process.env.REACT_APP_SERVICES_API // Using REACT_APP_SERVICES_API for consistency
-        : "http://localhost:5002"; 
+        ? process.env.REACT_APP_SERVICES_API
+        : "http://localhost:5002";
 
 const BookNow = () => {
     const location = useLocation();
@@ -33,7 +32,7 @@ const BookNow = () => {
 
     const [bookedDates, setBookedDates] = useState([]);
     const [paymentQRs, setPaymentQRs] = useState([]);
-    const [qrModalOpen, setQrModalOpen] = useState(false);
+    const [qrModalOpen, setQrModalOpen] = useState(true); // ⭐ auto-open because default is online
     const [message, setMessage] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
@@ -63,6 +62,7 @@ const BookNow = () => {
                 .join(" ")
                 .trim();
         }
+
         userFullName = userFullName || "Guest User";
 
         setFormData((prev) => ({
@@ -78,8 +78,8 @@ const BookNow = () => {
             .then((data) => setBookedDates(data))
             .catch((err) => console.error("Error fetching booked dates:", err));
 
-        // FETCH ALL SERVICES (includes payment QRs) from the Services API
-        fetch(`${PAYMENT_API_URL}/api/services`) 
+        // Fetch all payment QR codes
+        fetch(`${PAYMENT_API_URL}/api/services`)
             .then((res) => res.json())
             .then((data) => {
                 const filtered = data.filter((qr) => qr.type === "payment" && qr.image_url);
@@ -95,10 +95,14 @@ const BookNow = () => {
     // ---------------- FORM CHANGE ----------------
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData((p) => ({ ...p, [name]: value }));
 
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+
+        // Auto open modal when mode changed to online or onsite
         if (name === "modeOfPayment") {
-            // Open modal for both payment types to display the necessary QR codes/info
             setQrModalOpen(true);
         }
     };
@@ -109,6 +113,29 @@ const BookNow = () => {
         setMessage("");
         setIsSubmitting(true);
 
+        const { checkInDate, checkOutDate, referenceNumber, phoneNumber } = formData;
+
+        // ⭐ Phone Number Required
+        if (!phoneNumber.trim()) {
+            setMessage("❌ Phone number is required.");
+            setIsSubmitting(false);
+            return;
+        }
+
+        // ⭐ Reference Number Always Required
+        if (!referenceNumber.trim()) {
+            setMessage("❌ Reference number is required for payment.");
+            setIsSubmitting(false);
+            return;
+        }
+
+        // ⭐ Date validation (check if booked)
+        if (isDateBooked(checkInDate) || isDateBooked(checkOutDate)) {
+            setMessage("❌ Booking on that date is no longer available.");
+            setIsSubmitting(false);
+            return;
+        }
+
         const user = JSON.parse(localStorage.getItem("user"));
 
         const bookingData = {
@@ -118,14 +145,6 @@ const BookNow = () => {
             ...formData,
         };
 
-        if (bookingData.modeOfPayment === "online" && !bookingData.referenceNumber.trim()) {
-            setMessage("❌ Please enter your payment reference number for online payment.");
-            setIsSubmitting(false);
-            return;
-        }
-        
-        // Basic Date Validation checks...
-
         try {
             const res = await fetch(`${BOOKING_API_URL}/api/bookings`, {
                 method: "POST",
@@ -134,6 +153,7 @@ const BookNow = () => {
             });
 
             const data = await res.json();
+
             if (!res.ok) {
                 setMessage(`❌ Booking failed: ${data.error || "Server error"}`);
                 throw new Error(data.error);
@@ -163,22 +183,21 @@ const BookNow = () => {
                         <h3>
                             {formData.modeOfPayment === "online"
                                 ? "Online Payment (100% Required)"
-                                : "Onsite Payment (Minimum 15% Deposit)"} 
+                                : "Onsite Payment (Minimum 15% Deposit)"}
                         </h3>
 
                         <p>
                             {formData.modeOfPayment === "online"
                                 ? "Scan the QR below to proceed with the full payment:"
-                                : "To confirm your booking, a minimum 15% deposit is required. You may use the QR codes below to pay the deposit or pay the full amount onsite."}
+                                : "A 15% deposit is required. Scan a QR code below to pay the deposit or full amount."}
                         </p>
 
                         <div className="qr-grid">
                             {paymentQRs.length > 0 ? (
                                 paymentQRs.map((qr) => (
                                     <div key={qr.id} className="qr-item">
-                                        {/* ✅ FIX: Robust URL construction using the dynamically fetched image_url */}
                                         <img
-                                            src={`${PAYMENT_API_URL.replace(/\/$/, '')}${qr.image_url}`} 
+                                            src={`${PAYMENT_API_URL.replace(/\/$/, "")}${qr.image_url}`}
                                             alt={qr.name}
                                             className="qr-image"
                                         />
@@ -187,7 +206,7 @@ const BookNow = () => {
                                 ))
                             ) : (
                                 <p style={{ color: "red", fontWeight: "bold" }}>
-                                    No payment QR codes or deposit information available at this moment.
+                                    No payment QR codes available.
                                 </p>
                             )}
                         </div>
@@ -236,7 +255,11 @@ const BookNow = () => {
                 />
 
                 <label>Mode of Payment</label>
-                <select name="modeOfPayment" value={formData.modeOfPayment} onChange={handleChange}>
+                <select
+                    name="modeOfPayment"
+                    value={formData.modeOfPayment}
+                    onChange={handleChange}
+                >
                     <option value="online">💳 Online Payment (100% full payment)</option>
                     <option value="onsite">🏠 Pay Onsite (15% deposit required)</option>
                 </select>
@@ -245,26 +268,28 @@ const BookNow = () => {
                 <input
                     type="text"
                     name="referenceNumber"
-                    placeholder="Enter payment reference number (if paid online/deposit)"
+                    placeholder="Enter payment reference number"
                     value={formData.referenceNumber}
                     onChange={handleChange}
-                    // Requires reference number for online payment, but optional for deposit (onsite)
-                    required={formData.modeOfPayment === "online"}
+                    required // ALWAYS REQUIRED
                 />
-                
+
                 {showNoPaymentMessage && (
                     <p style={{ color: "red", marginTop: "10px" }}>
                         **No payment methods are available. Please try again later.**
                     </p>
                 )}
 
-
                 <button type="submit" className="btn-primary" disabled={isSubmitting}>
                     {isSubmitting ? "Processing..." : "Confirm Booking"}
                 </button>
 
                 {message && (
-                    <p className={`booking-message ${message.includes("❌") ? "error" : "success"}`}>
+                    <p
+                        className={`booking-message ${
+                            message.includes("❌") ? "error" : "success"
+                        }`}
+                    >
                         {message}
                     </p>
                 )}
