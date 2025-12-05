@@ -7,8 +7,25 @@ const fs = require('fs');
 
 const app = express();
 
+// --- START: CORS CONFIGURATION FIX ---
+// 1. Define the specific origin of your frontend application
+const FRONTEND_URL = 'https://emzbayviewmountainresort.up.railway.app';
+
+// 2. Configure CORS options
+const corsOptions = {
+    // Only allow requests from your deployed frontend URL
+    origin: FRONTEND_URL, 
+    // Allow the HTTP methods used in your application (GET, POST, PUT, DELETE)
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], 
+    // Allows credentials (like cookies or Authorization headers) to be sent, if needed later
+    credentials: true,
+};
+
+// 3. Apply the specific CORS configuration middleware
+app.use(cors(corsOptions));
+// --- END: CORS CONFIGURATION FIX ---
+
 // Middleware
-app.use(cors());
 app.use(express.json()); // Parse JSON
 
 // Request logger
