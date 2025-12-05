@@ -181,56 +181,120 @@ body {
     border-color: #e9ecef;
 }
 
+/* --- Confirmation Modal --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    padding: 10px;
+}
+
+.modal-content {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 1.5rem 1.8rem;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+    text-align: center;
+    font-size: 0.9em;
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.2em;
+    color: #4C5A48;
+}
+
+.modal-content p {
+    margin-bottom: 1.2rem;
+    color: #555;
+    line-height: 1.4;
+}
+
+.modal-content strong.status-approved {
+    color: #7C9271;
+}
+
+.modal-content strong.status-declined {
+    color: #d32f2f;
+}
+
+.modal-content strong.status-pending {
+    color: #f0ad4e;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.modal-actions .action-button {
+    padding: 6px 12px;
+    font-size: 0.85em;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    min-width: 80px;
+    transition: all 0.2s ease;
+}
+
+.modal-actions .approve-button {
+    background-color: #7C9271;
+    color: white;
+}
+
+.modal-actions .approve-button:hover {
+    background-color: #6A7C5F;
+    transform: translateY(-1px);
+}
+
+.modal-actions .decline-button {
+    background-color: #d32f2f;
+    color: white;
+}
+
+.modal-actions .decline-button:hover {
+    background-color: #c62828;
+    transform: translateY(-1px);
+}
+
 /* --- Mobile Responsive --- */
 @media (max-width: 1024px) {
-    .bookings-table {
-        font-size: 0.8em;
-    }
-    .bookings-table th,
-    .bookings-table td {
-        padding: 4px 6px;
-    }
-    .action-buttons button {
-        font-size: 0.7em;
-        padding: 3px 5px;
-        min-width: 50px;
-    }
-    .pagination-button {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.7em;
-    }
+    .bookings-table { font-size: 0.8em; }
+    .bookings-table th, .bookings-table td { padding: 4px 6px; }
+    .action-buttons button { font-size: 0.7em; padding: 3px 5px; min-width: 50px; }
+    .pagination-button { padding: 0.25rem 0.5rem; font-size: 0.7em; }
 }
 
 @media (max-width: 768px) {
-    .table-responsive {
-        overflow-x: auto;
-    }
+    .table-responsive { overflow-x: auto; }
+    .bookings-table { width: 100%; font-size: 0.75em; min-width: 750px; }
+    .bookings-table th, .bookings-table td { padding: 3px 5px; }
+    .action-buttons { flex-direction: column; gap: 2px; }
+    .action-buttons button { width: 100%; min-width: unset; font-size: 0.7em; padding: 3px 5px; }
+    .pagination-button { padding: 0.2rem 0.5rem; font-size: 0.65em; }
 
-    .bookings-table {
+    /* Modal Mobile */
+    .modal-content {
+        max-width: 90%;
+        padding: 1rem 1.2rem;
+        font-size: 0.85em;
+    }
+    .modal-actions .action-button {
         width: 100%;
-        font-size: 0.75em;
-        min-width: 750px; /* allow scroll instead of cutting columns */
-    }
-
-    .bookings-table th,
-    .bookings-table td {
-        padding: 3px 5px;
-    }
-
-    .action-buttons {
-        flex-direction: column;
-        gap: 2px;
-    }
-
-    .action-buttons button {
-        width: 100%;
+        padding: 5px 0;
+        font-size: 0.8em;
         min-width: unset;
-        font-size: 0.7em;
-        padding: 3px 5px;
-    }
-
-    .pagination-button {
-        padding: 0.2rem 0.5rem;
-        font-size: 0.65em;
     }
 }
