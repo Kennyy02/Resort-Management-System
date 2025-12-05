@@ -6,7 +6,7 @@ const path = require('path');
 const fs = require('fs');
 
 const app = express();
-// CORS FIX: Explicitly allowing your frontend domain
+// --- FIX #1: Explicit CORS Configuration ---
 const allowedOrigin = 'https://emzbayviewmountainresort.up.railway.app'; 
 
 app.use(cors({
@@ -67,33 +67,57 @@ db.getConnection()
     });
 
 
-// POST new service (FINAL FIX: Explicitly set price/description to NULL if empty)
+// POST new service (FINAL FIX: Robust NULL handling for optional fields like price)
 app.post('/api/services', upload.single('image'), async (req, res) => {
     console.log('Backend: POST /api/services hit!');
+    
+    // Extract fields
     const { name, description, price, status, type, mode_of_payment } = req.body;
     let image_url = null;
+    
     if (req.file) {
         image_url = `/uploads/${req.file.filename}`;
         console.log(`Image uploaded: ${image_url}`);
     }
 
+    // --- ENFORCING NULL for empty/missing optional fields ---
+    // The check (variable && variable.trim() !== '') ensures that only true data is kept.
+    // If empty string or undefined, it resolves to null.
+    const final_name = name || null; 
+    const final_description = (description && description.toString().trim() !== '') ? description : null;
+    const final_price = (price && price.toString().trim() !== '') ? price : null;
+    const final_image_url = image_url || null; 
+    const final_status = status || 'available'; 
+    const final_type = type || 'room';
     const final_mode_of_payment = mode_of_payment || 'online'; 
+    // --------------------------------------------------------
+    
+    if (!final_name || !final_type) {
+        return res.status(400).json({ error: "Service Name and Type are required." });
+    }
 
-    // **FINAL FIX: Convert empty string to NULL for database**
-    const final_price = (price === '' || price === undefined) ? null : price;
-    const final_description = (description === '' || description === undefined) ? null : description;
-    // ---------------------------------------------------------
-
+    // --- DEBUG LOG: WHAT ARE WE SENDING? ---
+    console.log("DEBUG: Attempting to insert service with values:");
+    console.log("name:", final_name);
+    console.log("description:", final_description);
+    console.log("price:", final_price);          
+    console.log("image_url:", final_image_url);
+    console.log("status:", final_status);
+    console.log("type:", final_type);
+    console.log("mode_of_payment:", final_mode_of_payment);
+    // ------------------------------------------
+    
     try {
         const [result] = await db.query(
             'INSERT INTO services (name, description, price, image_url, status, type, mode_of_payment) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            [name, final_description, final_price, image_url, status, type, final_mode_of_payment]
+            [final_name, final_description, final_price, final_image_url, final_status, final_type, final_mode_of_payment]
         );
         console.log('Service added to DB, ID:', result.insertId);
         res.status(201).json({ message: 'Service added successfully', id: result.insertId });
     } catch (err) {
         console.error('Backend: Insert error (POST /api/services):', err);
-        res.status(500).json({ error: err.message });
+        // This response will show the exact SQL error code in the frontend network tab
+        res.status(500).json({ error: err.message, sqlError: err.code }); 
     }
 });
 
@@ -110,18 +134,24 @@ app.get('/api/services', async (req, res) => {
     }
 });
 
-// PUT (Update) a service (FINAL FIX: Explicitly set price/description to NULL if empty)
+// PUT (Update) a service (FINAL FIX: Robust NULL handling for optional fields like price)
 app.put('/api/services/:id', upload.single('image'), async (req, res) => {
     console.log(`Backend: PUT /api/services/${req.params.id} hit!`);
     const { name, description, price, status, type, mode_of_payment } = req.body;
     const serviceId = req.params.id;
 
+    // --- ENFORCING NULL for empty/missing optional fields ---
+    const final_name = name || null;
+    const final_description = (description && description.toString().trim() !== '') ? description : null;
+    const final_price = (price && price.toString().trim() !== '') ? price : null;
+    const final_status = status || 'available'; 
+    const final_type = type || 'room'; 
     const final_mode_of_payment = mode_of_payment || 'online';
+    // --------------------------------------------------------
     
-    // **FINAL FIX: Convert empty string to NULL for database**
-    const final_price = (price === '' || price === undefined) ? null : price;
-    const final_description = (description === '' || description === undefined) ? null : description;
-    // ---------------------------------------------------------
+    if (!final_name) {
+        return res.status(400).json({ error: "Service Name is required." });
+    }
 
     try {
         const [rows] = await db.query('SELECT image_url FROM services WHERE id = ?', [serviceId]);
@@ -140,10 +170,11 @@ app.put('/api/services/:id', upload.single('image'), async (req, res) => {
             image_url = `/uploads/${req.file.filename}`; 
             console.log(`New image uploaded for service ID ${serviceId}: ${image_url}`);
         }
+        const final_image_url = image_url || null;
 
         await db.query(
             'UPDATE services SET name=?, description=?, price=?, image_url=?, status=?, type=?, mode_of_payment=? WHERE id=?',
-            [name, final_description, final_price, image_url, status, type, final_mode_of_payment, serviceId]
+            [final_name, final_description, final_price, final_image_url, final_status, final_type, final_mode_of_payment, serviceId]
         );
 
         // Delete old image file after successful DB update
@@ -155,7 +186,7 @@ app.put('/api/services/:id', upload.single('image'), async (req, res) => {
         res.json({ message: 'Service updated successfully' });
     } catch (err) {
         console.error('Backend: Update error (PUT /api/services/:id):', err);
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: err.message, sqlError: err.code });
     }
 });
 
