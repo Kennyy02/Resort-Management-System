@@ -1,6 +1,6 @@
-/* ============================
-   BOOKING FORM CONTAINER
-============================= */
+/* booknow.css */
+
+/* Wrapper */
 .booking-container {
   max-width: 450px;
   margin: 50px auto;
@@ -11,6 +11,7 @@
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* Title */
 .booking-title {
   text-align: center;
   font-size: 1.6rem;
@@ -19,14 +20,13 @@
   color: #333;
 }
 
-/* ============================
-   FORM
-============================= */
+/* Form */
 .booking-form {
   display: flex;
   flex-direction: column;
 }
 
+/* Labels */
 .booking-form label {
   font-size: 0.95rem;
   font-weight: 600;
@@ -35,6 +35,7 @@
   margin-top: 12px;
 }
 
+/* Inputs & Select */
 .booking-form input,
 .booking-form select {
   padding: 12px;
@@ -51,14 +52,13 @@
   box-shadow: 0 0 5px rgba(74, 144, 226, 0.3);
 }
 
+/* Disabled fields */
 .booking-form input[disabled] {
   background: #f5f5f5;
   cursor: not-allowed;
 }
 
-/* ============================
-   SUBMIT BUTTON
-============================= */
+/* Button */
 .btn-primary {
   margin-top: 20px;
   padding: 12px;
@@ -76,161 +76,146 @@
   background: #357ab8;
 }
 
-/* ============================
-   SUCCESS / ERROR MESSAGE
-============================= */
+/* Messages */
 .booking-message {
   margin-top: 15px;
   text-align: center;
   font-size: 0.95rem;
   font-weight: 500;
-}
-
-.booking-message.error {
-  color: #d9534f;
-}
-
-.booking-message.success {
   color: green;
 }
 
-/* ============================
-   LOADING
-============================= */
-.loading-container {
-  text-align: center;
-  padding: 40px;
-  font-size: 1rem;
-  color: #555;
+.error-text {
+  font-size: 0.85rem;
+  color: #d9534f;
+  margin-top: 5px;
 }
 
-/* ============================
-   QR MODAL OVERLAY
-============================= */
+/* ========================== */
+/*         QR MODAL           */
+/* ========================== */
+
 .qr-modal {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   background: rgba(0, 0, 0, 0.55);
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 15px;
-  z-index: 2000;
+  z-index: 999;
+  padding: 20px;
 }
 
-/* ============================
-   QR MODAL CONTENT
-============================= */
+/* Modal Content Box */
 .qr-modal-content {
-  width: 100%;
-  max-width: 480px;
-  background: #fff;
-  border-radius: 14px;
+  background: #ffffff;
+  width: 95%;
+  max-width: 430px;
   padding: 25px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-  animation: fadeUp 0.28s ease-out;
+  border-radius: 14px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
   text-align: center;
+  animation: fadeIn 0.25s ease-out;
 }
 
-@keyframes fadeUp {
-  from {
-    transform: translateY(15px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+/* Title inside modal */
+.qr-modal-content h3 {
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+  color: #333;
 }
 
-/* ============================
-   QR GRID
-============================= */
+/* Description inside modal */
+.qr-modal-content p {
+  font-size: 0.8rem;
+  color: #555;
+  margin-bottom: 15px;
+  line-height: 1.3;
+}
+
+/* QR Grid (usually 1 per row) */
 .qr-grid {
-  margin-top: 18px;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 18px;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
 }
 
+/* QR Item Wrapper */
 .qr-item {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
+/* BIG QR IMAGE */
 .qr-image {
-  width: 100%;
-  height: 150px;
-  object-fit: contain;
+  width: 85%;
+  max-width: 320px; /* BIG SIZE */
+  border-radius: 12px;
+  border: 1px solid #ddd;
 }
 
+/* QR Label */
 .qr-label {
-  margin-top: 8px;
-  font-size: 0.9rem;
-  font-weight: 500;
+  margin-top: 6px;
+  font-size: 0.8rem;
+  color: #444;
 }
 
-/* ============================
-   CLOSE MODAL BUTTON
-============================= */
+/* Close Button */
 .close-modal-btn {
-  margin-top: 22px;
-  padding: 10px 16px;
-  background: #4a90e2;
+  padding: 10px;
+  background: #333;
   color: white;
   border: none;
+  font-size: 0.9rem;
+  font-weight: 600;
   border-radius: 8px;
-  font-size: 0.95rem;
   cursor: pointer;
-  transition: background 0.25s ease;
+  width: 100%;
+  transition: opacity 0.2s ease;
 }
 
 .close-modal-btn:hover {
-  background: #357ab8;
+  opacity: 0.85;
 }
 
-/* ============================
-   RESPONSIVENESS
-============================= */
-@media (max-width: 600px) {
-  .booking-container {
-    margin: 25px 15px;
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* MOBILE FRIENDLY */
+@media (max-width: 480px) {
+  .qr-image {
+    width: 95%;
+    max-width: 280px;
+  }
+
+  .qr-modal-content {
     padding: 20px;
   }
 
-  .booking-title {
-    font-size: 1.4rem;
+  .qr-modal-content h3 {
+    font-size: 1rem;
   }
 
-  .qr-modal-content {
-    padding: 18px;
+  .qr-modal-content p {
+    font-size: 0.75rem;
   }
 
-  .qr-image {
-    height: 130px;
-  }
-
-  .qr-grid {
-    gap: 12px;
-  }
-}
-
-@media (max-width: 400px) {
-  .booking-container {
-    margin: 20px 10px;
-  }
-
-  .booking-form input,
-  .booking-form select {
-    padding: 10px;
-  }
-
-  .qr-image {
-    height: 110px;
-  }
-
-  .qr-modal-content {
-    border-radius: 10px;
+  .qr-label {
+    font-size: 0.75rem;
   }
 }
