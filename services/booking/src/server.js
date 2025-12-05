@@ -15,9 +15,10 @@ const db = mysql.createConnection({
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     port: process.env.DB_PORT || 3306
-});
+}).promise(); // ✅ OPTIMIZATION: Use promise pool connection for consistency
 
 db.connect((err) => {
+    // Note: The promise wrapper handles the connection differently, but we keep this initial log.
     if (err) {
         console.error("❌ DB Connection Error:", err.message);
         process.exit(1);
@@ -49,7 +50,7 @@ app.get('/api/bookings/check-prerequisite/:email', async (req, res) => {
     }
 
     try {
-        const [results] = await db.promise().query(
+        const [results] = await db.query(
             `SELECT id 
              FROM bookings 
              WHERE email = ? 
@@ -71,7 +72,7 @@ app.get('/api/bookings/check-prerequisite/:email', async (req, res) => {
 app.get('/api/bookings/service/:serviceId', async (req, res) => {
     const { serviceId } = req.params;
     try {
-        const [results] = await db.promise().query(
+        const [results] = await db.query(
             "SELECT DISTINCT DATE_FORMAT(checkInDate, '%Y-%m-%d') AS checkInDate FROM bookings WHERE serviceId = ?",
             [serviceId]
         );
@@ -83,25 +84,14 @@ app.get('/api/bookings/service/:serviceId', async (req, res) => {
     }
 });
 
-// ----------------- ✅ FIXED POST /api/bookings ROUTE -----------------
+// ----------------- POST /api/bookings ROUTE (Reference Number handling OK) -----------------
 app.post('/api/bookings', async (req, res) => {
     try {
-        // ✅ FIX 1: Destructure referenceNumber from the request body
         const { name, email, phoneNumber, checkInDate, checkOutDate, serviceId, serviceName, modeOfPayment, referenceNumber } = req.body;
 
-        // ✅ FIX 2: Include referenceNumber in the required fields check
-        const requiredFields = { name, email, phoneNumber, checkInDate, checkOutDate, serviceId, serviceName, modeOfPayment, referenceNumber };
-        // The frontend handles making referenceNumber optional for onsite payment, so we can simplify the backend check here.
-        // If referenceNumber is required by the form (e.g., online payment), the frontend ensures it's passed.
-        const missingFields = Object.keys(requiredFields).filter(key => {
-            // Check if the field is modeOfPayment and its value is missing
-            if (key === 'referenceNumber' && modeOfPayment === 'onsite') {
-                // referenceNumber is not required for onsite (or can be treated as an empty string)
-                return false; 
-            }
-            // Check if any other required field is missing/falsy
-            return !requiredFields[key];
-        });
+        const requiredFields = { name, email, phoneNumber, checkInDate, checkOutDate, serviceId, serviceName, modeOfPayment };
+        
+        const missingFields = Object.keys(requiredFields).filter(key => !requiredFields[key]);
 
         if (missingFields.length > 0) {
             console.error("❌ Missing required fields for booking:", missingFields.join(', '));
@@ -111,10 +101,10 @@ app.post('/api/bookings', async (req, res) => {
         const formattedCheckIn = new Date(checkInDate).toISOString().split('T')[0];
         const formattedCheckOut = new Date(checkOutDate).toISOString().split('T')[0];
         
-        // Ensure referenceNumber is stored as null if empty (for onsite payments)
-        const finalReferenceNumber = (modeOfPayment === 'onsite' && !referenceNumber) ? null : referenceNumber;
+        // Ensure referenceNumber is stored as null if empty (for onsite payments or if user did not provide one)
+        const finalReferenceNumber = referenceNumber && referenceNumber.trim() !== '' ? referenceNumber : null;
 
-        const [conflicts] = await db.promise().query(
+        const [conflicts] = await db.query(
             "SELECT id FROM bookings WHERE serviceId = ? AND checkInDate = ?",
             [serviceId, formattedCheckIn]
         );
@@ -124,28 +114,35 @@ app.post('/api/bookings', async (req, res) => {
 
         const sql = `INSERT INTO bookings 
              (name, email, phoneNumber, checkInDate, checkOutDate, serviceId, serviceName, modeOfPayment, referenceNumber) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`; // ✅ FIX 3: Added referenceNumber column
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
-        const [result] = await db.promise().query(sql, [
-            name, email, phoneNumber, formattedCheckIn, formattedCheckOut, serviceId, serviceName, modeOfPayment, finalReferenceNumber // ✅ FIX 4: Added referenceNumber value
+        const [result] = await db.query(sql, [
+            name, email, phoneNumber, formattedCheckIn, formattedCheckOut, serviceId, serviceName, modeOfPayment, finalReferenceNumber
         ]);
 
-        res.status(201).json({ message: 'Booking created', bookingId: result.insertId });
+        res.status(201).json({ message: 'Booking created', bookingId: result.insertId, status: 'pending' });
     } catch (err) {
         console.error("❌ Booking error:", err.message);
         res.status(500).json({ error: 'Server error while booking' });
     }
 });
-// ----------------- END FIXED POST /api/bookings ROUTE -----------------
+// ----------------- END POST /api/bookings ROUTE -----------------
 
 
-app.get('/api/bookings', (req, res) => {
-    db.query("SELECT * FROM bookings ORDER BY created_at DESC", (err, results) => {
-        if (err) return res.status(500).json({ error: 'Error fetching bookings' });
+// ----------------- GET /api/bookings ROUTE (Admin Fetch) -----------------
+app.get('/api/bookings', async (req, res) => { // ✅ CONSISTENCY FIX: Made route async
+    try {
+        // SELECT * will include referenceNumber automatically
+        const [results] = await db.query("SELECT * FROM bookings ORDER BY created_at DESC"); // ✅ CONSISTENCY FIX: Used db.promise().query
         res.json(results);
-    });
+    } catch (err) {
+        console.error("❌ Error fetching bookings:", err.message);
+        res.status(500).json({ error: 'Error fetching bookings' });
+    }
 });
+// ----------------- END GET /api/bookings ROUTE -----------------
 
+// ----------------- PUT /api/bookings/:id/status ROUTE (Email Fix) -----------------
 app.put('/api/bookings/:id/status', async (req, res) => {
     const { status } = req.body;
     const { id } = req.params;
@@ -155,7 +152,7 @@ app.put('/api/bookings/:id/status', async (req, res) => {
     }
 
     try {
-        const [result] = await db.promise().query(
+        const [result] = await db.query(
             "UPDATE bookings SET status = ? WHERE id = ?",
             [status, id]
         );
@@ -164,8 +161,9 @@ app.put('/api/bookings/:id/status', async (req, res) => {
             return res.status(404).json({ error: 'Booking not found' });
         }
 
-        const [rows] = await db.promise().query(
-            "SELECT name, email, serviceName, checkInDate, checkOutDate FROM bookings WHERE id = ?",
+        // ✅ FIX: Include referenceNumber and modeOfPayment for email confirmation
+        const [rows] = await db.query(
+            "SELECT name, email, serviceName, checkInDate, checkOutDate, referenceNumber, modeOfPayment FROM bookings WHERE id = ?",
             [id]
         );
         const booking = rows[0];
@@ -179,7 +177,17 @@ app.put('/api/bookings/:id/status', async (req, res) => {
         let subject, text;
         if (status === 'approved') {
             subject = "✅ Your Booking Has Been Approved";
-            text = `Hello ${booking.name},\n\nYour reservation for ${booking.serviceName} from ${formatDate(booking.checkInDate)} to ${formatDate(booking.checkOutDate)} has been APPROVED.\n\nThank you for choosing us!`;
+            
+            // Build the payment reference text for the email
+            const refText = booking.referenceNumber 
+                ? `\n\nYour Payment Reference Number: ${booking.referenceNumber}`
+                : booking.modeOfPayment === 'onsite' 
+                    ? `\n\nPayment Note: You chose to pay the full amount or balance upon arrival.`
+                    : ''; // Fallback for any other case
+            
+            // ✅ FIX: Inject refText into the email body
+            text = `Hello ${booking.name},\n\nYour reservation for ${booking.serviceName} from ${formatDate(booking.checkInDate)} to ${formatDate(booking.checkOutDate)} has been APPROVED.${refText}\n\nThank you for choosing us! We look forward to seeing you!`;
+            
         } else if (status === 'declined') {
             subject = "❌ Your Booking Has Been Declined";
             text = `Hello ${booking.name},\n\nWe’re sorry, but your reservation for ${booking.serviceName} from ${formatDate(booking.checkInDate)} to ${formatDate(booking.checkOutDate)} has been DECLINED.\n\nPlease contact us for more details.`;
@@ -206,5 +214,7 @@ app.put('/api/bookings/:id/status', async (req, res) => {
         res.status(500).json({ error: 'Error updating status or sending email' });
     }
 });
+// ----------------- END PUT /api/bookings/:id/status ROUTE -----------------
+
 
 app.listen(PORT, () => console.log(`🚀 Booking service running on http://localhost:${PORT}`));
