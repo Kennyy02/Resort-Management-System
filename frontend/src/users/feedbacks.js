@@ -12,20 +12,22 @@ const renderStars = (rating) => {
     return fullStar.repeat(rating) + emptyStar.repeat(5 - rating);
 };
 
-export default function Feedbacks({ user }) {
+// Ensure this component receives 'user' as a prop
+export default function Feedbacks({ user }) { 
     const [feedbacks, setFeedbacks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [filters, setFilters] = useState({ stars: "", withPhoto: null, date: "" });
-    const [userEligible, setUserEligible] = useState(false);
+    // FIX: Initialize eligibility based on user presence
+    const [userEligible, setUserEligible] = useState(!!user); 
     const navigate = useNavigate();
 
     const fetchFeedbacks = async () => {
         setLoading(true);
         try {
-            // FIX: Added /api to the endpoint to match the backend route
-            const res = await fetch(`${process.env.REACT_APP_RATINGS_API}/api/feedbacks`); 
+            // Backend route is correct: /api/feedbacks
+            const res = await fetch(`${process.env.REACT_APP_RATINGS_API}/api/feedbacks`); 
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || "Failed to fetch feedbacks");
             setFeedbacks(data.sort((a,b) => new Date(b.created_at) - new Date(a.created_at)));
@@ -37,23 +39,12 @@ export default function Feedbacks({ user }) {
         }
     };
 
-    const checkUserEligibility = async () => {
-        if (!user) return setUserEligible(false);
-        try {
-            // This check is likely in a different service, assuming the path is correct here
-            const res = await fetch(`${process.env.REACT_APP_BOOKINGS_API}/bookings?email=${user.email}`); 
-            const data = await res.json();
-            // Eligible if at least one booking is approved
-            setUserEligible(data.some(b => b.status === "approved"));
-        } catch {
-            setUserEligible(false);
-        }
-    };
-
+    // FIX: Simplified logic - runs when component mounts and whenever 'user' state changes.
     useEffect(() => {
         fetchFeedbacks();
-        checkUserEligibility();
-    }, []);
+        // Check if user object exists (logged in)
+        setUserEligible(!!user);
+    }, [user]); 
 
     // Filter feedbacks
     const filteredFeedbacks = feedbacks.filter((fb) => {
@@ -85,7 +76,8 @@ export default function Feedbacks({ user }) {
             </div>
 
             <div className="feedbacks-content-container">
-                {user && userEligible && (
+                {/* Button is visible if user is logged in */}
+                {userEligible && (
                     <div className="write-feedback-btn">
                         <button onClick={() => navigate("/create-feedback")}>✍️ Write Feedback</button>
                     </div>
