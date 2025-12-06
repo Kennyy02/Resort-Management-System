@@ -42,27 +42,29 @@ db.connect((err) => {
   console.log('Connected to MySQL database');
 });
 
-// --- Ensure Table Exists ---
+// --- Table Existence Logic Removed ---
+// The following block has been removed as the table 'messages' is confirmed to exist.
+/*
 const createTableSQL = `
-CREATE TABLE IF NOT EXISTS messages ( // <-- FIX: Changed table name from contact_messages to messages
+CREATE TABLE IF NOT EXISTS messages ( 
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   email VARCHAR(255) NOT NULL,
   message TEXT NOT NULL,
-  status VARCHAR(50) DEFAULT 'notAnswered', // <-- FIX: Changed default status from 'pending' to 'notAnswered'
+  status VARCHAR(50) DEFAULT 'notAnswered', 
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )`;
-
 db.query(createTableSQL, (err) => {
   if (err) console.error('Error creating table:', err);
   else console.log('Contact Messages table ensured.');
 });
+*/
+// ------------------------------------
 
 // --- Routes ---
 // Submit a new contact message
 app.post('/api/contact', (req, res) => {
   const { name, email, message } = req.body;
-  // <-- FIX: Changed table name to messages and status to notAnswered
   const sql = 'INSERT INTO messages (name, email, message, status) VALUES (?, ?, ?, ?)';
   
   db.query(sql, [name, email, message, 'notAnswered'], (err) => { 
@@ -76,7 +78,6 @@ app.post('/api/contact', (req, res) => {
 
 // Get all messages (most recent first)
 app.get('/api/messages', (req, res) => {
-  // <-- FIX: Changed table name to messages
   const sql = 'SELECT * FROM messages ORDER BY created_at DESC'; 
   db.query(sql, (err, results) => {
     if (err) {
@@ -96,7 +97,6 @@ app.put('/api/messages/:id/status', (req, res) => {
     return res.status(400).json({ error: 'Invalid status value' });
   }
 
-  // <-- FIX: Changed table name to messages
   const sql = 'UPDATE messages SET status = ? WHERE id = ?'; 
   db.query(sql, [status, id], (err, result) => {
     if (err) {
