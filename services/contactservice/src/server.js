@@ -3,12 +3,10 @@ const mysql = require('mysql2');
 const cors = require('cors');
 
 const app = express();
-const PORT = process.env.PORT || 8081;
+// Railway automatically sets the PORT variable
+const PORT = process.env.PORT || 8081; 
 
-// ✅ FIX: Using the simple, permissive CORS that works in your booking service.
-// This allows all origins, resolving the CORS block/loading error.
 app.use(cors()); 
-
 app.use(express.json());
 
 // --- MySQL Connection ---
@@ -18,7 +16,6 @@ const db = mysql.createConnection({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   port: process.env.DB_PORT || 3306,
-  // FIX: Removed 'dateStrings: true' so MySQL returns JS Date objects
 });
 
 db.connect((err) => {
@@ -27,14 +24,15 @@ db.connect((err) => {
 });
 
 // --- Ensure Table Exists ---
+// ✅ FIX: Removed leading whitespace/special characters from the SQL lines.
 const createTableSQL = `
 CREATE TABLE IF NOT EXISTS contact_messages (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(255) NOT NULL,
-  email VARCHAR(255) NOT NULL,
-  message TEXT NOT NULL,
-  status VARCHAR(50) DEFAULT 'pending',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+id INT AUTO_INCREMENT PRIMARY KEY,
+name VARCHAR(255) NOT NULL,
+email VARCHAR(255) NOT NULL,
+message TEXT NOT NULL,
+status VARCHAR(50) DEFAULT 'pending',
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )`;
 
 db.query(createTableSQL, (err) => {
@@ -45,6 +43,7 @@ db.query(createTableSQL, (err) => {
 // --- Routes ---
 // Submit a new contact message
 app.post('/api/contact', (req, res) => {
+// ... (rest of the post route is unchanged)
   const { name, email, message } = req.body;
   const sql = 'INSERT INTO contact_messages (name, email, message, status) VALUES (?, ?, ?, ?)';
   
@@ -59,19 +58,20 @@ app.post('/api/contact', (req, res) => {
 
 // Get all messages (most recent first)
 app.get('/api/messages', (req, res) => {
+// ... (rest of the get route is unchanged)
   const sql = 'SELECT * FROM contact_messages ORDER BY created_at DESC';
   db.query(sql, (err, results) => {
     if (err) {
       console.error('❌ Error fetching messages:', err);
       return res.status(500).json({ error: 'Failed to fetch messages' });
     }
-    // Results are returned as JSON array of objects
     res.json(results);
   });
 });
 
 // Update message status to "answered"
 app.put('/api/messages/:id/status', (req, res) => {
+// ... (rest of the put route is unchanged)
   const { id } = req.params;
   const { status } = req.body;
 
