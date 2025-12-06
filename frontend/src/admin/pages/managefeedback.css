@@ -1,189 +1,96 @@
-:root {
-  --sage: #9CAF88;
-  --sage-dark: #6B7F62;
-  --sage-light: #F6F8F5;
-  --line: #E1E7DD;
-  --text: #2F3A2F;
+/* MAIN CONTAINER */
+.feedback-container {
+  padding: 40px;
+  background: #f6f8f5;
+  min-height: 100vh;
 }
 
-body {
-  margin: 0;
-  background: var(--sage-light);
-  color: var(--text);
-  font-family: "Segoe UI", sans-serif;
-}
-
-/* CONTAINER */
-.managefeedback-container {
-  max-width: 1150px;
-  margin: 30px auto;
-  background: white;
-  padding: 20px 18px;
-  border-radius: 14px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-}
-
-h2 {
-  margin-bottom: 14px;
-  color: var(--sage-dark);
+/* TITLE */
+.feedback-title {
+  font-size: 32px;
   font-weight: 600;
+  color: #4b5d45;
   text-align: center;
+  margin-bottom: 30px;
 }
 
-/* FILTER */
-.filter-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-bottom: 14px;
-}
-
-.filter-buttons button {
-  padding: 6px 14px;
-  background: transparent;
-  border: 1px solid var(--sage);
-  color: var(--sage-dark);
-  border-radius: 20px;
-  font-size: 13px;
-  cursor: pointer;
-}
-
-.active-filter {
-  background: var(--sage);
-  color: white;
-}
-
-/* STATUS MESSAGES */
-.status-message {
-  text-align: center;
-  padding: 8px;
-  border-radius: 8px;
-  background: var(--sage-light);
-  border: 1px solid var(--line);
-  margin: 12px 0;
+/* TABLE WRAPPER */
+.feedback-table-wrapper {
+  background: white;
+  border-radius: 4px;
+  padding: 0;
+  overflow-x: auto;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
 /* TABLE */
-.table-responsive {
-  overflow-x: auto;
-}
-
 .feedback-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13.8px;
+  font-size: 15px;
 }
 
+/* TABLE HEADER */
 .feedback-table thead {
-  background: var(--sage);
+  background: #5f7056;
   color: white;
 }
 
 .feedback-table th {
-  padding: 10px 8px;
+  padding: 14px 12px;
   text-align: left;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* TABLE BODY */
+.feedback-table td {
+  padding: 16px 12px;
+  border-bottom: 1px solid #e0e0e0;
+  color: #333;
+}
+
+/* HOVER EFFECT */
+.feedback-table tbody tr:hover {
+  background: #f4f7f3;
+}
+
+/* MESSAGE COLUMN */
+.feedback-message {
+  max-width: 350px;
+  line-height: 1.4;
+}
+
+/* STATUS BADGES */
+.status-active {
+  color: #2e7d32;
   font-weight: 500;
 }
 
-.feedback-table td {
-  padding: 8px 8px;
-  border-bottom: 1px solid var(--line);
-}
-
-.feedback-table tbody tr:hover {
-  background: #F4F7F2;
-}
-
-/* HIDDEN ITEM */
-.deleted-row {
-  opacity: 0.5;
-  background: #FAECEC;
-  text-decoration: line-through;
-}
-
-/* IMAGES */
-.photo-preview-admin {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.admin-feedback-image {
-  width: 34px;
-  height: 34px;
-  border-radius: 6px;
-  object-fit: cover;
-  border: 1px solid var(--line);
-}
-
-.photo-count-indicator {
-  background: var(--sage-dark);
-  color: white;
-  font-size: 10px;
-  padding: 3px 6px;
-  border-radius: 10px;
+.status-deleted {
+  color: #c62828;
+  font-weight: 500;
 }
 
 /* BUTTONS */
-.feedback-table button {
-  padding: 5px 10px;
-  border-radius: 30px;
-  font-size: 12px;
+.feedback-btn {
+  padding: 6px 14px;
   border: none;
+  border-radius: 3px;
   cursor: pointer;
+  font-size: 14px;
 }
 
-.hide-btn {
-  background: #C94B4B;
+.delete-btn {
+  background: #c62828;
   color: white;
 }
 
 .restore-btn {
-  background: var(--sage);
+  background: #2e7d32;
   color: white;
 }
 
-/* PAGINATION */
-.pagination {
-  margin-top: 16px;
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.pagination-button {
-  padding: 5px 11px;
-  border: 1px solid var(--line);
-  background: white;
-  border-radius: 30px;
-  font-size: 12px;
-  cursor: pointer;
-}
-
-.pagination-button.active {
-  background: var(--sage-dark);
-  color: white;
-  border-color: var(--sage-dark);
-}
-
-/* MOBILE */
-@media (max-width: 700px) {
-  .feedback-table, .feedback-table tbody,
-  .feedback-table tr, .feedback-table td {
-    display: block;
-    width: 100%;
-  }
-
-  .feedback-table thead {
-    display: none;
-  }
-
-  .feedback-table tr {
-    background: white;
-    margin-bottom: 10px;
-    border: 1px solid var(--line);
-    padding: 10px;
-    border-radius: 10px;
-  }
+.feedback-btn:hover {
+  opacity: 0.85;
 }
