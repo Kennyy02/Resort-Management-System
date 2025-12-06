@@ -8,7 +8,8 @@ body {
 
 .managefeedback-container {
     width: 100%;
-    padding: 2rem;
+    /* Reduced top/bottom padding for a tighter feel */
+    padding: 1.5rem 2rem; 
     background-color: transparent;
 }
 
@@ -16,27 +17,28 @@ h2 {
     text-align: center;
     color: #4C5A48;
     margin-bottom: 1rem;
-    font-size: 2em;
+    /* Slightly smaller font size for compactness */
+    font-size: 1.8em; 
     font-weight: 600;
 }
 
-/* -------------------------------------- */
-/* FIX: Renamed from .feedback-toggle to .filter-buttons */
-/* -------------------------------------- */
+/* Toggle buttons */
 .filter-buttons {
     display: flex;
     justify-content: center;
-    gap: 10px;
-    margin-bottom: 1.5rem;
+    /* Slightly smaller gap */
+    gap: 8px; 
+    margin-bottom: 1rem; /* Reduced margin */
 }
 
 .filter-buttons button {
-    padding: 0.6rem 1.2rem;
+    /* Slightly smaller button padding */
+    padding: 0.5rem 1rem; 
     border: none;
     border-radius: 5px;
     cursor: pointer;
     font-weight: 500;
-    font-size: 0.9rem;
+    font-size: 0.85rem; /* Slightly smaller text */
     background-color: #ffffff;
     border: 1px solid #dee2e6;
     color: #6c757d;
@@ -47,15 +49,14 @@ h2 {
     background-color: #e9ecef;
 }
 
-.filter-buttons button.active-filter { /* Used .active-filter from JS code */
+.filter-buttons button.active-filter {
     background-color: #5E6D58;
     color: white;
     font-weight: 600;
-    border-color: #5E6D58; /* Added border color for active state */
+    border-color: #5E6D58;
 }
-/* -------------------------------------- */
 
-/* Status messages */
+/* Status messages (kept standard size for visibility) */
 .status-message {
     text-align: center;
     font-size: 1.1em;
@@ -98,9 +99,10 @@ h2 {
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
+/* 💥 MAIN FIX: Reduced vertical padding on cells */
 .feedback-table th,
 .feedback-table td {
-    padding: 12px 15px;
+    padding: 6px 15px; 
     text-align: left;
     border-bottom: 1px solid #e0e0e0;
 }
@@ -109,8 +111,7 @@ h2 {
     background-color: #5E6D58;
     color: #ffffff;
     font-weight: 600;
-    text-transform: uppercase;
-    font-size: 0.9em;
+    font-size: 0.8em; /* Slightly smaller header text */
 }
 
 .feedback-table tbody tr:nth-child(even) {
@@ -130,15 +131,16 @@ h2 {
 
 /* Buttons */
 .feedback-table td button {
-    padding: 6px 10px;
+    /* Slightly smaller button size */
+    padding: 4px 8px; 
     border: none;
-    border-radius: 5px;
+    border-radius: 4px;
     cursor: pointer;
     font-weight: 500;
     transition: 0.3s ease;
-    font-size: 0.85em;
-    min-width: 70px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* Minor enhancement */
+    font-size: 0.8em; /* Smaller button text */
+    min-width: 60px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .hide-btn {
@@ -162,30 +164,26 @@ h2 {
 }
 
 /* Image Column */
-
-/* Note: The class .images-cell is not used in your ManageFeedback.js, 
-   the styling is applied directly to elements within the table cell (td). 
-   I kept the styling block here for image elements. */
-
 .photo-preview-admin {
     display: flex;
     flex-wrap: nowrap;
     align-items: center;
-    gap: 6px;
+    gap: 4px; /* Reduced gap */
 }
 
+/* 💥 FIX: Reduced image size */
 .admin-feedback-image {
-    width: 55px;
-    height: 55px;
-    border-radius: 5px;
+    width: 40px; 
+    height: 40px;
+    border-radius: 4px;
     object-fit: cover;
 }
 
 .photo-count-indicator {
     background: #5E6D58;
     color: #fff;
-    padding: 4px 6px;
-    font-size: 0.75rem;
+    padding: 3px 5px; /* Reduced padding */
+    font-size: 0.7rem;
     border-radius: 4px;
     height: fit-content;
 }
@@ -195,8 +193,8 @@ h2 {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 1.5rem;
-    gap: 0.5rem;
+    margin-top: 1rem; /* Reduced margin */
+    gap: 0.3rem; /* Reduced gap */
     flex-wrap: wrap;
 }
 
@@ -204,10 +202,10 @@ h2 {
     background-color: #ffffff;
     border: 1px solid #dee2e6;
     color: #6c757d;
-    padding: 0.5rem 1rem;
-    border-radius: 5px;
+    padding: 0.4rem 0.8rem; /* Reduced padding */
+    border-radius: 4px;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 500;
     transition: 0.2s ease;
 }
@@ -243,17 +241,18 @@ h2 {
     }
 
     .feedback-table tr {
-        margin-bottom: 1rem;
+        margin-bottom: 0.8rem; /* Reduced margin */
         border: 1px solid #e0e0e0;
         border-radius: 8px;
-        padding: 0.5rem;
+        padding: 0.3rem; /* Reduced padding */
         box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
 
     .feedback-table td {
+        /* Adjusted padding for mobile cells */
+        padding: 6px 10px 6px 50%; 
         border-bottom: 1px dashed #eee;
         text-align: right;
-        padding-left: 50%;
         position: relative;
     }
 
@@ -270,17 +269,17 @@ h2 {
     }
 
     .feedback-table td button {
-        margin-top: 0.5rem;
+        margin-top: 0.4rem; /* Reduced margin */
         width: 100%;
     }
 
     .pagination-button {
-        padding: 0.4rem 0.8rem;
-        font-size: 0.8rem;
+        padding: 0.3rem 0.6rem; /* Reduced padding */
+        font-size: 0.75rem;
     }
 
-    .filter-buttons { /* Renamed class here too */
+    .filter-buttons {
         flex-direction: column;
-        gap: 0.5rem;
+        gap: 0.4rem; /* Reduced gap */
     }
 }
