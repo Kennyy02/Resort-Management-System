@@ -8,7 +8,8 @@ body {
 
 .managefeedback-container {
     width: 100%;
-    padding: 2rem;
+    /* Reduced top/bottom padding slightly */
+    padding: 1.5rem 2rem; 
     background-color: transparent;
 }
 
@@ -20,9 +21,7 @@ h2 {
     font-weight: 600;
 }
 
-/* -------------------------------------- */
-/* FIX: Renamed from .feedback-toggle to .filter-buttons */
-/* -------------------------------------- */
+/* Toggle buttons */
 .filter-buttons {
     display: flex;
     justify-content: center;
@@ -47,13 +46,12 @@ h2 {
     background-color: #e9ecef;
 }
 
-.filter-buttons button.active-filter { /* Used .active-filter from JS code */
+.filter-buttons button.active-filter {
     background-color: #5E6D58;
     color: white;
     font-weight: 600;
-    border-color: #5E6D58; /* Added border color for active state */
+    border-color: #5E6D58;
 }
-/* -------------------------------------- */
 
 /* Status messages */
 .status-message {
@@ -98,9 +96,10 @@ h2 {
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
+/* FIX: Reduced vertical padding from 12px to 8px */
 .feedback-table th,
 .feedback-table td {
-    padding: 12px 15px;
+    padding: 8px 15px; 
     text-align: left;
     border-bottom: 1px solid #e0e0e0;
 }
@@ -138,7 +137,7 @@ h2 {
     transition: 0.3s ease;
     font-size: 0.85em;
     min-width: 70px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* Minor enhancement */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .hide-btn {
@@ -163,10 +162,6 @@ h2 {
 
 /* Image Column */
 
-/* Note: The class .images-cell is not used in your ManageFeedback.js, 
-   the styling is applied directly to elements within the table cell (td). 
-   I kept the styling block here for image elements. */
-
 .photo-preview-admin {
     display: flex;
     flex-wrap: nowrap;
@@ -174,9 +169,10 @@ h2 {
     gap: 6px;
 }
 
+/* Reduced size of image preview */
 .admin-feedback-image {
-    width: 55px;
-    height: 55px;
+    width: 45px; 
+    height: 45px;
     border-radius: 5px;
     object-fit: cover;
 }
@@ -251,9 +247,10 @@ h2 {
     }
 
     .feedback-table td {
+        /* FIX: Reduced overall padding in mobile view */
+        padding: 8px 10px 8px 50%; 
         border-bottom: 1px dashed #eee;
         text-align: right;
-        padding-left: 50%;
         position: relative;
     }
 
@@ -279,7 +276,7 @@ h2 {
         font-size: 0.8rem;
     }
 
-    .filter-buttons { /* Renamed class here too */
+    .filter-buttons {
         flex-direction: column;
         gap: 0.5rem;
     }
