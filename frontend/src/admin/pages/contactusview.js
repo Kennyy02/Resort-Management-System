@@ -135,7 +135,12 @@ export default function ContactView() {
                     <td>{msg.name}</td>
                     <td>{msg.email}</td>
                     <td>{msg.message}</td>
-                    <td>{new Date(msg.created_at).toLocaleString()}</td>
+                    <td>
+                      {/* <-- FIX: Check if date exists before attempting to format it */}
+                      {msg.created_at
+                        ? new Date(msg.created_at).toLocaleString()
+                        : 'N/A'} 
+                    </td>
                     <td>
                       <span
                         className={`status-badge status-${msg.status === "answered" ? "answered" : "pending"}`}
