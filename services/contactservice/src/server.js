@@ -5,14 +5,8 @@ const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 8080; // Railway assigns PORT dynamically
 
-// --- CORS CONFIG ---
-// For testing, allow all origins so frontend can access
-app.use(cors({
-    origin: '*', 
-    methods: ['GET', 'POST', 'PUT', 'OPTIONS'],
-}));
-
-// --- Middleware ---
+// --- Enable CORS for all origins (like booking service) ---
+app.use(cors());
 app.use(express.json());
 
 // --- MySQL connection ---
@@ -22,18 +16,18 @@ const db = mysql.createConnection({
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     port: process.env.DB_PORT || 3306,
-    dateStrings: true // return dates as ISO strings
+    dateStrings: true // ensures dates return as ISO strings
 });
 
-db.connect(err => {
+db.connect((err) => {
     if (err) {
-        console.error('MySQL connection failed:', err);
+        console.error('❌ MySQL connection failed:', err);
         return;
     }
-    console.log('Connected to MySQL database');
+    console.log('✅ Connected to MySQL database');
 });
 
-// --- Ensure table exists ---
+// --- Ensure contact_messages table exists ---
 const createTableSQL = `
 CREATE TABLE IF NOT EXISTS contact_messages (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -45,14 +39,14 @@ CREATE TABLE IF NOT EXISTS contact_messages (
 )
 `;
 
-db.query(createTableSQL, err => {
-    if (err) console.error('Error creating table:', err);
-    else console.log('Contact Messages table ensured.');
+db.query(createTableSQL, (err) => {
+    if (err) console.error('❌ Error creating table:', err);
+    else console.log('✅ Contact Messages table ensured.');
 });
 
 // --- API Routes ---
 
-// Send message
+// Send a contact message
 app.post('/api/contact', (req, res) => {
     const { name, email, message } = req.body;
 
@@ -63,19 +57,19 @@ app.post('/api/contact', (req, res) => {
     const sql = 'INSERT INTO contact_messages (name, email, message, status) VALUES (?, ?, ?, ?)';
     db.query(sql, [name, email, message, 'pending'], (err, result) => {
         if (err) {
-            console.error('Error saving message:', err);
+            console.error('❌ Error saving message:', err);
             return res.status(500).json({ error: 'Failed to store message' });
         }
         res.status(201).json({ message: 'Message submitted successfully' });
     });
 });
 
-// Get all messages
+// Get all contact messages (for admin)
 app.get('/api/messages', (req, res) => {
     const sql = 'SELECT * FROM contact_messages ORDER BY created_at DESC';
     db.query(sql, (err, results) => {
         if (err) {
-            console.error('Error fetching messages:', err);
+            console.error('❌ Error fetching messages:', err);
             return res.status(500).json({ error: 'Failed to fetch messages' });
         }
         res.json(results);
@@ -94,7 +88,7 @@ app.put('/api/messages/:id/status', (req, res) => {
     const sql = 'UPDATE contact_messages SET status = ? WHERE id = ?';
     db.query(sql, [status, id], (err, result) => {
         if (err) {
-            console.error('Error updating status:', err);
+            console.error('❌ Error updating status:', err);
             return res.status(500).json({ error: 'Failed to update status' });
         }
         if (result.affectedRows === 0) {
@@ -106,5 +100,5 @@ app.put('/api/messages/:id/status', (req, res) => {
 
 // --- Start server ---
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(`🚀 Contact service running on port ${PORT}`);
 });
