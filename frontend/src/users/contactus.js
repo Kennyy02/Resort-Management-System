@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import './styles/contactus.css';
-import mountainView from '../components/pictures/mountainView.jpg';
+// import mountainView from '../components/pictures/mountainView.jpg'; // <-- COMMENTED OUT TO TEST
 
 const ContactUs = () => {
   const [form, setForm] = useState({ name: '', email: '', message: '' });
@@ -35,8 +35,9 @@ const ContactUs = () => {
   return (
     <div className="contact-page">
       {/* HERO SECTION */}
-      <section className="contact-hero-section">
-        <img src={mountainView} alt="Mountain View" className="contact-hero-image" />
+      {/* TEMPORARY FIX: Added style and removed image tag to prevent crashing due to file path errors */}
+      <section className="contact-hero-section" style={{ minHeight: '200px', backgroundColor: '#333' }}>
+        {/* <img src={mountainView} alt="Mountain View" className="contact-hero-image" /> */}
         <div className="contact-hero-overlay" />
         <div className="contact-hero-content">
           <h1 className="hero-title">Get in Touch</h1>
