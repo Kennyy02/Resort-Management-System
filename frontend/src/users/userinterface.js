@@ -4,18 +4,22 @@ import axios from "axios";
 import mountainView from "../components/pictures/mountainView.jpg";
 import "./styles/userinterface.css";
 
+/* ---------------- CONSTANTS ---------------- */
+
 const BASE_URLS = {
   ABOUT: "https://about-us-production.up.railway.app",
   SERVICES: "https://manage-service-production.up.railway.app",
-  FEEDBACKS: "https://ratings-and-feedbacks-production.up.railway.app",
+  FEEDBACKS: "https://ratings-and-feedbacks-production.up.railway.app"
 };
 
-const tryFetch = async (urls, config = {}) => {
-  for (const url of urls) {
+/* ---------------- UTILS ---------------- */
+
+const tryFetch = async (candidates, config = {}) => {
+  for (const url of candidates) {
     try {
       const res = await axios.get(url, config);
       if (res && res.data) return { data: res.data, url };
-    } catch (error) {
+    } catch {
       continue;
     }
   }
@@ -25,11 +29,11 @@ const tryFetch = async (urls, config = {}) => {
 const getImage = (item) =>
   item?.image || item?.imageUrl || item?.photo || item?.thumbnail || null;
 
-/* --------------------- CUSTOM HOOK ---------------------- */
+/* ---------------- CUSTOM HOOK ---------------- */
 
 const useResortData = () => {
   const [data, setData] = useState({
-    about: { content: "Loading...", videoUrl: null },
+    about: { content: "Loading about info...", videoUrl: null },
     rooms: [],
     islandHops: [],
     feedbacks: [],
@@ -46,34 +50,36 @@ const useResortData = () => {
     }
 
     if (typeof dataToProcess === "object" && dataToProcess !== null) {
-      content =
-        dataToProcess.content ||
-        dataToProcess.description ||
-        "About information unavailable.";
+      content = dataToProcess.content || dataToProcess.description || "";
       videoUrl = dataToProcess.videoUrl || dataToProcess.video || null;
     }
 
-    return { content, videoUrl };
+    return {
+      content: content || "About info unavailable",
+      videoUrl,
+    };
   };
 
   const filterServices = (servicesData) => {
-    if (!Array.isArray(servicesData)) return { rooms: [], islandHops: [] };
+    if (!Array.isArray(servicesData)) {
+      return { rooms: [], islandHops: [] };
+    }
 
     const rooms = servicesData
       .filter(
         (i) =>
-          (i.type && i.type.toLowerCase().includes("room")) ||
-          (i.category && i.category.toLowerCase().includes("room")) ||
-          (i.title && /room|suite|cottage/i.test(i.title))
+          i?.type?.toLowerCase().includes("room") ||
+          i?.category?.toLowerCase().includes("room") ||
+          /room|suite|cottage/i.test(i?.title)
       )
       .slice(0, 4);
 
     const islandHops = servicesData
       .filter(
         (i) =>
-          (i.type && i.type.toLowerCase().includes("island")) ||
-          (i.category && i.category.toLowerCase().includes("island")) ||
-          (i.title && /island|hop|boat|tour|package/i.test(i.title))
+          i?.type?.toLowerCase().includes("island") ||
+          i?.category?.toLowerCase().includes("island") ||
+          /island|hop|boat|tour|package/i.test(i?.title)
       )
       .slice(0, 4);
 
@@ -82,31 +88,23 @@ const useResortData = () => {
 
   useEffect(() => {
     const fetchAll = async () => {
-      const aboutPromise = tryFetch([
-        `${BASE_URLS.ABOUT}/pre/api/aboutus`,
-        `${BASE_URLS.ABOUT}/api/aboutus`,
-        `${BASE_URLS.ABOUT}/aboutus`,
-        `${BASE_URLS.ABOUT}/api/v1/about`,
-      ]);
-
-      const servicesPromise = tryFetch([
-        `${BASE_URLS.SERVICES}/api/services`,
-        `${BASE_URLS.SERVICES}/services`,
-        `${BASE_URLS.SERVICES}/service`,
-        `${BASE_URLS.SERVICES}/api/v1/services`,
-      ]);
-
-      const feedbackPromise = tryFetch([
-        `${BASE_URLS.FEEDBACKS}/api/feedbacks`,
-        `${BASE_URLS.FEEDBACKS}/feedbacks`,
-        `${BASE_URLS.FEEDBACKS}/ratings`,
-      ]);
-
       try {
         const [aboutResp, servicesResp, feedbackResp] = await Promise.all([
-          aboutPromise,
-          servicesPromise,
-          feedbackPromise,
+          tryFetch([
+            `${BASE_URLS.ABOUT}/pre/api/aboutus`,
+            `${BASE_URLS.ABOUT}/api/aboutus`,
+            `${BASE_URLS.ABOUT}/aboutus`,
+          ]),
+
+          tryFetch([
+            `${BASE_URLS.SERVICES}/api/services`,
+            `${BASE_URLS.SERVICES}/services`,
+          ]),
+
+          tryFetch([
+            `${BASE_URLS.FEEDBACKS}/api/feedbacks`,
+            `${BASE_URLS.FEEDBACKS}/feedbacks`,
+          ]),
         ]);
 
         const about = normalizeAbout(aboutResp.data);
@@ -116,15 +114,9 @@ const useResortData = () => {
           ? feedbackResp.data.slice(0, 4)
           : [];
 
-        setData({
-          about,
-          rooms,
-          islandHops,
-          feedbacks,
-          loading: false,
-        });
+        setData({ about, rooms, islandHops, feedbacks, loading: false });
       } catch (error) {
-        console.error("Homepage fetch error:", error);
+        console.error("Home error:", error);
         setData((prev) => ({ ...prev, loading: false }));
       }
     };
@@ -135,7 +127,7 @@ const useResortData = () => {
   return data;
 };
 
-/* --------------------- MAIN COMPONENT ---------------------- */
+/* ---------------- COMPONENT ---------------- */
 
 export default function Homepage() {
   const navigate = useNavigate();
@@ -166,22 +158,18 @@ export default function Homepage() {
 
   useEffect(() => {
     const callback = (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const cls = entry.target.classList;
-          if (cls.contains("about-section")) setVisible((v) => ({ ...v, about: true }));
-          if (cls.contains("rooms-section")) setVisible((v) => ({ ...v, rooms: true }));
-          if (cls.contains("island-section")) setVisible((v) => ({ ...v, island: true }));
-          if (cls.contains("feedbacks-section"))
-            setVisible((v) => ({ ...v, feedbacks: true }));
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          if (e.target.classList.contains("about-section")) setVisible(v => ({ ...v, about: true }));
+          if (e.target.classList.contains("rooms-section")) setVisible(v => ({ ...v, rooms: true }));
+          if (e.target.classList.contains("island-section")) setVisible(v => ({ ...v, island: true }));
+          if (e.target.classList.contains("feedbacks-section")) setVisible(v => ({ ...v, feedbacks: true }));
         }
       });
     };
 
     const observer = new IntersectionObserver(callback, { threshold: 0.15 });
-    document
-      .querySelectorAll(".scroll-animate")
-      .forEach((el) => observer.observe(el));
+    document.querySelectorAll(".scroll-animate").forEach((el) => observer.observe(el));
 
     return () => observer.disconnect();
   }, []);
@@ -193,96 +181,78 @@ export default function Homepage() {
 
   return (
     <div className="homepage-root">
+
       {/* HERO */}
-      <header
-        className="hero large-hero"
-        style={{ backgroundImage: `url(${mountainView})` }}
-      >
+      <header className="hero" style={{ backgroundImage: `url(${mountainView})` }}>
         <div className="hero-overlay"></div>
 
         <div className="hero-inner">
-          <div className="hero-left">
-            <h1 className="hero-title">EM'z Bayview Mountain Resort</h1>
-            <p className="hero-sub">
-              A peaceful escape — book rooms, join island hopping, and make memories.
-            </p>
+          <h1>EM'z Bayview Mountain Resort</h1>
+          <p>A peaceful escape</p>
 
-            <div className="hero-cta">
-              <button onClick={() => navigate("/services")}>
-                Explore Rooms
-              </button>
-              <button className="ghost" onClick={() => navigate("/services")}>
-                Island Hopping
-              </button>
-            </div>
+          <div className="hero-cta">
+            <button onClick={() => navigate("/services")}>Explore Rooms</button>
+            <button className="ghost" onClick={() => navigate("/services")}>
+              Island hopping
+            </button>
           </div>
 
-          {/* SEARCH BOX */}
           <form className="hero-search-box" onSubmit={handleSearchSubmit}>
-            <div className="search-fields">
-              <div className="search-field-group">
-                <label>Room Name</label>
-                <input
-                  type="text"
-                  name="roomName"
-                  placeholder="Family Room"
-                  value={searchQuery.roomName}
-                  onChange={handleSearchChange}
-                />
-              </div>
+            <input
+              type="text"
+              name="roomName"
+              placeholder="Room name"
+              value={searchQuery.roomName}
+              onChange={handleSearchChange}
+            />
 
-              <div className="search-field-group">
-                <label>Check-in</label>
-                <input
-                  type="date"
-                  name="checkInDate"
-                  value={searchQuery.checkInDate}
-                  onChange={handleSearchChange}
-                  required
-                />
-              </div>
+            <input
+              type="date"
+              name="checkInDate"
+              value={searchQuery.checkInDate}
+              onChange={handleSearchChange}
+              required
+            />
 
-              <div className="search-field-group">
-                <label>Check-out</label>
-                <input
-                  type="date"
-                  name="checkOutDate"
-                  value={searchQuery.checkOutDate}
-                  onChange={handleSearchChange}
-                  required
-                />
-              </div>
+            <input
+              type="date"
+              name="checkOutDate"
+              value={searchQuery.checkOutDate}
+              onChange={handleSearchChange}
+              required
+            />
 
-              <div className="search-field-group search-button-container">
-                <button type="submit" className="btn search-button">
-                  CHECK AVAILABILITY
-                </button>
-              </div>
-            </div>
+            <button type="submit">Check Availability</button>
           </form>
         </div>
       </header>
 
-      <main className="main-content">
-        {/* ABOUT */}
-        <section className={`about-section scroll-animate ${visible.about ? "is-visible" : ""}`}>
-          <div className="about-grid">
-            <div className="about-text">
-              <h2>Swim, Chill, Chillax</h2>
-              {loading ? <p>Loading...</p> : <p>{about.content}</p>}
-            </div>
+      {/* ABOUT */}
+      <section className={`about-section scroll-animate ${visible.about ? "is-visible" : ""}`}>
+        <p>{about.content}</p>
+        <iframe src={videoToUse} title="Resort video" allowFullScreen />
+      </section>
 
-            <div className="about-media">
-              <iframe
-                src={videoToUse}
-                title="Resort Video"
-                frameBorder="0"
-                allowFullScreen
-              ></iframe>
-            </div>
+      {/* ROOMS */}
+      <section className={`rooms-section scroll-animate ${visible.rooms ? "is-visible" : ""}`}>
+        {rooms.map((r, i) => (
+          <div className="card" key={i}>
+            <img src={getImage(r)} alt="room" />
+            <h4>{r.title || r.name}</h4>
           </div>
-        </section>
-      </main>
+        ))}
+      </section>
+
+      {/* FEEDBACK */}
+      <section className={`feedbacks-section scroll-animate ${visible.feedbacks ? "is-visible" : ""}`}>
+        {feedbacks.map((f, i) => (
+          <blockquote key={i}>
+            <p>"{f.message}"</p>
+            <small>{f.name}</small>
+          </blockquote>
+        ))}
+      </section>
+
     </div>
   );
 }
