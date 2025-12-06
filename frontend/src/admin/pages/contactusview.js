@@ -56,7 +56,6 @@ export default function ContactView() {
   if (filter === "notAnswered") visibleMessages = visibleMessages.filter((m) => m.status !== "answered");
 
   visibleMessages.sort((a, b) => {
-    // Ensure dates are valid before sorting
     const dateA = new Date(a.created_at);
     const dateB = new Date(b.created_at);
     return sort === "newest" ? dateB - dateA : dateA - dateB;
@@ -136,12 +135,7 @@ export default function ContactView() {
                     <td>{msg.name}</td>
                     <td>{msg.email}</td>
                     <td>{msg.message}</td>
-                    <td>
-                      {/* FIX: Check if date exists to prevent "Invalid Date" error */}
-                      {msg.created_at
-                        ? new Date(msg.created_at).toLocaleString()
-                        : 'N/A'} 
-                    </td>
+                    <td>{new Date(msg.created_at).toLocaleString()}</td>
                     <td>
                       <span
                         className={`status-badge status-${msg.status === "answered" ? "answered" : "pending"}`}
