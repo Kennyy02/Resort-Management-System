@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import "./contactview.css"; // Ensure this CSS file is present
+import "./contactview.css"; // Ensure your CSS file exists
 
 const MESSAGES_PER_PAGE = 10;
 
@@ -19,11 +19,10 @@ export default function ContactView() {
     const fetchMessages = async () => {
         setLoading(true);
         try {
-            // Ensure this environment variable is correctly pointing to your contact service URL
-            const { data } = await axios.get(
+            const response = await axios.get(
                 `${process.env.REACT_APP_CONTACT_API}/api/messages`
             );
-            // The data received here should be an array of message objects from the database
+            const data = Array.isArray(response.data) ? response.data : []; // ✅ Ensure array
             setMessages(data);
             setError(null);
         } catch (err) {
@@ -44,10 +43,11 @@ export default function ContactView() {
                 { status: "answered" }
             );
             setMessages((prev) =>
-                prev.map((msg) =>
-                    // Use the database 'id' for mapping
-                    msg.id === id ? { ...msg, status: "answered" } : msg
-                )
+                Array.isArray(prev)
+                    ? prev.map((msg) =>
+                          msg.id === id ? { ...msg, status: "answered" } : msg
+                      )
+                    : []
             );
         } catch (err) {
             alert("Failed to update status.");
@@ -55,22 +55,20 @@ export default function ContactView() {
         }
     };
 
-    // --- Filtering and Sorting Logic ---
-    let visibleMessages = [...messages];
+    // --- Filtering and Sorting ---
+    let visibleMessages = Array.isArray(messages) ? [...messages] : [];
     if (filter === "answered")
         visibleMessages = visibleMessages.filter((m) => m.status === "answered");
     if (filter === "notAnswered")
         visibleMessages = visibleMessages.filter((m) => m.status !== "answered");
 
     visibleMessages.sort((a, b) => {
-        // Since we enabled dateStrings in server.js, new Date() should work reliably
         const dateA = new Date(a.created_at);
         const dateB = new Date(b.created_at);
-        
         return sort === "newest" ? dateB - dateA : dateA - dateB;
     });
 
-    // --- Pagination Logic ---
+    // --- Pagination ---
     const totalPages = Math.ceil(visibleMessages.length / MESSAGES_PER_PAGE);
     const currentMessages = visibleMessages.slice(
         (currentPage - 1) * MESSAGES_PER_PAGE,
@@ -85,9 +83,8 @@ export default function ContactView() {
         { length: endPage - startPage + 1 },
         (_, i) => startPage + i
     );
-    // --- End Pagination Logic ---
 
-
+    // --- Loading / Error States ---
     if (loading)
         return (
             <p className="status-message loading-message">Loading messages...</p>
@@ -98,7 +95,7 @@ export default function ContactView() {
         <div className="admin-contact-card">
             <h2>Guest Messages</h2>
 
-            {/* Filter and Sort Controls */}
+            {/* Filter & Sort Controls */}
             <div className="filter-controls">
                 <div>
                     <label>Filter: </label>
@@ -129,7 +126,7 @@ export default function ContactView() {
                 </div>
             </div>
 
-            {/* Table or No Data Message */}
+            {/* Messages Table */}
             {currentMessages.length === 0 ? (
                 <p className="status-message no-data">No messages found.</p>
             ) : (
@@ -147,18 +144,22 @@ export default function ContactView() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {currentMessages.map((msg) => (
-                                    // Using msg.id as key is important
-                                    <tr key={msg.id}> 
-                                        {/* Ensure properties are accessed correctly */}
-                                        <td>{msg.name}</td>
-                                        <td>{msg.email}</td>
-                                        <td>{msg.message}</td>
-                                        <td>{new Date(msg.created_at).toLocaleString()}</td>
+                                {(currentMessages || []).map((msg) => (
+                                    <tr key={msg.id}>
+                                        <td>{msg.name || "N/A"}</td>
+                                        <td>{msg.email || "N/A"}</td>
+                                        <td>{msg.message || "N/A"}</td>
+                                        <td>
+                                            {msg.created_at
+                                                ? new Date(msg.created_at).toLocaleString()
+                                                : "Invalid Date"}
+                                        </td>
                                         <td>
                                             <span
                                                 className={`status-badge status-${
-                                                    msg.status === "answered" ? "answered" : "pending"
+                                                    msg.status === "answered"
+                                                        ? "answered"
+                                                        : "pending"
                                                 }`}
                                             >
                                                 {msg.status === "answered"
@@ -170,7 +171,9 @@ export default function ContactView() {
                                             {msg.status !== "answered" && (
                                                 <button
                                                     className="action-button answered-button"
-                                                    onClick={() => toggleStatus(msg.id, msg.status)}
+                                                    onClick={() =>
+                                                        toggleStatus(msg.id, msg.status)
+                                                    }
                                                 >
                                                     Mark as Answered
                                                 </button>
