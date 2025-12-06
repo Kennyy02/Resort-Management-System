@@ -20,15 +20,17 @@ h2 {
     font-weight: 600;
 }
 
-/* Toggle buttons */
-.feedback-toggle {
+/* -------------------------------------- */
+/* FIX: Renamed from .feedback-toggle to .filter-buttons */
+/* -------------------------------------- */
+.filter-buttons {
     display: flex;
     justify-content: center;
     gap: 10px;
     margin-bottom: 1.5rem;
 }
 
-.feedback-toggle button {
+.filter-buttons button {
     padding: 0.6rem 1.2rem;
     border: none;
     border-radius: 5px;
@@ -41,15 +43,17 @@ h2 {
     transition: 0.2s ease;
 }
 
-.feedback-toggle button:hover:not(:disabled) {
+.filter-buttons button:hover:not(:disabled) {
     background-color: #e9ecef;
 }
 
-.feedback-toggle button.active {
+.filter-buttons button.active-filter { /* Used .active-filter from JS code */
     background-color: #5E6D58;
     color: white;
     font-weight: 600;
+    border-color: #5E6D58; /* Added border color for active state */
 }
+/* -------------------------------------- */
 
 /* Status messages */
 .status-message {
@@ -134,6 +138,7 @@ h2 {
     transition: 0.3s ease;
     font-size: 0.85em;
     min-width: 70px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* Minor enhancement */
 }
 
 .hide-btn {
@@ -156,12 +161,11 @@ h2 {
     transform: translateY(-1px);
 }
 
-/* ------- FIXED IMAGE COLUMN -------- */
+/* Image Column */
 
-.images-cell {
-    display: flex;
-    align-items: center;
-}
+/* Note: The class .images-cell is not used in your ManageFeedback.js, 
+   the styling is applied directly to elements within the table cell (td). 
+   I kept the styling block here for image elements. */
 
 .photo-preview-admin {
     display: flex;
@@ -275,7 +279,7 @@ h2 {
         font-size: 0.8rem;
     }
 
-    .feedback-toggle {
+    .filter-buttons { /* Renamed class here too */
         flex-direction: column;
         gap: 0.5rem;
     }
