@@ -1,12 +1,12 @@
 /* MAIN CONTAINER */
-.feedback-container {
+.managefeedback-container {
   padding: 40px;
   background: #f6f8f5;
   min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* TITLE */
-.feedback-title {
+.managefeedback-container h2 {
   font-size: 32px;
   font-weight: 600;
   color: #4b5d45;
@@ -14,13 +14,36 @@
   margin-bottom: 30px;
 }
 
+/* FILTER BUTTONS */
+.filter-buttons {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.filter-buttons button {
+  padding: 8px 16px;
+  margin: 0 8px;
+  border: none;
+  border-radius: 4px;
+  background: #e0e0e0;
+  color: #333;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.filter-buttons button.active-filter {
+  background: #38761d;
+  color: white;
+}
+
 /* TABLE WRAPPER */
-.feedback-table-wrapper {
+.table-responsive {
+  overflow-x: auto;
   background: white;
   border-radius: 4px;
   padding: 0;
-  overflow-x: auto;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  margin-bottom: 20px;
 }
 
 /* TABLE */
@@ -55,25 +78,42 @@
   background: #f4f7f3;
 }
 
-/* MESSAGE COLUMN */
-.feedback-message {
-  max-width: 350px;
-  line-height: 1.4;
+/* DELETED ROW */
+.deleted-row {
+  background: #fce4e4;
 }
 
-/* STATUS BADGES */
-.status-active {
-  color: #2e7d32;
+/* PHOTO PREVIEW */
+.photo-preview-admin {
+  display: flex;
+  align-items: center;
+}
+
+.admin-feedback-image {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  margin-right: 6px;
+  border-radius: 3px;
+}
+
+.photo-count-indicator {
+  font-size: 12px;
+  color: #555;
+}
+
+/* STATUS */
+td:nth-child(5) {
   font-weight: 500;
+  color: #2e7d32; /* Active */
 }
 
-.status-deleted {
-  color: #c62828;
-  font-weight: 500;
+.deleted-row td:nth-child(5) {
+  color: #c62828; /* Hidden */
 }
 
-/* BUTTONS */
-.feedback-btn {
+/* ACTION BUTTONS */
+.hide-btn, .restore-btn {
   padding: 6px 14px;
   border: none;
   border-radius: 3px;
@@ -81,7 +121,7 @@
   font-size: 14px;
 }
 
-.delete-btn {
+.hide-btn {
   background: #c62828;
   color: white;
 }
@@ -91,6 +131,50 @@
   color: white;
 }
 
-.feedback-btn:hover {
+.hide-btn:hover, .restore-btn:hover {
   opacity: 0.85;
+}
+
+/* STATUS MESSAGES */
+.status-message {
+  text-align: center;
+  font-size: 16px;
+  margin-top: 30px;
+}
+
+.status-message.loading {
+  color: #38761d;
+}
+
+.status-message.error {
+  color: #c62828;
+}
+
+.status-message.no-feedback {
+  color: #555;
+}
+
+/* PAGINATION */
+.pagination {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.pagination-button {
+  padding: 6px 12px;
+  margin: 0 4px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  background: #e0e0e0;
+}
+
+.pagination-button.active {
+  background: #38761d;
+  color: white;
+}
+
+.pagination-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
