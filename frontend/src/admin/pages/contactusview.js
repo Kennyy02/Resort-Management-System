@@ -20,14 +20,8 @@ export default function ContactView() {
     setLoading(true);
     try {
       const { data } = await axios.get(
-        `${process.env.REACT_APP_CONTACTUS_API}/api/messages`
+        `${process.env.REACT_APP_CONTACT_API}/api/messages`
       );
-
-      // Ensure data is an array
-      if (!Array.isArray(data)) {
-        throw new Error("Invalid data format received from server");
-      }
-
       setMessages(data);
       setError(null);
     } catch (err) {
@@ -40,16 +34,14 @@ export default function ContactView() {
 
   const toggleStatus = async (id, currentStatus) => {
     if (currentStatus === "answered") return;
+
     try {
       await axios.put(
-        `${process.env.REACT_APP_CONTACTUS_API}/api/messages/${id}/status`,
+        `${process.env.REACT_APP_CONTACT_API}/api/messages/${id}/status`,
         { status: "answered" }
       );
-
       setMessages((prev) =>
-        prev.map((msg) =>
-          msg.id === id ? { ...msg, status: "answered" } : msg
-        )
+        prev.map((msg) => (msg.id === id ? { ...msg, status: "answered" } : msg))
       );
     } catch (err) {
       alert("Failed to update status.");
@@ -57,15 +49,12 @@ export default function ContactView() {
     }
   };
 
-  // --- Filtering ---
+  // --- Filtering and Sorting ---
   let visibleMessages = [...messages];
-  if (filter === "answered") {
-    visibleMessages = visibleMessages.filter((m) => m.status === "answered");
-  } else if (filter === "notAnswered") {
-    visibleMessages = visibleMessages.filter((m) => m.status !== "answered");
-  }
 
-  // --- Sorting ---
+  if (filter === "answered") visibleMessages = visibleMessages.filter((m) => m.status === "answered");
+  if (filter === "notAnswered") visibleMessages = visibleMessages.filter((m) => m.status !== "answered");
+
   visibleMessages.sort((a, b) => {
     const dateA = new Date(a.created_at);
     const dateB = new Date(b.created_at);
@@ -80,25 +69,19 @@ export default function ContactView() {
   );
 
   const MAX_VISIBLE_PAGES = 3;
-  const startPage =
-    Math.floor((currentPage - 1) / MAX_VISIBLE_PAGES) * MAX_VISIBLE_PAGES + 1;
+  const startPage = Math.floor((currentPage - 1) / MAX_VISIBLE_PAGES) * MAX_VISIBLE_PAGES + 1;
   const endPage = Math.min(startPage + MAX_VISIBLE_PAGES - 1, totalPages);
-  const visiblePages = Array.from(
-    { length: endPage - startPage + 1 },
-    (_, i) => startPage + i
-  );
+  const visiblePages = Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
 
-  if (loading)
-    return (
-      <p className="status-message loading-message">Loading messages...</p>
-    );
+  // --- Render Loading / Error ---
+  if (loading) return <p className="status-message loading-message">Loading messages...</p>;
   if (error) return <p className="status-message error-message">{error}</p>;
 
   return (
     <div className="admin-contact-card">
       <h2>Guest Messages</h2>
 
-      {/* Filter and Sort Controls */}
+      {/* Filter & Sort */}
       <div className="filter-controls">
         <div>
           <label>Filter: </label>
@@ -129,7 +112,7 @@ export default function ContactView() {
         </div>
       </div>
 
-      {/* Table */}
+      {/* Messages Table */}
       {currentMessages.length === 0 ? (
         <p className="status-message no-data">No messages found.</p>
       ) : (
@@ -155,9 +138,7 @@ export default function ContactView() {
                     <td>{new Date(msg.created_at).toLocaleString()}</td>
                     <td>
                       <span
-                        className={`status-badge status-${
-                          msg.status === "answered" ? "answered" : "pending"
-                        }`}
+                        className={`status-badge status-${msg.status === "answered" ? "answered" : "pending"}`}
                       >
                         {msg.status === "answered" ? "Answered" : "Not Answered"}
                       </span>
@@ -193,9 +174,7 @@ export default function ContactView() {
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
-                  className={`pagination-button ${
-                    currentPage === page ? "active" : ""
-                  }`}
+                  className={`pagination-button ${currentPage === page ? "active" : ""}`}
                 >
                   {page}
                 </button>
