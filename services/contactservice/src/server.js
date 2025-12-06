@@ -6,7 +6,9 @@ const app = express();
 // Railway automatically sets the PORT variable
 const PORT = process.env.PORT || 8081; 
 
+// 1. FIX: Use the simple, permissive CORS that works in your booking service
 app.use(cors()); 
+
 app.use(express.json());
 
 // --- MySQL Connection ---
@@ -24,7 +26,7 @@ db.connect((err) => {
 });
 
 // --- Ensure Table Exists ---
-// ✅ FIX: Removed leading whitespace/special characters from the SQL lines.
+// 2. FIX: Cleaned up the SQL syntax/indentation to avoid the 1064 Error
 const createTableSQL = `
 CREATE TABLE IF NOT EXISTS contact_messages (
 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -43,7 +45,6 @@ db.query(createTableSQL, (err) => {
 // --- Routes ---
 // Submit a new contact message
 app.post('/api/contact', (req, res) => {
-// ... (rest of the post route is unchanged)
   const { name, email, message } = req.body;
   const sql = 'INSERT INTO contact_messages (name, email, message, status) VALUES (?, ?, ?, ?)';
   
@@ -58,20 +59,31 @@ app.post('/api/contact', (req, res) => {
 
 // Get all messages (most recent first)
 app.get('/api/messages', (req, res) => {
-// ... (rest of the get route is unchanged)
-  const sql = 'SELECT * FROM contact_messages ORDER BY created_at DESC';
-  db.query(sql, (err, results) => {
-    if (err) {
-      console.error('❌ Error fetching messages:', err);
-      return res.status(500).json({ error: 'Failed to fetch messages' });
-    }
-    res.json(results);
-  });
+    // 3. FIX: Use DATE_FORMAT to ensure the date is returned as an unambiguous string
+    const sql = `
+        SELECT 
+            id, 
+            name, 
+            email, 
+            message, 
+            status, 
+            DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS created_at 
+        FROM contact_messages 
+        ORDER BY created_at DESC
+    `;
+
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error('❌ Error fetching messages:', err);
+            return res.status(500).json({ error: 'Failed to fetch messages' });
+        }
+        // Results are returned as JSON array of objects
+        res.json(results);
+    });
 });
 
 // Update message status to "answered"
 app.put('/api/messages/:id/status', (req, res) => {
-// ... (rest of the put route is unchanged)
   const { id } = req.params;
   const { status } = req.body;
 
