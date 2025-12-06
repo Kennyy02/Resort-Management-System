@@ -6,9 +6,11 @@ const app = express();
 const PORT = process.env.PORT || 8081;
 
 // --- CORS Setup ---
+// FIX: Added the contact service domain itself to the allowed origins list
 const allowedOrigins = [
-  'https://emzbayviewmountainresort.up.railway.app',
-  'http://localhost:3000',
+  'https://emzbayviewmountainresort.up.railway.app', // Frontend Domain
+  'http://localhost:3000', // Local Dev Domain
+  'https://contact-service-production-47ef.up.railway.app', // API Domain
 ];
 
 const corsOptions = {
@@ -34,8 +36,7 @@ const db = mysql.createConnection({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   port: process.env.DB_PORT || 3306,
-  // FIX: Removed dateStrings: true. Now dates will be returned as JS Date objects,
-  // which the frontend can correctly parse.
+  // FIX: Removed 'dateStrings: true' so MySQL returns JS Date objects
 });
 
 db.connect((err) => {
