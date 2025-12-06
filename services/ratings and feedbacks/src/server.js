@@ -32,13 +32,13 @@ app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
 // ================================
-// STATIC FILE SERVER (FIXED)
-// Serve uploads from Railway volume
+// STATIC FILE SERVER
 // ================================
+// Serve uploads from Railway volume
 app.use("/uploads", express.static("/data/uploads"));
 
 // ================================
-// MULTER STORAGE (FIXED FOR VOLUME)
+// MULTER STORAGE
 // Saves to /data/uploads/feedbacks
 // ================================
 const storage = multer.diskStorage({
@@ -75,11 +75,11 @@ db.connect((err) => {
 });
 
 // ================================
-// ROUTES (UNCHANGED)
+// ROUTES (FIXED: All routes now use the /api prefix)
 // ================================
 
 // Fetch all feedbacks
-app.get("/feedbacks", (req, res) => {
+app.get("/api/feedbacks", (req, res) => {
     const showDeleted = req.query.showDeleted === 'true';
     const whereClause = showDeleted ? "" : "WHERE deleted = FALSE";
     const sql = `SELECT * FROM feedbacks ${whereClause} ORDER BY created_at DESC`;
@@ -98,7 +98,7 @@ app.get("/feedbacks", (req, res) => {
 });
 
 // Add new feedback
-app.post("/feedbacks", upload.array("photos"), (req, res) => {
+app.post("/api/feedbacks", upload.array("photos"), (req, res) => {
     const { name, profilePicture, message, rating } = req.body;
 
     const photos = req.files && req.files.length > 0
@@ -120,7 +120,7 @@ app.post("/feedbacks", upload.array("photos"), (req, res) => {
 });
 
 // Like a feedback
-app.post("/feedbacks/:id/like", (req, res) => {
+app.post("/api/feedbacks/:id/like", (req, res) => {
     const { id } = req.params;
     const { userId } = req.body;
 
@@ -145,7 +145,7 @@ app.post("/feedbacks/:id/like", (req, res) => {
 });
 
 // Reply to feedback
-app.post("/feedbacks/:id/reply", (req, res) => {
+app.post("/api/feedbacks/:id/reply", (req, res) => {
     const { id } = req.params;
     const { userId, userName, message, anonymous } = req.body;
 
@@ -170,7 +170,7 @@ app.post("/feedbacks/:id/reply", (req, res) => {
 });
 
 // Edit feedback
-app.put("/feedbacks/:id", (req, res) => {
+app.put("/api/feedbacks/:id", (req, res) => {
     const { id } = req.params;
     const { message } = req.body;
 
@@ -183,7 +183,7 @@ app.put("/feedbacks/:id", (req, res) => {
 });
 
 // Delete feedback
-app.delete("/feedbacks/:id", (req, res) => {
+app.delete("/api/feedbacks/:id", (req, res) => {
     const { id } = req.params;
 
     db.query("DELETE FROM feedbacks WHERE id = ?", [id], (err) => {
@@ -193,7 +193,7 @@ app.delete("/feedbacks/:id", (req, res) => {
 });
 
 // Soft delete
-app.put("/feedbacks/:id/delete", (req, res) => {
+app.put("/api/feedbacks/:id/delete", (req, res) => {
     const { id } = req.params;
     db.query("UPDATE feedbacks SET deleted = true WHERE id = ?", [id], (err) => {
         if (err) return res.status(500).json({ error: "Internal Server Error" });
@@ -202,7 +202,7 @@ app.put("/feedbacks/:id/delete", (req, res) => {
 });
 
 // Restore
-app.put("/feedbacks/:id/restore", (req, res) => {
+app.put("/api/feedbacks/:id/restore", (req, res) => {
     const { id } = req.params;
     db.query("UPDATE feedbacks SET deleted = false WHERE id = ?", [id], (err) => {
         if (err) return res.status(500).json({ error: "Internal Server Error" });
