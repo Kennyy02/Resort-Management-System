@@ -13,7 +13,7 @@ const allowedOrigins = [
 
 const corsOptions = {
   origin: (origin, callback) => {
-    if (!origin) return callback(null, true); // Allow non-browser requests
+    if (!origin) return callback(null, true); 
     if (!allowedOrigins.includes(origin)) {
       const msg = `CORS policy does not allow access from origin: ${origin}`;
       return callback(new Error(msg), false);
@@ -34,7 +34,7 @@ const db = mysql.createConnection({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   port: process.env.DB_PORT || 3306,
-  dateStrings: true, // Return dates as ISO strings
+  dateStrings: true, 
 });
 
 db.connect((err) => {
@@ -42,29 +42,16 @@ db.connect((err) => {
   console.log('Connected to MySQL database');
 });
 
-// --- Ensure Table Exists ---
-const createTableSQL = `
-CREATE TABLE IF NOT EXISTS contact_messages (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(255) NOT NULL,
-  email VARCHAR(255) NOT NULL,
-  message TEXT NOT NULL,
-  status VARCHAR(50) DEFAULT 'pending',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-)`;
-
-db.query(createTableSQL, (err) => {
-  if (err) console.error('Error creating table:', err);
-  else console.log('Contact Messages table ensured.');
-});
+// *** REMOVED CREATE TABLE LOGIC: Table 'messages' is assumed to exist. ***
 
 // --- Routes ---
 // Submit a new contact message
 app.post('/api/contact', (req, res) => {
   const { name, email, message } = req.body;
-  const sql = 'INSERT INTO contact_messages (name, email, message, status) VALUES (?, ?, ?, ?)';
+  // FIX: Using correct table 'messages' and consistent status 'notAnswered'
+  const sql = 'INSERT INTO messages (name, email, message, status) VALUES (?, ?, ?, ?)';
   
-  db.query(sql, [name, email, message, 'pending'], (err) => {
+  db.query(sql, [name, email, message, 'notAnswered'], (err) => { 
     if (err) {
       console.error('Error saving message:', err);
       return res.status(500).json({ error: 'Failed to store message' });
@@ -73,9 +60,10 @@ app.post('/api/contact', (req, res) => {
   });
 });
 
-// Get all messages (most recent first)
+// Get all messages (used by admin/contactview.js)
 app.get('/api/messages', (req, res) => {
-  const sql = 'SELECT * FROM contact_messages ORDER BY created_at DESC';
+  // FIX: Using correct table 'messages'
+  const sql = 'SELECT * FROM messages ORDER BY created_at DESC'; 
   db.query(sql, (err, results) => {
     if (err) {
       console.error('Error fetching messages:', err);
@@ -94,7 +82,8 @@ app.put('/api/messages/:id/status', (req, res) => {
     return res.status(400).json({ error: 'Invalid status value' });
   }
 
-  const sql = 'UPDATE contact_messages SET status = ? WHERE id = ?';
+  // FIX: Using correct table 'messages'
+  const sql = 'UPDATE messages SET status = ? WHERE id = ?'; 
   db.query(sql, [status, id], (err, result) => {
     if (err) {
       console.error('Error updating status:', err);
