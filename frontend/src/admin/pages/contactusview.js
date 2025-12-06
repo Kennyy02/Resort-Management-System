@@ -1,116 +1,202 @@
-const express = require('express');
-const mysql = require('mysql2');
-const cors = require('cors');
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import "./contactview.css";
 
-const app = express();
-const PORT = process.env.PORT || 8081;
+const MESSAGES_PER_PAGE = 10;
 
-// --- CORS Setup ---
-const allowedOrigins = [
-  'https://emzbayviewmountainresort.up.railway.app',
-  'http://localhost:3000',
-];
+export default function ContactView() {
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [filter, setFilter] = useState("all");
+  const [sort, setSort] = useState("newest");
+  const [currentPage, setCurrentPage] = useState(1);
 
-const corsOptions = {
-  origin: (origin, callback) => {
-    if (!origin) return callback(null, true); // Allow non-browser requests
-    if (!allowedOrigins.includes(origin)) {
-      const msg = `CORS policy does not allow access from origin: ${origin}`;
-      return callback(new Error(msg), false);
+  useEffect(() => {
+    fetchMessages();
+  }, []);
+
+  const fetchMessages = async () => {
+    setLoading(true);
+    try {
+      const { data } = await axios.get(
+        `${process.env.REACT_APP_CONTACT_API}/api/messages`
+      );
+      setMessages(data);
+      setError(null);
+    } catch (err) {
+      setError("Failed to load messages. Please check the server and API endpoint.");
+      console.error("Error fetching messages:", err);
+    } finally {
+      setLoading(false);
     }
-    return callback(null, true);
-  },
-  methods: "GET,HEAD,PUT,PATCH,POST,OPTIONS",
-  credentials: true,
-};
+  };
 
-app.use(cors(corsOptions));
-app.use(express.json());
+  const toggleStatus = async (id, currentStatus) => {
+    if (currentStatus === "answered") return;
 
-// --- MySQL Connection ---
-const db = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  port: process.env.DB_PORT || 3306,
-  dateStrings: true, // Return dates as ISO strings
-});
-
-db.connect((err) => {
-  if (err) return console.error('MySQL connection failed:', err);
-  console.log('Connected to MySQL database');
-});
-
-// --- Table Existence Logic Removed ---
-// The following block has been removed as the table 'messages' is confirmed to exist.
-/*
-const createTableSQL = `
-CREATE TABLE IF NOT EXISTS messages ( 
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(255) NOT NULL,
-  email VARCHAR(255) NOT NULL,
-  message TEXT NOT NULL,
-  status VARCHAR(50) DEFAULT 'notAnswered', 
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-)`;
-db.query(createTableSQL, (err) => {
-  if (err) console.error('Error creating table:', err);
-  else console.log('Contact Messages table ensured.');
-});
-*/
-// ------------------------------------
-
-// --- Routes ---
-// Submit a new contact message
-app.post('/api/contact', (req, res) => {
-  const { name, email, message } = req.body;
-  const sql = 'INSERT INTO messages (name, email, message, status) VALUES (?, ?, ?, ?)';
-  
-  db.query(sql, [name, email, message, 'notAnswered'], (err) => { 
-    if (err) {
-      console.error('Error saving message:', err);
-      return res.status(500).json({ error: 'Failed to store message' });
+    try {
+      await axios.put(
+        `${process.env.REACT_APP_CONTACT_API}/api/messages/${id}/status`,
+        { status: "answered" }
+      );
+      setMessages((prev) =>
+        prev.map((msg) => (msg.id === id ? { ...msg, status: "answered" } : msg))
+      );
+    } catch (err) {
+      alert("Failed to update status.");
+      console.error(err);
     }
-    res.status(201).json({ message: 'Message submitted successfully' });
+  };
+
+  // --- Filtering and Sorting ---
+  let visibleMessages = [...messages];
+
+  if (filter === "answered") visibleMessages = visibleMessages.filter((m) => m.status === "answered");
+  if (filter === "notAnswered") visibleMessages = visibleMessages.filter((m) => m.status !== "answered");
+
+  visibleMessages.sort((a, b) => {
+    // Ensure dates are valid before sorting
+    const dateA = new Date(a.created_at);
+    const dateB = new Date(b.created_at);
+    return sort === "newest" ? dateB - dateA : dateA - dateB;
   });
-});
 
-// Get all messages (most recent first)
-app.get('/api/messages', (req, res) => {
-  const sql = 'SELECT * FROM messages ORDER BY created_at DESC'; 
-  db.query(sql, (err, results) => {
-    if (err) {
-      console.error('Error fetching messages:', err);
-      return res.status(500).json({ error: 'Failed to fetch messages' });
-    }
-    res.json(results);
-  });
-});
+  // --- Pagination ---
+  const totalPages = Math.ceil(visibleMessages.length / MESSAGES_PER_PAGE);
+  const currentMessages = visibleMessages.slice(
+    (currentPage - 1) * MESSAGES_PER_PAGE,
+    currentPage * MESSAGES_PER_PAGE
+  );
 
-// Update message status to "answered"
-app.put('/api/messages/:id/status', (req, res) => {
-  const { id } = req.params;
-  const { status } = req.body;
+  const MAX_VISIBLE_PAGES = 3;
+  const startPage = Math.floor((currentPage - 1) / MAX_VISIBLE_PAGES) * MAX_VISIBLE_PAGES + 1;
+  const endPage = Math.min(startPage + MAX_VISIBLE_PAGES - 1, totalPages);
+  const visiblePages = Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
 
-  if (status !== 'answered') {
-    return res.status(400).json({ error: 'Invalid status value' });
-  }
+  // --- Render Loading / Error ---
+  if (loading) return <p className="status-message loading-message">Loading messages...</p>;
+  if (error) return <p className="status-message error-message">{error}</p>;
 
-  const sql = 'UPDATE messages SET status = ? WHERE id = ?'; 
-  db.query(sql, [status, id], (err, result) => {
-    if (err) {
-      console.error('Error updating status:', err);
-      return res.status(500).json({ error: 'Failed to update status' });
-    }
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: 'Message not found' });
-    }
-    res.status(200).json({ message: 'Message status updated successfully' });
-  });
-});
+  return (
+    <div className="admin-contact-card">
+      <h2>Guest Messages</h2>
 
-// --- Start Server ---
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+      {/* Filter & Sort */}
+      <div className="filter-controls">
+        <div>
+          <label>Filter: </label>
+          <select
+            value={filter}
+            onChange={(e) => {
+              setFilter(e.target.value);
+              setCurrentPage(1);
+            }}
+          >
+            <option value="all">All</option>
+            <option value="answered">Answered</option>
+            <option value="notAnswered">Not answered</option>
+          </select>
+        </div>
+        <div>
+          <label>Sort: </label>
+          <select
+            value={sort}
+            onChange={(e) => {
+              setSort(e.target.value);
+              setCurrentPage(1);
+            }}
+          >
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Messages Table */}
+      {currentMessages.length === 0 ? (
+        <p className="status-message no-data">No messages found.</p>
+      ) : (
+        <>
+          <div className="table-responsive">
+            <table className="contact-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Message</th>
+                  <th>Date Submitted</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentMessages.map((msg) => (
+                  <tr key={msg.id}>
+                    <td>{msg.name}</td>
+                    <td>{msg.email}</td>
+                    <td>{msg.message}</td>
+                    <td>
+                      {/* FIX: Check if date exists to prevent "Invalid Date" error */}
+                      {msg.created_at
+                        ? new Date(msg.created_at).toLocaleString()
+                        : 'N/A'} 
+                    </td>
+                    <td>
+                      <span
+                        className={`status-badge status-${msg.status === "answered" ? "answered" : "pending"}`}
+                      >
+                        {msg.status === "answered" ? "Answered" : "Not Answered"}
+                      </span>
+                    </td>
+                    <td>
+                      {msg.status !== "answered" && (
+                        <button
+                          className="action-button answered-button"
+                          onClick={() => toggleStatus(msg.id, msg.status)}
+                        >
+                          Mark as Answered
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="pagination">
+              <button
+                className="pagination-button"
+                onClick={() => setCurrentPage((p) => p - 1)}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </button>
+
+              {visiblePages.map((page) => (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`pagination-button ${currentPage === page ? "active" : ""}`}
+                >
+                  {page}
+                </button>
+              ))}
+
+              <button
+                className="pagination-button"
+                onClick={() => setCurrentPage((p) => p + 1)}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
